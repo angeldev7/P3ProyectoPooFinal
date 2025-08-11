@@ -36,14 +36,14 @@ import singleton.GestorDisponibilidad;
 <span class="nc" id="L36">            } catch (Exception e) {</span>
 <span class="nc" id="L37">                javax.swing.JOptionPane.showMessageDialog(null, </span>
 <span class="nc" id="L38">                    &quot;Error iniciando el sistema: &quot; + e.getMessage(),</span>
-                    &quot;Error Crítico&quot;, 
-                    javax.swing.JOptionPane.ERROR_MESSAGE);
+<span class="nc" id="L39">                    &quot;Error Crítico&quot;, </span>
+<span class="nc" id="L40">                    javax.swing.JOptionPane.ERROR_MESSAGE);</span>
                 
 <span class="nc" id="L42">                java.util.logging.Logger.getLogger(P3ProyectoPooFinal.class.getName())</span>
 <span class="nc" id="L43">                    .severe(&quot;Error crítico iniciando sistema: &quot; + e.getMessage());</span>
                 
 <span class="nc" id="L45">                System.exit(1);</span>
-<span class="nc" id="L46">            }</span>
+            }
 <span class="nc" id="L47">        });</span>
 <span class="nc" id="L48">    }</span>
 }

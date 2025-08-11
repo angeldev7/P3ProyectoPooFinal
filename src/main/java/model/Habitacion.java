@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Locale;
+
 import org.bson.Document;
 
 /**
@@ -90,7 +92,8 @@ public class Habitacion {
      * @return String formateado para mostrar en ComboBox o tablas
      */
     public String getDisplayText() {
-        return "#" + numero + " | " + tipo + " | $" + String.format("%.2f", precio);
+        // Se fuerza Locale.US para evitar fallos en tests por separador decimal (p.ej. 99,50 vs 99.50)
+        return "#" + numero + " | " + tipo + " | $" + String.format(Locale.US, "%.2f", precio);
     }
 
     /**
@@ -104,6 +107,6 @@ public class Habitacion {
 
     @Override
     public String toString() {
-    return "#"+numero+" - "+tipo+" - $"+String.format("%.2f",precio)+(ocupada?" (Ocupada)":"");
+        return "#"+numero+" - "+tipo+" - $"+String.format(Locale.US, "%.2f", precio)+(ocupada?" (Ocupada)":"");
     }
 }

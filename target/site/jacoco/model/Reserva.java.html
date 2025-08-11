@@ -58,8 +58,8 @@ public class Reserva {
      * @param observaciones Observaciones adicionales
      * @param confirmada Estado de confirmación de la reserva
      */
-    public Reserva(String id, String idCliente, String idHabitacion, Date fechaIngreso, 
-<span class="fc" id="L62">                   Date fechaSalida, double total, String observaciones, boolean confirmada) {</span>
+<span class="fc" id="L61">    public Reserva(String id, String idCliente, String idHabitacion, Date fechaIngreso, </span>
+                   Date fechaSalida, double total, String observaciones, boolean confirmada) {
 <span class="fc" id="L63">        this.id = id;</span>
 <span class="fc" id="L64">        this.idCliente = idCliente;</span>
 <span class="fc" id="L65">        this.idHabitacion = idHabitacion;</span>
@@ -84,9 +84,9 @@ public class Reserva {
 <span class="fc" id="L84">    public double getTotal() { return total; }</span>
 <span class="nc" id="L85">    public void setTotal(double total) { this.total = total; }</span>
 <span class="fc" id="L86">    public String getObservaciones() { return observaciones; }</span>
-<span class="nc" id="L87">    public void setObservaciones(String observaciones) { this.observaciones = observaciones; }</span>
+<span class="fc" id="L87">    public void setObservaciones(String observaciones) { this.observaciones = observaciones; }</span>
 <span class="fc" id="L88">    public boolean isConfirmada() { return confirmada; }</span>
-<span class="nc" id="L89">    public void setConfirmada(boolean confirmada) { this.confirmada = confirmada; }</span>
+<span class="fc" id="L89">    public void setConfirmada(boolean confirmada) { this.confirmada = confirmada; }</span>
 
     /**
      * Convierte la reserva a un Document de MongoDB.
@@ -94,14 +94,14 @@ public class Reserva {
      * @return Document para insertar en MongoDB
      */
     public Document toDocument() {
-<span class="nc" id="L97">        return new Document(&quot;_id&quot;, id)</span>
-<span class="nc" id="L98">                .append(&quot;idCliente&quot;, idCliente)</span>
-<span class="nc" id="L99">                .append(&quot;idHabitacion&quot;, idHabitacion)</span>
-<span class="nc" id="L100">                .append(&quot;fechaIngreso&quot;, fechaIngreso)</span>
-<span class="nc" id="L101">                .append(&quot;fechaSalida&quot;, fechaSalida)</span>
-<span class="nc" id="L102">                .append(&quot;total&quot;, total)</span>
-<span class="nc" id="L103">                .append(&quot;observaciones&quot;, observaciones)</span>
-<span class="nc" id="L104">                .append(&quot;confirmada&quot;, confirmada);</span>
+<span class="fc" id="L97">        return new Document(&quot;_id&quot;, id)</span>
+<span class="fc" id="L98">                .append(&quot;idCliente&quot;, idCliente)</span>
+<span class="fc" id="L99">                .append(&quot;idHabitacion&quot;, idHabitacion)</span>
+<span class="fc" id="L100">                .append(&quot;fechaIngreso&quot;, fechaIngreso)</span>
+<span class="fc" id="L101">                .append(&quot;fechaSalida&quot;, fechaSalida)</span>
+<span class="fc" id="L102">                .append(&quot;total&quot;, total)</span>
+<span class="fc" id="L103">                .append(&quot;observaciones&quot;, observaciones)</span>
+<span class="fc" id="L104">                .append(&quot;confirmada&quot;, confirmada);</span>
     }
 
     /**
@@ -111,15 +111,15 @@ public class Reserva {
      * @return Nueva instancia de Reserva
      */
     public static Reserva fromDocument(Document doc) {
-<span class="nc" id="L114">        return new Reserva(</span>
-<span class="nc" id="L115">            doc.getString(&quot;_id&quot;),</span>
-<span class="nc" id="L116">            doc.getString(&quot;idCliente&quot;),</span>
-<span class="nc" id="L117">            doc.getString(&quot;idHabitacion&quot;),</span>
-<span class="nc" id="L118">            doc.getDate(&quot;fechaIngreso&quot;),</span>
-<span class="nc" id="L119">            doc.getDate(&quot;fechaSalida&quot;),</span>
-<span class="nc bnc" id="L120" title="All 2 branches missed.">            doc.getDouble(&quot;total&quot;) != null ? doc.getDouble(&quot;total&quot;) : 0.0,</span>
-<span class="nc bnc" id="L121" title="All 2 branches missed.">            doc.getString(&quot;observaciones&quot;) != null ? doc.getString(&quot;observaciones&quot;) : &quot;&quot;,</span>
-<span class="nc" id="L122">            doc.getBoolean(&quot;confirmada&quot;, true)</span>
+<span class="fc" id="L114">        return new Reserva(</span>
+<span class="fc" id="L115">            doc.getString(&quot;_id&quot;),</span>
+<span class="fc" id="L116">            doc.getString(&quot;idCliente&quot;),</span>
+<span class="fc" id="L117">            doc.getString(&quot;idHabitacion&quot;),</span>
+<span class="fc" id="L118">            doc.getDate(&quot;fechaIngreso&quot;),</span>
+<span class="fc" id="L119">            doc.getDate(&quot;fechaSalida&quot;),</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">            doc.getDouble(&quot;total&quot;) != null ? doc.getDouble(&quot;total&quot;) : 0.0,</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">            doc.getString(&quot;observaciones&quot;) != null ? doc.getString(&quot;observaciones&quot;) : &quot;&quot;,</span>
+<span class="fc" id="L122">            doc.getBoolean(&quot;confirmada&quot;, true)</span>
         );
     }
 
@@ -129,7 +129,7 @@ public class Reserva {
      * @return true si la reserva está activa, false en caso contrario
      */
     public boolean isActiva() {
-<span class="pc bpc" id="L132" title="1 of 4 branches missed.">        return fechaSalida == null &amp;&amp; confirmada;</span>
+<span class="fc bfc" id="L132" title="All 4 branches covered.">        return fechaSalida == null &amp;&amp; confirmada;</span>
     }
 
     /**
@@ -142,15 +142,15 @@ public class Reserva {
     @Override
     public String toString() {
 <span class="nc" id="L144">        return &quot;Reserva{&quot; +</span>
-                &quot;id='&quot; + id + '\'' +
-                &quot;, idCliente='&quot; + idCliente + '\'' +
-                &quot;, idHabitacion='&quot; + idHabitacion + '\'' +
-                &quot;, fechaIngreso=&quot; + fechaIngreso +
-                &quot;, fechaSalida=&quot; + fechaSalida +
-                &quot;, total=&quot; + total +
-                &quot;, observaciones='&quot; + observaciones + '\'' +
-                &quot;, confirmada=&quot; + confirmada +
-                '}';
+<span class="nc" id="L145">                &quot;id='&quot; + id + '\'' +</span>
+<span class="nc" id="L146">                &quot;, idCliente='&quot; + idCliente + '\'' +</span>
+<span class="nc" id="L147">                &quot;, idHabitacion='&quot; + idHabitacion + '\'' +</span>
+<span class="nc" id="L148">                &quot;, fechaIngreso=&quot; + fechaIngreso +</span>
+<span class="nc" id="L149">                &quot;, fechaSalida=&quot; + fechaSalida +</span>
+<span class="nc" id="L150">                &quot;, total=&quot; + total +</span>
+<span class="nc" id="L151">                &quot;, observaciones='&quot; + observaciones + '\'' +</span>
+<span class="nc" id="L152">                &quot;, confirmada=&quot; + confirmada +</span>
+<span class="nc" id="L153">                '}';</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

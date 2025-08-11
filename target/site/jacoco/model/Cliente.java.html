@@ -42,7 +42,7 @@ public class Cliente {
 <span class="fc" id="L42">    public String getId() { return id; }</span>
 <span class="fc" id="L43">    public void setId(String id) { this.id = id; }</span>
 <span class="fc" id="L44">    public String getNombre() { return nombre; }</span>
-<span class="nc" id="L45">    public void setNombre(String nombre) { this.nombre = nombre; }</span>
+<span class="fc" id="L45">    public void setNombre(String nombre) { this.nombre = nombre; }</span>
 <span class="fc" id="L46">    public String getApellido() { return apellido; }</span>
 <span class="nc" id="L47">    public void setApellido(String apellido) { this.apellido = apellido; }</span>
 <span class="fc" id="L48">    public String getCedula() { return cedula; }</span>
@@ -56,11 +56,11 @@ public class Cliente {
      * @return Document para insertar en MongoDB
      */
     public Document toDocument() {
-<span class="nc" id="L59">        return new Document(&quot;_id&quot;, id)</span>
-<span class="nc" id="L60">                .append(&quot;nombre&quot;, nombre)</span>
-<span class="nc" id="L61">                .append(&quot;apellido&quot;, apellido)</span>
-<span class="nc" id="L62">                .append(&quot;cedula&quot;, cedula)</span>
-<span class="nc" id="L63">                .append(&quot;telefono&quot;, telefono);</span>
+<span class="fc" id="L59">        return new Document(&quot;_id&quot;, id)</span>
+<span class="fc" id="L60">                .append(&quot;nombre&quot;, nombre)</span>
+<span class="fc" id="L61">                .append(&quot;apellido&quot;, apellido)</span>
+<span class="fc" id="L62">                .append(&quot;cedula&quot;, cedula)</span>
+<span class="fc" id="L63">                .append(&quot;telefono&quot;, telefono);</span>
     }
 
     /**
@@ -70,12 +70,12 @@ public class Cliente {
      * @return Nueva instancia de Cliente
      */
     public static Cliente fromDocument(Document doc) {
-<span class="nc" id="L73">        return new Cliente(</span>
-<span class="nc" id="L74">            doc.getString(&quot;_id&quot;),</span>
-<span class="nc" id="L75">            doc.getString(&quot;nombre&quot;),</span>
-<span class="nc" id="L76">            doc.getString(&quot;apellido&quot;),</span>
-<span class="nc" id="L77">            doc.getString(&quot;cedula&quot;),</span>
-<span class="nc" id="L78">            doc.getString(&quot;telefono&quot;)</span>
+<span class="fc" id="L73">        return new Cliente(</span>
+<span class="fc" id="L74">            doc.getString(&quot;_id&quot;),</span>
+<span class="fc" id="L75">            doc.getString(&quot;nombre&quot;),</span>
+<span class="fc" id="L76">            doc.getString(&quot;apellido&quot;),</span>
+<span class="fc" id="L77">            doc.getString(&quot;cedula&quot;),</span>
+<span class="fc" id="L78">            doc.getString(&quot;telefono&quot;)</span>
         );
     }
 
@@ -91,7 +91,7 @@ public class Cliente {
     @Override
     public String toString() {
     // Representación amigable para listas/combo boxes
-<span class="pc bpc" id="L94" title="2 of 4 branches missed.">    String base = (nombre!=null?nombre:&quot;&quot;) + &quot; &quot; + (apellido!=null?apellido:&quot;&quot;).trim();</span>
+<span class="pc bpc" id="L94" title="1 of 4 branches missed.">    String base = (nombre!=null?nombre:&quot;&quot;) + &quot; &quot; + (apellido!=null?apellido:&quot;&quot;).trim();</span>
 <span class="pc bpc" id="L95" title="1 of 2 branches missed.">    String doc = cedula!=null?cedula:&quot;&quot;;</span>
 <span class="pc bpc" id="L96" title="1 of 2 branches missed.">    return base.trim() + (doc.isEmpty()?&quot;&quot;:&quot; (&quot;+doc+&quot;)&quot;);</span>
     }

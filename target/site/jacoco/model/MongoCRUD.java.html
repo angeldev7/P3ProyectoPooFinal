@@ -51,7 +51,7 @@ public class MongoCRUD implements Readable, Writable, Deletable {
 <span class="nc" id="L51">        List&lt;Document&gt; lista = new ArrayList&lt;&gt;();</span>
 <span class="nc bnc" id="L52" title="All 2 branches missed.">        for (Document doc : col.find(filtro)) {</span>
 <span class="nc" id="L53">            lista.add(doc);</span>
-<span class="nc" id="L54">        }</span>
+        }
 <span class="nc" id="L55">        return lista;</span>
     }
 
@@ -87,7 +87,7 @@ public class MongoCRUD implements Readable, Writable, Deletable {
 <span class="nc" id="L87">        List&lt;Document&gt; lista = new ArrayList&lt;&gt;();</span>
 <span class="nc bnc" id="L88" title="All 2 branches missed.">        for (Document doc : col.find()) {</span>
 <span class="nc" id="L89">            lista.add(doc);</span>
-<span class="nc" id="L90">        }</span>
+        }
 <span class="nc" id="L91">        return lista;</span>
     }
 

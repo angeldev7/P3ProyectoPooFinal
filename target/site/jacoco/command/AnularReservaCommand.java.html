@@ -29,9 +29,9 @@ public class AnularReservaCommand implements ICommand {
     /**
      * Constructor del comando de anular reserva.
      */
-    public AnularReservaCommand(String cedula, IModeloService modeloService, 
+<span class="nc" id="L32">    public AnularReservaCommand(String cedula, IModeloService modeloService, </span>
                                GestorDisponibilidad gestorDisponibilidad,
-<span class="nc" id="L34">                               ControladorVentanaPrincipal controlador) {</span>
+                               ControladorVentanaPrincipal controlador) {
 <span class="nc" id="L35">        this.cedula = cedula;</span>
 <span class="nc" id="L36">        this.modeloService = modeloService;</span>
 <span class="nc" id="L37">        this.gestorDisponibilidad = gestorDisponibilidad;</span>
@@ -90,7 +90,7 @@ public class AnularReservaCommand implements ICommand {
             
 <span class="nc" id="L91">        } catch (Exception e) {</span>
 <span class="nc" id="L92">            throw new RuntimeException(&quot;Error al anular reserva: &quot; + e.getMessage(), e);</span>
-<span class="nc" id="L93">        }</span>
+        }
 <span class="nc" id="L94">    }</span>
 
     @Override
@@ -116,7 +116,7 @@ public class AnularReservaCommand implements ICommand {
                     
 <span class="nc bnc" id="L117" title="All 2 branches missed.">                    if (modeloService.crearReserva(reservaAnulada)) {</span>
 <span class="nc" id="L118">                        controlador.mostrarMensaje(&quot;✅ Anulación deshecha: Cliente restaurado y reserva reactivada.&quot;);</span>
-                    } else {
+<span class="nc" id="L119">                    } else {</span>
                         // Si no se pudo crear la reserva, eliminar el cliente nuevamente para mantener consistencia
 <span class="nc" id="L121">                        modeloService.eliminarCliente(cliente.getId());</span>
 <span class="nc" id="L122">                        throw new RuntimeException(&quot;No se pudo reactivar la reserva - habitación no disponible.&quot;);</span>
@@ -134,7 +134,7 @@ public class AnularReservaCommand implements ICommand {
 <span class="nc" id="L134">        } catch (Exception e) {</span>
 <span class="nc" id="L135">            System.err.println(&quot;Error al deshacer anulación: &quot; + e.getMessage());</span>
 <span class="nc" id="L136">            controlador.mostrarMensaje(&quot;Error al deshacer anulación de reserva.&quot;);</span>
-<span class="nc" id="L137">        }</span>
+        }
 <span class="nc" id="L138">    }</span>
 
     @Override

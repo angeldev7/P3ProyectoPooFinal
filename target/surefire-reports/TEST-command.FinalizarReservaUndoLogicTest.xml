@@ -5,17 +5,17 @@
     <property name="sun.cpu.isalist" value="amd64"/>
     <property name="sun.jnu.encoding" value="Cp1252"/>
     <property name="java.class.path" value="C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\target\test-classes;C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\target\classes;C:\Users\asdw\.m2\repository\org\mongodb\mongodb-driver-sync\5.5.1\mongodb-driver-sync-5.5.1.jar;C:\Users\asdw\.m2\repository\org\mongodb\bson\5.5.1\bson-5.5.1.jar;C:\Users\asdw\.m2\repository\org\mongodb\mongodb-driver-core\5.5.1\mongodb-driver-core-5.5.1.jar;C:\Users\asdw\.m2\repository\org\mongodb\bson-record-codec\5.5.1\bson-record-codec-5.5.1.jar;C:\Users\asdw\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.2\junit-jupiter-api-5.10.2.jar;C:\Users\asdw\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\asdw\.m2\repository\org\junit\platform\junit-platform-commons\1.10.2\junit-platform-commons-1.10.2.jar;C:\Users\asdw\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\asdw\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.2\junit-jupiter-engine-5.10.2.jar;C:\Users\asdw\.m2\repository\org\junit\platform\junit-platform-engine\1.10.2\junit-platform-engine-1.10.2.jar;"/>
-    <property name="java.vm.vendor" value="Azul Systems, Inc."/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="user.variant" value=""/>
-    <property name="java.vendor.url" value="http://www.azul.com/"/>
+    <property name="java.vendor.url" value="https://java.oracle.com/"/>
     <property name="user.timezone" value="America/Guayaquil"/>
     <property name="os.name" value="Windows 11"/>
     <property name="java.vm.specification.version" value="24"/>
-    <property name="user.country" value="ES"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
-    <property name="sun.boot.library.path" value="C:\Program Files\Apache NetBeans\jdk\bin"/>
-    <property name="sun.java.command" value="C:\Users\asdw\AppData\Local\Temp\surefire2700987359653864153\surefirebooter-20250810191109464_3.jar C:\Users\asdw\AppData\Local\Temp\surefire2700987359653864153 2025-08-10T19-11-09_337-jvmRun1 surefire-20250810191109464_1tmp surefire_0-20250810191109464_2tmp"/>
+    <property name="user.country" value="ES"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-24\bin"/>
+    <property name="sun.java.command" value="C:\Users\asdw\AppData\Local\Temp\surefire6033148878601143070\surefirebooter-20250810225222093_3.jar C:\Users\asdw\AppData\Local\Temp\surefire6033148878601143070 2025-08-10T22-52-21_911-jvmRun1 surefire-20250810225222093_1tmp surefire_0-20250810225222093_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\target\test-classes;C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\target\classes;C:\Users\asdw\.m2\repository\org\mongodb\mongodb-driver-sync\5.5.1\mongodb-driver-sync-5.5.1.jar;C:\Users\asdw\.m2\repository\org\mongodb\bson\5.5.1\bson-5.5.1.jar;C:\Users\asdw\.m2\repository\org\mongodb\mongodb-driver-core\5.5.1\mongodb-driver-core-5.5.1.jar;C:\Users\asdw\.m2\repository\org\mongodb\bson-record-codec\5.5.1\bson-record-codec-5.5.1.jar;C:\Users\asdw\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.2\junit-jupiter-api-5.10.2.jar;C:\Users\asdw\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\asdw\.m2\repository\org\junit\platform\junit-platform-commons\1.10.2\junit-platform-commons-1.10.2.jar;C:\Users\asdw\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\asdw\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.2\junit-jupiter-engine-5.10.2.jar;C:\Users\asdw\.m2\repository\org\junit\platform\junit-platform-engine\1.10.2\junit-platform-engine-1.10.2.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -23,28 +23,26 @@
     <property name="user.language" value="es"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
     <property name="java.version.date" value="2025-04-15"/>
-    <property name="java.home" value="C:\Program Files\Apache NetBeans\jdk"/>
+    <property name="java.home" value="C:\Program Files\Java\jdk-24"/>
     <property name="file.separator" value="\"/>
     <property name="basedir" value="C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal"/>
     <property name="java.vm.compressedOopsMode" value="Zero based"/>
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\asdw\AppData\Local\Temp\surefire2700987359653864153\surefirebooter-20250810191109464_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\asdw\AppData\Local\Temp\surefire6033148878601143070\surefirebooter-20250810225222093_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
-    <property name="java.runtime.version" value="24.0.1+9"/>
+    <property name="java.runtime.version" value="24.0.1+9-30"/>
     <property name="user.name" value="asdw"/>
     <property name="stdout.encoding" value="Cp1252"/>
     <property name="path.separator" value=";"/>
     <property name="os.version" value="10.0"/>
-    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="file.encoding" value="UTF-8"/>
-    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
-    <property name="java.vendor.version" value="Zulu24.30+11-CA"/>
-    <property name="maven.ext.class.path" value="C:\Program Files\Apache NetBeans\java\maven-nblib\netbeans-eventspy.jar"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
     <property name="localRepository" value="C:\Users\asdw\.m2\repository"/>
-    <property name="java.vendor.url.bug" value="http://www.azul.com/support/"/>
+    <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
     <property name="java.io.tmpdir" value="C:\Users\asdw\AppData\Local\Temp\"/>
     <property name="java.version" value="24.0.1"/>
     <property name="user.dir" value="C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal"/>
@@ -52,13 +50,13 @@
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
     <property name="sun.os.patch.level" value=""/>
     <property name="native.encoding" value="Cp1252"/>
-    <property name="java.library.path" value="C:\Program Files\Apache NetBeans\jdk\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA App\NvDLISR;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Users\asdw\AppData\Local\Microsoft\WindowsApps;C:\Users\asdw\AppData\Local\Programs\Microsoft VS Code\bin;C:\Tools\apache-maven-3.8.8\bin;;C:\Tools\apache-maven-3.8.8\bin;C:\Users\asdw\AppData\Local\Microsoft\WindowsApps;C:\Users\asdw\AppData\Local\Programs\Microsoft VS Code\bin;;."/>
+    <property name="java.library.path" value="C:\Program Files\Java\jdk-24\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA App\NvDLISR;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Users\asdw\AppData\Local\Microsoft\WindowsApps;C:\Users\asdw\AppData\Local\Programs\Microsoft VS Code\bin;C:\Tools\apache-maven-3.8.8\bin;C:\Tools\apache-maven-3.8.8\bin;C:\Program Files\Git\cmd;C:\Users\asdw\AppData\Local\Microsoft\WindowsApps;C:\Users\asdw\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\asdw\AppData\Local\GitHubDesktop\bin;c:\Users\asdw\AppData\Roaming\Code\User\globalStorage\github.copilot-chat\debugCommand;."/>
     <property name="java.vm.info" value="mixed mode, sharing"/>
     <property name="stderr.encoding" value="Cp1252"/>
-    <property name="java.vendor" value="Azul Systems, Inc."/>
-    <property name="java.vm.version" value="24.0.1+9"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="java.vm.version" value="24.0.1+9-30"/>
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="68.0"/>
   </properties>
-  <testcase name="undoReactivaReservaConLogicaInterna" classname="command.FinalizarReservaUndoLogicTest" time="0.003"/>
+  <testcase name="undoReactivaReservaConLogicaInterna" classname="command.FinalizarReservaUndoLogicTest" time="0.002"/>
 </testsuite>

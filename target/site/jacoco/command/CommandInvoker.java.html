@@ -55,8 +55,8 @@ public class CommandInvoker implements ICommandInvoker {
 
     @Override
     public void executeCommand(ICommand command) {
-<span class="pc bpc" id="L58" title="1 of 2 branches missed.">        if (command == null) {</span>
-<span class="nc" id="L59">            throw new IllegalArgumentException(&quot;El comando no puede ser nulo&quot;);</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (command == null) {</span>
+<span class="fc" id="L59">            throw new IllegalArgumentException(&quot;El comando no puede ser nulo&quot;);</span>
         }
         
         try {
@@ -70,14 +70,14 @@ public class CommandInvoker implements ICommandInvoker {
 <span class="fc" id="L70">                redoSnapshots.clear();</span>
             }
 <span class="fc" id="L72">            history.add(command.getDescription());</span>
-<span class="pc bpc" id="L73" title="2 of 4 branches missed.">            if (maxHistorySize &gt; 0 &amp;&amp; undoStack.size() &gt; maxHistorySize) {</span>
-<span class="nc" id="L74">                undoStack.remove(0);</span>
-<span class="nc" id="L75">                history.remove(0);</span>
-<span class="nc bnc" id="L76" title="All 4 branches missed.">                if (modeloService!=null &amp;&amp; !undoSnapshots.isEmpty()) undoSnapshots.removeLast();</span>
+<span class="pc bpc" id="L73" title="1 of 4 branches missed.">            if (maxHistorySize &gt; 0 &amp;&amp; undoStack.size() &gt; maxHistorySize) {</span>
+<span class="fc" id="L74">                undoStack.remove(0);</span>
+<span class="fc" id="L75">                history.remove(0);</span>
+<span class="pc bpc" id="L76" title="2 of 4 branches missed.">                if (modeloService!=null &amp;&amp; !undoSnapshots.isEmpty()) undoSnapshots.removeLast();</span>
             }
-<span class="nc" id="L78">        } catch (Exception e) {</span>
+<span class="pc" id="L78">        } catch (Exception e) {</span>
 <span class="nc" id="L79">            throw new RuntimeException(&quot;Error al ejecutar comando: &quot; + command.getDescription(), e);</span>
-<span class="fc" id="L80">        }</span>
+        }
 <span class="fc" id="L81">    }</span>
 
     @Override
@@ -106,8 +106,8 @@ public class CommandInvoker implements ICommandInvoker {
 
     @Override
     public boolean redo() {
-<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        if (!canRedo()) {</span>
-<span class="nc" id="L110">            return false;</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        if (!canRedo()) {</span>
+<span class="fc" id="L110">            return false;</span>
         }
         
         try {
@@ -130,32 +130,32 @@ public class CommandInvoker implements ICommandInvoker {
 
     @Override
     public boolean canUndo() {
-<span class="pc bpc" id="L133" title="2 of 4 branches missed.">    return !undoStack.isEmpty() &amp;&amp; undoStack.peek().canUndo();</span>
+<span class="pc bpc" id="L133" title="1 of 4 branches missed.">    return !undoStack.isEmpty() &amp;&amp; undoStack.peek().canUndo();</span>
     }
 
     @Override
     public boolean canRedo() {
-<span class="pc bpc" id="L138" title="1 of 2 branches missed.">    return !redoStack.isEmpty();</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">    return !redoStack.isEmpty();</span>
     }
 
     @Override
     public List&lt;String&gt; getCommandHistory() {
-<span class="nc" id="L143">        return new ArrayList&lt;&gt;(history);</span>
+<span class="fc" id="L143">        return new ArrayList&lt;&gt;(history);</span>
     }
 
     @Override
     public void clearHistory() {
-<span class="nc" id="L148">        undoStack.clear();</span>
-<span class="nc" id="L149">        redoStack.clear();</span>
-<span class="nc" id="L150">        history.clear();</span>
-<span class="nc" id="L151">    }</span>
+<span class="fc" id="L148">        undoStack.clear();</span>
+<span class="fc" id="L149">        redoStack.clear();</span>
+<span class="fc" id="L150">        history.clear();</span>
+<span class="fc" id="L151">    }</span>
 
     @Override
     public String getNextUndoDescription() {
-<span class="nc bnc" id="L155" title="All 2 branches missed.">        if (canUndo()) {</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">        if (canUndo()) {</span>
 <span class="nc" id="L156">            return undoStack.peek().getDescription();</span>
         }
-<span class="nc" id="L158">        return null;</span>
+<span class="fc" id="L158">        return null;</span>
     }
 
     @Override
@@ -172,7 +172,7 @@ public class CommandInvoker implements ICommandInvoker {
      * @return Cantidad de comandos que pueden deshacerse
      */
     public int getUndoStackSize() {
-<span class="nc" id="L175">        return undoStack.size();</span>
+<span class="fc" id="L175">        return undoStack.size();</span>
     }
 
     /**

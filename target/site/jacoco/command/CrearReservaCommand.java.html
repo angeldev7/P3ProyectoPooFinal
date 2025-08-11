@@ -34,8 +34,8 @@ public class CrearReservaCommand implements ICommand {
 <span class="fc" id="L34">                .setFechaIngreso(new java.util.Date())</span>
 <span class="fc" id="L35">                .build();</span>
         }
-<span class="pc bpc" id="L37" title="1 of 2 branches missed.">        if (!modeloService.crearReserva(reservaCreada)) {</span>
-<span class="nc" id="L38">            throw new RuntimeException(&quot;No se pudo crear la reserva&quot;);</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if (!modeloService.crearReserva(reservaCreada)) {</span>
+<span class="fc" id="L38">            throw new RuntimeException(&quot;No se pudo crear la reserva&quot;);</span>
         }
 <span class="fc" id="L40">    }</span>
 

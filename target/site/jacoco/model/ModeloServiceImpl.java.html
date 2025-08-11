@@ -84,7 +84,7 @@ public class ModeloServiceImpl implements IModeloService {
             }
 <span class="nc" id="L85">        } catch (Exception e) {</span>
 <span class="nc" id="L86">            System.err.println(&quot;Error al buscar cliente por cédula: &quot; + e.getMessage());</span>
-<span class="nc" id="L87">        }</span>
+        }
 <span class="nc" id="L88">        return null;</span>
     }
     
@@ -95,7 +95,7 @@ public class ModeloServiceImpl implements IModeloService {
 <span class="nc" id="L95">            List&lt;Cliente&gt; clientes = new ArrayList&lt;&gt;();</span>
 <span class="nc bnc" id="L96" title="All 2 branches missed.">            for (Document doc : documentos) {</span>
 <span class="nc" id="L97">                clientes.add(Cliente.fromDocument(doc));</span>
-<span class="nc" id="L98">            }</span>
+            }
 <span class="nc" id="L99">            return clientes;</span>
 <span class="nc" id="L100">        } catch (Exception e) {</span>
 <span class="nc" id="L101">            System.err.println(&quot;Error al obtener todos los clientes: &quot; + e.getMessage());</span>
@@ -162,7 +162,7 @@ public class ModeloServiceImpl implements IModeloService {
 <span class="nc bnc" id="L162" title="All 4 branches missed.">                if (id != null &amp;&amp; id.startsWith(&quot;CLI-&quot;)){</span>
 <span class="nc bnc" id="L163" title="All 2 branches missed.">                    try {int n = Integer.parseInt(id.substring(4)); if (n&gt;max) max=n;} catch(Exception ignore){}</span>
                 }
-<span class="nc" id="L165">            }</span>
+            }
 <span class="nc" id="L166">            return String.format(&quot;CLI-%04d&quot;, max+1);</span>
 <span class="nc" id="L167">        } catch (Exception e){</span>
 <span class="nc" id="L168">            return &quot;CLI-&quot;+java.util.UUID.randomUUID().toString().substring(0,8).toUpperCase();</span>
@@ -179,7 +179,7 @@ public class ModeloServiceImpl implements IModeloService {
 <span class="nc bnc" id="L179" title="All 4 branches missed.">                if (id != null &amp;&amp; id.startsWith(&quot;RES-&quot;)){</span>
 <span class="nc bnc" id="L180" title="All 2 branches missed.">                    try {int n = Integer.parseInt(id.substring(4)); if (n&gt;max) max=n;} catch(Exception ignore){}</span>
                 }
-<span class="nc" id="L182">            }</span>
+            }
 <span class="nc" id="L183">            return String.format(&quot;RES-%04d&quot;, max+1);</span>
 <span class="nc" id="L184">        } catch (Exception e){</span>
 <span class="nc" id="L185">            return &quot;RES-&quot;+java.util.UUID.randomUUID().toString().substring(0,8).toUpperCase();</span>
@@ -199,7 +199,7 @@ public class ModeloServiceImpl implements IModeloService {
 <span class="nc bnc" id="L199" title="All 2 branches missed.">                if (!hab.isOcupada()) {</span>
 <span class="nc" id="L200">                    disponibles.add(hab);</span>
                 }
-<span class="nc" id="L202">            }</span>
+            }
 <span class="nc" id="L203">            return disponibles;</span>
 <span class="nc" id="L204">        } catch (Exception e) {</span>
 <span class="nc" id="L205">            System.err.println(&quot;Error al obtener habitaciones disponibles: &quot; + e.getMessage());</span>
@@ -218,7 +218,7 @@ public class ModeloServiceImpl implements IModeloService {
 <span class="nc bnc" id="L218" title="All 2 branches missed.">                if (hab.isOcupada()) {</span>
 <span class="nc" id="L219">                    ocupadas.add(hab);</span>
                 }
-<span class="nc" id="L221">            }</span>
+            }
 <span class="nc" id="L222">            return ocupadas;</span>
 <span class="nc" id="L223">        } catch (Exception e) {</span>
 <span class="nc" id="L224">            System.err.println(&quot;Error al obtener habitaciones ocupadas: &quot; + e.getMessage());</span>
@@ -255,15 +255,15 @@ public class ModeloServiceImpl implements IModeloService {
 <span class="nc" id="L255">                                reserva.getId()</span>
                             );
 <span class="nc" id="L257">                            resultado.add(info);</span>
-<span class="nc" id="L258">                        }</span>
-                        break; // Ya encontramos la reserva para esta habitación
+                        }
+<span class="nc" id="L259">                        break; // Ya encontramos la reserva para esta habitación</span>
                     }
-<span class="nc" id="L261">                }</span>
-<span class="nc" id="L262">            }</span>
+                }
+            }
             
 <span class="nc" id="L264">        } catch (Exception e) {</span>
 <span class="nc" id="L265">            System.err.println(&quot;Error al obtener habitaciones ocupadas con cliente: &quot; + e.getMessage());</span>
-<span class="nc" id="L266">        }</span>
+        }
         
 <span class="nc" id="L268">        return resultado;</span>
     }
@@ -276,7 +276,7 @@ public class ModeloServiceImpl implements IModeloService {
             
 <span class="nc bnc" id="L277" title="All 2 branches missed.">            for (Document doc : documentos) {</span>
 <span class="nc" id="L278">                habitaciones.add(Habitacion.fromDocument(doc));</span>
-<span class="nc" id="L279">            }</span>
+            }
 <span class="nc" id="L280">            return habitaciones;</span>
 <span class="nc" id="L281">        } catch (Exception e) {</span>
 <span class="nc" id="L282">            System.err.println(&quot;Error al obtener todas las habitaciones: &quot; + e.getMessage());</span>
@@ -299,7 +299,7 @@ public class ModeloServiceImpl implements IModeloService {
             }
 <span class="nc" id="L300">        } catch (Exception e) {</span>
 <span class="nc" id="L301">            System.err.println(&quot;Error al buscar habitación: &quot; + e.getMessage());</span>
-<span class="nc" id="L302">        }</span>
+        }
 <span class="nc" id="L303">        return null;</span>
     }
     
@@ -325,7 +325,7 @@ public class ModeloServiceImpl implements IModeloService {
 <span class="nc" id="L325">                List&lt;Document&gt; docs = mongoCRUD.listarTodos(&quot;habitaciones&quot;);</span>
 <span class="nc bnc" id="L326" title="All 2 branches missed.">                for (Document doc : docs) {</span>
 <span class="nc" id="L327">                    mongoCRUD.eliminarPorId(&quot;habitaciones&quot;, doc.getString(&quot;_id&quot;));</span>
-<span class="nc" id="L328">                }</span>
+                }
                 
                 // Crear las 20 habitaciones como en el código original
 <span class="nc bnc" id="L331" title="All 2 branches missed.">                for (int i = 1; i &lt;= 20; i++) {</span>
@@ -343,7 +343,7 @@ public class ModeloServiceImpl implements IModeloService {
             }
 <span class="nc" id="L344">        } catch (Exception e) {</span>
 <span class="nc" id="L345">            System.err.println(&quot;Error al inicializar habitaciones: &quot; + e.getMessage());</span>
-<span class="nc" id="L346">        }</span>
+        }
 <span class="nc" id="L347">    }</span>
     
     // === OPERACIONES DE RESERVAS ===
@@ -413,7 +413,7 @@ public class ModeloServiceImpl implements IModeloService {
             }
 <span class="nc" id="L414">        } catch (Exception e) {</span>
 <span class="nc" id="L415">            System.err.println(&quot;Error al buscar reserva activa: &quot; + e.getMessage());</span>
-<span class="nc" id="L416">        }</span>
+        }
 <span class="nc" id="L417">        return null;</span>
     }
     
@@ -457,7 +457,7 @@ public class ModeloServiceImpl implements IModeloService {
             
 <span class="nc bnc" id="L458" title="All 2 branches missed.">            for (Document doc : documentos) {</span>
 <span class="nc" id="L459">                reservas.add(Reserva.fromDocument(doc));</span>
-<span class="nc" id="L460">            }</span>
+            }
 <span class="nc" id="L461">            return reservas;</span>
 <span class="nc" id="L462">        } catch (Exception e) {</span>
 <span class="nc" id="L463">            System.err.println(&quot;Error al obtener reservas: &quot; + e.getMessage());</span>
@@ -473,7 +473,7 @@ public class ModeloServiceImpl implements IModeloService {
             
 <span class="nc bnc" id="L474" title="All 2 branches missed.">            for (Document doc : documentos) {</span>
 <span class="nc" id="L475">                reservas.add(Reserva.fromDocument(doc));</span>
-<span class="nc" id="L476">            }</span>
+            }
             
             // Ordenar por fecha de ingreso (más recientes primero)
 <span class="nc" id="L479">            reservas.sort((r1, r2) -&gt; r2.getFechaIngreso().compareTo(r1.getFechaIngreso()));</span>
@@ -515,22 +515,22 @@ public class ModeloServiceImpl implements IModeloService {
             // Restaurar datos del memento
 <span class="nc bnc" id="L516" title="All 2 branches missed.">            for (Cliente cliente : memento.getClientes()) {</span>
 <span class="nc" id="L517">                mongoCRUD.insertar(&quot;clientes&quot;, cliente.toDocument());</span>
-<span class="nc" id="L518">            }</span>
+            }
             
 <span class="nc bnc" id="L520" title="All 2 branches missed.">            for (Habitacion habitacion : memento.getHabitaciones()) {</span>
 <span class="nc" id="L521">                mongoCRUD.insertar(&quot;habitaciones&quot;, habitacion.toDocument());</span>
-<span class="nc" id="L522">            }</span>
+            }
             
 <span class="nc bnc" id="L524" title="All 2 branches missed.">            for (Reserva reserva : memento.getReservas()) {</span>
 <span class="nc" id="L525">                mongoCRUD.insertar(&quot;reservas&quot;, reserva.toDocument());</span>
-<span class="nc" id="L526">            }</span>
+            }
             
             // Actualizar gestor de disponibilidad
 <span class="nc" id="L529">            gestorDisponibilidad.inicializar(memento.getHabitaciones());</span>
             
 <span class="nc" id="L531">        } catch (Exception e) {</span>
 <span class="nc" id="L532">            System.err.println(&quot;Error al restaurar estado: &quot; + e.getMessage());</span>
-<span class="nc" id="L533">        }</span>
+        }
 <span class="nc" id="L534">    }</span>
     
     @Override
@@ -559,10 +559,10 @@ public class ModeloServiceImpl implements IModeloService {
 <span class="nc bnc" id="L559" title="All 2 branches missed.">                if (h.isOcupada()) {</span>
 <span class="nc" id="L560">                    ocupadas++;</span>
 <span class="nc" id="L561">                    System.out.println(&quot;OCUPADA: &quot; + h.getNumero() + &quot; - &quot; + h.getTipo() + &quot; (ID: &quot; + h.getId() + &quot;)&quot;);</span>
-                } else {
+<span class="nc" id="L562">                } else {</span>
 <span class="nc" id="L563">                    disponibles++;</span>
                 }
-<span class="nc" id="L565">            }</span>
+            }
             
 <span class="nc" id="L567">            System.out.println(&quot;Disponibles: &quot; + disponibles + &quot;, Ocupadas: &quot; + ocupadas);</span>
             
@@ -573,11 +573,11 @@ public class ModeloServiceImpl implements IModeloService {
 <span class="nc bnc" id="L573" title="All 2 branches missed.">                if (r.getFechaSalida() == null) {</span>
 <span class="nc" id="L574">                    System.out.println(&quot;RESERVA ACTIVA: Cliente &quot; + r.getIdCliente() + &quot; -&gt; Habitación &quot; + r.getIdHabitacion());</span>
                 }
-<span class="nc" id="L576">            }</span>
+            }
             
 <span class="nc" id="L578">        } catch (Exception e) {</span>
 <span class="nc" id="L579">            System.err.println(&quot;Error en debug: &quot; + e.getMessage());</span>
-<span class="nc" id="L580">        }</span>
+        }
 <span class="nc" id="L581">        System.out.println(&quot;=== FIN DEBUG ===&quot;);</span>
 <span class="nc" id="L582">    }</span>
 }

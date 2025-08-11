@@ -18,9 +18,17 @@ public class CommandInvokerFallbackTest {
         ICommand crear = new CrearReservaCommand(service, c.getId(), hab, 40.0, "Fx");
         invoker.executeCommand(crear);
         assertEquals(1, service.obtenerTodasReservas().size());
+        assertTrue(invoker.canUndo());
         invoker.undo();
         // Como undo lógico finaliza reserva (fechaSalida != null)
         assertEquals(1, service.obtenerTodasReservas().size());
         assertNotNull(service.obtenerTodasReservas().get(0).getFechaSalida());
+        assertFalse(invoker.canUndo(), "Ya no hay comandos con canUndo true tras undo lógico");
+    }
+
+    @Test
+    void redoSinHistorialDevuelveFalse(){
+        CommandInvoker invoker = new CommandInvoker();
+        assertFalse(invoker.redo());
     }
 }

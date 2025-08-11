@@ -27,8 +27,8 @@ public class ControladorHabitaciones {
      * @param modeloService Servicio del modelo (abstracción)
      * @param gestorDisponibilidad Gestor de disponibilidad singleton
      */
-    public ControladorHabitaciones(IModeloService modeloService, 
-<span class="nc" id="L31">                                 GestorDisponibilidad gestorDisponibilidad) {</span>
+<span class="nc" id="L30">    public ControladorHabitaciones(IModeloService modeloService, </span>
+                                 GestorDisponibilidad gestorDisponibilidad) {
 <span class="nc" id="L32">        this.modeloService = modeloService;</span>
 <span class="nc" id="L33">        this.gestorDisponibilidad = gestorDisponibilidad;</span>
 <span class="nc" id="L34">    }</span>
@@ -68,7 +68,7 @@ public class ControladorHabitaciones {
 <span class="nc" id="L68">                &quot;$&quot; + String.format(&quot;%.2f&quot;, h.getPrecio())</span>
             });
 <span class="nc" id="L70">            comboBox.addItem(display);</span>
-<span class="nc" id="L71">        }</span>
+        }
         
 <span class="nc bnc" id="L73" title="All 2 branches missed.">        for (HabitacionOcupadaInfo info : habitacionesOcupadas) {</span>
 <span class="nc" id="L74">            modeloOcup.addRow(new Object[]{</span>
@@ -77,7 +77,7 @@ public class ControladorHabitaciones {
 <span class="nc" id="L77">                info.getPrecioFormateado(),</span>
 <span class="nc" id="L78">                info.getNombreCompletoCliente()</span>
             });
-<span class="nc" id="L80">        }</span>
+        }
         
         // Si no hay habitaciones disponibles, deshabilitar el ComboBox
 <span class="nc bnc" id="L83" title="All 2 branches missed.">        comboBox.setEnabled(comboBox.getItemCount() &gt; 0);</span>

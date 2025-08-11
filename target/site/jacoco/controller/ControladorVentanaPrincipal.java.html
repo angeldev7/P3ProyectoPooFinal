@@ -40,9 +40,9 @@ public class ControladorVentanaPrincipal {
      * @param commandInvoker Gestor de comandos para Undo/Redo
      * @param gestorDisponibilidad Singleton para gestión de disponibilidad
      */
-    public ControladorVentanaPrincipal(VentanaPrincipal vista, IModeloService modeloService, 
+<span class="nc" id="L43">    public ControladorVentanaPrincipal(VentanaPrincipal vista, IModeloService modeloService, </span>
                                      ICommandInvoker commandInvoker, 
-<span class="nc" id="L45">                                     GestorDisponibilidad gestorDisponibilidad) {</span>
+                                     GestorDisponibilidad gestorDisponibilidad) {
 <span class="nc" id="L46">        this.vista = vista;</span>
 <span class="nc" id="L47">        this.modeloService = modeloService;</span>
 <span class="nc" id="L48">        this.commandInvoker = commandInvoker;</span>
@@ -109,8 +109,8 @@ public class ControladorVentanaPrincipal {
 
             // Crear comando de check-in
 <span class="nc" id="L111">            CheckinCommand comando = new CheckinCommand(</span>
-                nombre, apellido, cedula, telefono, habitacionDisplay,
-                modeloService, this
+<span class="nc" id="L112">                nombre, apellido, cedula, telefono, habitacionDisplay,</span>
+<span class="nc" id="L113">                modeloService, this</span>
             );
 
             // Ejecutar comando
@@ -122,7 +122,7 @@ public class ControladorVentanaPrincipal {
             
 <span class="nc" id="L123">        } catch (Exception e) {</span>
 <span class="nc" id="L124">            mostrarError(&quot;Error al realizar check-in: &quot; + e.getMessage());</span>
-<span class="nc" id="L125">        }</span>
+        }
 <span class="nc" id="L126">    }</span>
 
     /**
@@ -139,7 +139,7 @@ public class ControladorVentanaPrincipal {
 
             // Crear comando de anulación
 <span class="nc" id="L141">            AnularReservaCommand comando = new AnularReservaCommand(</span>
-                cedula, modeloService, gestorDisponibilidad, this
+<span class="nc" id="L142">                cedula, modeloService, gestorDisponibilidad, this</span>
             );
 
             // Ejecutar comando
@@ -151,7 +151,7 @@ public class ControladorVentanaPrincipal {
             
 <span class="nc" id="L152">        } catch (Exception e) {</span>
 <span class="nc" id="L153">            mostrarError(&quot;Error al anular reserva: &quot; + e.getMessage());</span>
-<span class="nc" id="L154">        }</span>
+        }
 <span class="nc" id="L155">    }</span>
 
     /**
@@ -167,14 +167,14 @@ public class ControladorVentanaPrincipal {
         
         // Mostrar confirmación con mensaje personalizado
 <span class="nc" id="L169">        String mensaje = &quot;¿Está seguro que desea deshacer la siguiente operación?\n\n&quot; +</span>
-                        &quot;⚠️ &quot; + descripcion + &quot;\n\n&quot; +
-                        &quot;Esta acción liberará recursos y modificará el estado del sistema.&quot;;
+<span class="nc" id="L170">                        &quot;⚠️ &quot; + descripcion + &quot;\n\n&quot; +</span>
+<span class="nc" id="L171">                        &quot;Esta acción liberará recursos y modificará el estado del sistema.&quot;;</span>
         
 <span class="nc bnc" id="L173" title="All 2 branches missed.">        if (mostrarConfirmacion(mensaje, &quot;Confirmar Deshacer&quot;)) {</span>
 <span class="nc bnc" id="L174" title="All 2 branches missed.">            if (commandInvoker.undo()) {</span>
 <span class="nc" id="L175">                actualizarVista();</span>
 <span class="nc" id="L176">                mostrarMensaje(&quot;✅ Operación deshecha correctamente: &quot; + descripcion);</span>
-            } else {
+<span class="nc" id="L177">            } else {</span>
 <span class="nc" id="L178">                mostrarError(&quot;No se pudo deshacer la operación.&quot;);</span>
             }
         }
@@ -193,14 +193,14 @@ public class ControladorVentanaPrincipal {
         
         // Mostrar confirmación con mensaje personalizado
 <span class="nc" id="L195">        String mensaje = &quot;¿Está seguro que desea rehacer la siguiente operación?\n\n&quot; +</span>
-                        &quot;🔄 &quot; + descripcion + &quot;\n\n&quot; +
-                        &quot;Esta acción volverá a ejecutar la operación y ocupará recursos.&quot;;
+<span class="nc" id="L196">                        &quot;🔄 &quot; + descripcion + &quot;\n\n&quot; +</span>
+<span class="nc" id="L197">                        &quot;Esta acción volverá a ejecutar la operación y ocupará recursos.&quot;;</span>
         
 <span class="nc bnc" id="L199" title="All 2 branches missed.">        if (mostrarConfirmacion(mensaje, &quot;Confirmar Rehacer&quot;)) {</span>
 <span class="nc bnc" id="L200" title="All 2 branches missed.">            if (commandInvoker.redo()) {</span>
 <span class="nc" id="L201">                actualizarVista();</span>
 <span class="nc" id="L202">                mostrarMensaje(&quot;✅ Operación rehecha correctamente: &quot; + descripcion);</span>
-            } else {
+<span class="nc" id="L203">            } else {</span>
 <span class="nc" id="L204">                mostrarError(&quot;No se pudo rehacer la operación.&quot;);</span>
             }
         }
@@ -216,13 +216,13 @@ public class ControladorVentanaPrincipal {
         // Actualizar tooltips
 <span class="nc bnc" id="L217" title="All 2 branches missed.">        if (commandInvoker.canUndo()) {</span>
 <span class="nc" id="L218">            vista.BtnUndo.setToolTipText(&quot;Deshacer: &quot; + commandInvoker.getNextUndoDescription());</span>
-        } else {
+<span class="nc" id="L219">        } else {</span>
 <span class="nc" id="L220">            vista.BtnUndo.setToolTipText(&quot;No hay operaciones para deshacer&quot;);</span>
         }
         
 <span class="nc bnc" id="L223" title="All 2 branches missed.">        if (commandInvoker.canRedo()) {</span>
 <span class="nc" id="L224">            vista.BtnRedo.setToolTipText(&quot;Rehacer: &quot; + commandInvoker.getNextRedoDescription());</span>
-        } else {
+<span class="nc" id="L225">        } else {</span>
 <span class="nc" id="L226">            vista.BtnRedo.setToolTipText(&quot;No hay operaciones para rehacer&quot;);</span>
         }
 <span class="nc" id="L228">    }</span>
@@ -281,9 +281,9 @@ public class ControladorVentanaPrincipal {
      */
     public void actualizarVista() {
 <span class="nc" id="L283">        controladorHabitaciones.cargarHabitaciones(</span>
-            vista.TablaHabitacionesDisponibles, 
-            vista.TablaHabitacionesOcupadas, 
-            vista.CmboxHabitaciones
+<span class="nc" id="L284">            vista.TablaHabitacionesDisponibles, </span>
+<span class="nc" id="L285">            vista.TablaHabitacionesOcupadas, </span>
+<span class="nc" id="L286">            vista.CmboxHabitaciones</span>
         );
 <span class="nc" id="L288">        actualizarGestorDisponibilidad();</span>
 <span class="nc" id="L289">    }</span>
@@ -322,11 +322,11 @@ public class ControladorVentanaPrincipal {
      */
     public boolean mostrarConfirmacion(String mensaje, String titulo) {
 <span class="nc" id="L324">        int opcion = JOptionPane.showConfirmDialog(</span>
-            vista, 
-            mensaje, 
-            titulo, 
-            JOptionPane.YES_NO_OPTION, 
-            JOptionPane.QUESTION_MESSAGE
+<span class="nc" id="L325">            vista, </span>
+<span class="nc" id="L326">            mensaje, </span>
+<span class="nc" id="L327">            titulo, </span>
+<span class="nc" id="L328">            JOptionPane.YES_NO_OPTION, </span>
+<span class="nc" id="L329">            JOptionPane.QUESTION_MESSAGE</span>
         );
 <span class="nc bnc" id="L331" title="All 2 branches missed.">        return opcion == JOptionPane.YES_OPTION;</span>
     }

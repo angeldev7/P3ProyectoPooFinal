@@ -308,7 +308,7 @@ public class VentanaAdmin extends javax.swing.JFrame {
 <span class="nc" id="L308">        card.setBackground(CARD_COLOR);</span>
 <span class="nc" id="L309">        card.setBorder(BorderFactory.createCompoundBorder(</span>
 <span class="nc" id="L310">            BorderFactory.createLineBorder(new Color(230, 230, 230), 1),</span>
-            new EmptyBorder(20, 20, 20, 20)
+<span class="nc" id="L311">            new EmptyBorder(20, 20, 20, 20)</span>
         ));
         
         // Icono
@@ -361,12 +361,12 @@ public class VentanaAdmin extends javax.swing.JFrame {
 <span class="nc" id="L361">        scrollPane.setBorder(BorderFactory.createCompoundBorder(</span>
 <span class="nc" id="L362">            BorderFactory.createTitledBorder(</span>
 <span class="nc" id="L363">                BorderFactory.createLineBorder(new Color(230, 230, 230), 1),</span>
-                &quot;Reservas Recientes&quot;,
-                0, 0,
-                new Font(&quot;Segoe UI&quot;, Font.BOLD, 14),
-                TEXT_COLOR
+<span class="nc" id="L364">                &quot;Reservas Recientes&quot;,</span>
+<span class="nc" id="L365">                0, 0,</span>
+<span class="nc" id="L366">                new Font(&quot;Segoe UI&quot;, Font.BOLD, 14),</span>
+<span class="nc" id="L367">                TEXT_COLOR</span>
             ),
-            new EmptyBorder(10, 10, 10, 10)
+<span class="nc" id="L369">            new EmptyBorder(10, 10, 10, 10)</span>
         ));
         
 <span class="nc" id="L372">        return scrollPane;</span>
@@ -387,7 +387,7 @@ public class VentanaAdmin extends javax.swing.JFrame {
             }
 <span class="nc" id="L388">        } catch (Exception e) {</span>
 <span class="nc" id="L389">            logger.warning(&quot;No se pudo establecer Look and Feel moderno: &quot; + e.getMessage());</span>
-<span class="nc" id="L390">        }</span>
+        }
 <span class="nc" id="L391">    }</span>
     
     /**
@@ -449,7 +449,7 @@ public class VentanaAdmin extends javax.swing.JFrame {
     private void handleMenuSelection(String item) {
 <span class="nc bnc" id="L450" title="All 2 branches missed.">        if (controlador != null) {</span>
 <span class="nc" id="L451">            controlador.navegarHacia(item);</span>
-        } else {
+<span class="nc" id="L452">        } else {</span>
 <span class="nc" id="L453">            logger.warning(&quot;Controlador no está inicializado en VentanaAdmin.&quot;);</span>
         }
 <span class="nc" id="L455">    }</span>
@@ -496,7 +496,7 @@ public class VentanaAdmin extends javax.swing.JFrame {
             }
 <span class="nc" id="L497">        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {</span>
 <span class="nc" id="L498">            logger.log(java.util.logging.Level.SEVERE, null, ex);</span>
-<span class="nc" id="L499">        }</span>
+        }
         //&lt;/editor-fold&gt;
 
         /* Create and display the form */

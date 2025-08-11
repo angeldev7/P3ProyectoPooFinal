@@ -34,8 +34,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private void configurarAtajosTeclado() {
         // Ctrl+Z para Undo
 <span class="nc" id="L36">        javax.swing.KeyStroke undoKeyStroke = javax.swing.KeyStroke.getKeyStroke(</span>
-            java.awt.event.KeyEvent.VK_Z, 
-            java.awt.event.InputEvent.CTRL_DOWN_MASK
+<span class="nc" id="L37">            java.awt.event.KeyEvent.VK_Z, </span>
+<span class="nc" id="L38">            java.awt.event.InputEvent.CTRL_DOWN_MASK</span>
         );
 <span class="nc" id="L40">        this.getRootPane().getInputMap(javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW)</span>
 <span class="nc" id="L41">            .put(undoKeyStroke, &quot;undo&quot;);</span>
@@ -50,8 +50,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         
         // Ctrl+Y para Redo
 <span class="nc" id="L52">        javax.swing.KeyStroke redoKeyStroke = javax.swing.KeyStroke.getKeyStroke(</span>
-            java.awt.event.KeyEvent.VK_Y, 
-            java.awt.event.InputEvent.CTRL_DOWN_MASK
+<span class="nc" id="L53">            java.awt.event.KeyEvent.VK_Y, </span>
+<span class="nc" id="L54">            java.awt.event.InputEvent.CTRL_DOWN_MASK</span>
         );
 <span class="nc" id="L56">        this.getRootPane().getInputMap(javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW)</span>
 <span class="nc" id="L57">            .put(redoKeyStroke, &quot;redo&quot;);</span>
@@ -121,13 +121,13 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 <span class="nc" id="L121">        jTabbedPane2.setPreferredSize(new java.awt.Dimension(600, 500));</span>
 
 <span class="nc" id="L123">        TablaHabitacionesOcupadas.setModel(new javax.swing.table.DefaultTableModel(</span>
-            new Object [][] {
+<span class="nc" id="L124">            new Object [][] {</span>
 
             },
-            new String [] {
-                &quot;Habitacion&quot;, &quot;Tipo&quot;, &quot;Precio&quot;, &quot;Cliente&quot;
+<span class="nc" id="L127">            new String [] {</span>
+<span class="nc" id="L128">                &quot;Habitacion&quot;, &quot;Tipo&quot;, &quot;Precio&quot;, &quot;Cliente&quot;</span>
             }
-<span class="nc" id="L130">        ) {</span>
+        ) {
 <span class="nc" id="L131">            boolean[] canEdit = new boolean [] {</span>
                 false, false, false, false
             };
@@ -145,13 +145,13 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 <span class="nc" id="L145">        LblHabitacionOcupada.setText(&quot;Habitaciones ocupadas&quot;);</span>
 
 <span class="nc" id="L147">        TablaHabitacionesDisponibles.setModel(new javax.swing.table.DefaultTableModel(</span>
-            new Object [][] {
+<span class="nc" id="L148">            new Object [][] {</span>
 
             },
-            new String [] {
-                &quot;Habitaciones&quot;, &quot;Tipo&quot;, &quot;Precio&quot;
+<span class="nc" id="L151">            new String [] {</span>
+<span class="nc" id="L152">                &quot;Habitaciones&quot;, &quot;Tipo&quot;, &quot;Precio&quot;</span>
             }
-<span class="nc" id="L154">        ) {</span>
+        ) {
 <span class="nc" id="L155">            boolean[] canEdit = new boolean [] {</span>
                 false, false, false
             };
@@ -413,7 +413,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             }
 <span class="nc" id="L414">        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {</span>
 <span class="nc" id="L415">            logger.log(java.util.logging.Level.SEVERE, null, ex);</span>
-<span class="nc" id="L416">        }</span>
+        }
         //&lt;/editor-fold&gt;
 
         /* Create and display the form */

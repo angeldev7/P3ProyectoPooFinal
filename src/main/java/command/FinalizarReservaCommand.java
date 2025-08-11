@@ -33,22 +33,28 @@ public class FinalizarReservaCommand implements ICommand {
 
     @Override
     public void undo() {
-        if (reservaOriginal != null && reservaOriginal.getFechaSalida() == null) {
-            return; // ya activa
-        }
-        if (reservaOriginal != null) {
-            Reserva reactivada = new Reserva(
-                null,
-                reservaOriginal.getIdCliente(),
-                reservaOriginal.getIdHabitacion(),
-                new java.util.Date(),
-                null,
-                reservaOriginal.getTotal(),
-                reservaOriginal.getObservaciones(),
-                true
-            );
-            modeloService.crearReserva(reactivada);
-        }
+        if (reservaOriginal == null) return;
+        // Si la reserva original ya está activa (no debería tras execute) no hacemos nada
+        if (reservaOriginal.getFechaSalida() == null) return;
+
+        // Evitar duplicar si ya existe una reserva activa para la misma habitación
+        List<Reserva> todas = modeloService.obtenerTodasReservas();
+        boolean yaExisteActiva = todas.stream().anyMatch(r ->
+            r.getFechaSalida() == null && r.getIdHabitacion().equals(reservaOriginal.getIdHabitacion())
+        );
+        if (yaExisteActiva) return;
+
+        Reserva reactivada = new Reserva(
+            null,
+            reservaOriginal.getIdCliente(),
+            reservaOriginal.getIdHabitacion(),
+            new java.util.Date(),
+            null,
+            reservaOriginal.getTotal(),
+            reservaOriginal.getObservaciones(),
+            true
+        );
+        modeloService.crearReserva(reactivada);
     }
 
     @Override

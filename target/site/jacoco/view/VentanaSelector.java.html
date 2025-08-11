@@ -36,8 +36,8 @@ public class VentanaSelector extends JFrame {
     /**
      * Constructor con inyección de dependencias.
      */
-    public VentanaSelector(IModeloService modeloService, ICommandInvoker commandInvoker, 
-<span class="nc" id="L40">                          GestorDisponibilidad gestorDisponibilidad) {</span>
+<span class="nc" id="L39">    public VentanaSelector(IModeloService modeloService, ICommandInvoker commandInvoker, </span>
+                          GestorDisponibilidad gestorDisponibilidad) {
 <span class="nc" id="L41">        this.modeloService = modeloService;</span>
 <span class="nc" id="L42">        this.commandInvoker = commandInvoker;</span>
 <span class="nc" id="L43">        this.gestorDisponibilidad = gestorDisponibilidad;</span>
@@ -110,9 +110,9 @@ public class VentanaSelector extends JFrame {
 <span class="nc" id="L110">        gbc.gridx = 0;</span>
 <span class="nc" id="L111">        gbc.gridy = 0;</span>
 <span class="nc" id="L112">        JPanel tradicionCard = createInterfaceCard(</span>
-            &quot;Check-in&quot;,
-            &quot;Vista clásica con formularios\ny tablas estándar&quot;,
-            &quot;📋&quot;,
+<span class="nc" id="L113">            &quot;Check-in&quot;,</span>
+<span class="nc" id="L114">            &quot;Vista clásica con formularios\ny tablas estándar&quot;,</span>
+<span class="nc" id="L115">            &quot;📋&quot;,</span>
 <span class="nc" id="L116">            () -&gt; abrirInterfazTradicional()</span>
         );
 <span class="nc" id="L118">        content.add(tradicionCard, gbc);</span>
@@ -121,9 +121,9 @@ public class VentanaSelector extends JFrame {
 <span class="nc" id="L121">        gbc.gridx = 1;</span>
 <span class="nc" id="L122">        gbc.gridy = 0;</span>
 <span class="nc" id="L123">        JPanel adminCard = createInterfaceCard(</span>
-            &quot;Panel de Administración&quot;,
-            &quot;Dashboard moderno con\nanálisis y navegación avanzada&quot;,
-            &quot;📊&quot;,
+<span class="nc" id="L124">            &quot;Panel de Administración&quot;,</span>
+<span class="nc" id="L125">            &quot;Dashboard moderno con\nanálisis y navegación avanzada&quot;,</span>
+<span class="nc" id="L126">            &quot;📊&quot;,</span>
 <span class="nc" id="L127">            () -&gt; abrirInterfazAdmin()</span>
         );
 <span class="nc" id="L129">        content.add(adminCard, gbc);</span>
@@ -232,7 +232,7 @@ public class VentanaSelector extends JFrame {
             }
 <span class="nc" id="L233">        } catch (Exception e) {</span>
 <span class="nc" id="L234">            logger.warning(&quot;No se pudo establecer Look and Feel moderno: &quot; + e.getMessage());</span>
-<span class="nc" id="L235">        }</span>
+        }
 <span class="nc" id="L236">    }</span>
     
     /**
@@ -259,8 +259,8 @@ public class VentanaSelector extends JFrame {
 <span class="nc" id="L259">                logger.severe(&quot;Error iniciando interfaz tradicional: &quot; + e.getMessage());</span>
 <span class="nc" id="L260">                JOptionPane.showMessageDialog(this, </span>
 <span class="nc" id="L261">                    &quot;Error iniciando interfaz tradicional: &quot; + e.getMessage(),</span>
-                    &quot;Error&quot;, JOptionPane.ERROR_MESSAGE);
-<span class="nc" id="L263">            }</span>
+<span class="nc" id="L262">                    &quot;Error&quot;, JOptionPane.ERROR_MESSAGE);</span>
+            }
 <span class="nc" id="L264">        });</span>
 <span class="nc" id="L265">    }</span>
     
@@ -275,7 +275,7 @@ public class VentanaSelector extends JFrame {
                 
                 // Crear el controlador con inyección de dependencias
 <span class="nc" id="L277">                ControladorVentanaAdmin controladorAdmin = new ControladorVentanaAdmin(</span>
-                    vistaAdmin, modeloService, commandInvoker, gestorDisponibilidad);
+<span class="nc" id="L278">                    vistaAdmin, modeloService, commandInvoker, gestorDisponibilidad);</span>
                 
                 // Conectar vista y controlador
 <span class="nc" id="L281">                vistaAdmin.setControlador(controladorAdmin);</span>
@@ -292,8 +292,8 @@ public class VentanaSelector extends JFrame {
 <span class="nc" id="L292">                logger.severe(&quot;Error iniciando panel de administración: &quot; + e.getMessage());</span>
 <span class="nc" id="L293">                JOptionPane.showMessageDialog(this, </span>
 <span class="nc" id="L294">                    &quot;Error iniciando panel de administración: &quot; + e.getMessage(),</span>
-                    &quot;Error&quot;, JOptionPane.ERROR_MESSAGE);
-<span class="nc" id="L296">            }</span>
+<span class="nc" id="L295">                    &quot;Error&quot;, JOptionPane.ERROR_MESSAGE);</span>
+            }
 <span class="nc" id="L297">        });</span>
 <span class="nc" id="L298">    }</span>
 }

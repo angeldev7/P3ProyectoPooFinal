@@ -6,6 +6,9 @@ import org.bson.Document;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 
 /**
  * Implementación concreta del servicio del modelo.
@@ -42,8 +45,8 @@ public class ModeloServiceImpl implements IModeloService {
         }
         
         try {
-            // Generar ID si no existe
-            if (cliente.getId() == null || cliente.getId().trim().isEmpty()) {
+            // Generar / normalizar ID si no existe o no es legible (patrón CLI-0001)
+            if (cliente.getId() == null || !cliente.getId().matches("CLI-\\d{4}")) {
                 cliente.setId(generarCodigoCliente());
             }
             
@@ -52,6 +55,39 @@ public class ModeloServiceImpl implements IModeloService {
         } catch (Exception e) {
             System.err.println("Error al registrar cliente: " + e.getMessage());
             return false;
+        }
+    }
+
+    /**
+     * MIGRACIÓN: Convierte IDs de clientes existentes que no sigan el formato CLI-0001
+     * a uno nuevo incremental, actualizando además las reservas que apunten al ID antiguo.
+     * Es idempotente: si todos los IDs son legibles no hace cambios.
+     */
+    public void migrarIdsClientesLegibles(){
+        try {
+            List<Document> docs = mongoCRUD.listarTodos("clientes");
+            MongoCollection<Document> colClientes = mongoCRUD.getConexion().getColeccion("clientes");
+            MongoCollection<Document> colReservas = mongoCRUD.getConexion().getColeccion("reservas");
+            for (Document doc : docs){
+                String oldId = doc.getString("_id");
+                if (oldId == null || !oldId.matches("CLI-\\d{4}")) {
+                    // Generar nuevo ID legible evitando colisiones actuales
+                    String nuevoId = generarCodigoCliente();
+                    // Crear nuevo documento con el mismo contenido excepto _id
+                    Document nuevo = new Document("_id", nuevoId)
+                            .append("nombre", doc.getString("nombre"))
+                            .append("apellido", doc.getString("apellido"))
+                            .append("cedula", doc.getString("cedula"))
+                            .append("telefono", doc.getString("telefono"));
+                    // Eliminar antiguo e insertar nuevo (no se puede modificar _id)
+                    colClientes.deleteOne(Filters.eq("_id", oldId));
+                    colClientes.insertOne(nuevo);
+                    // Actualizar reservas que referencian al cliente
+                    colReservas.updateMany(Filters.eq("idCliente", oldId), Updates.set("idCliente", nuevoId));
+                }
+            }
+        } catch (Exception e){
+            System.err.println("Error en migrarIdsClientesLegibles: "+e.getMessage());
         }
     }
     

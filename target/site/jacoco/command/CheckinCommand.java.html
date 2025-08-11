@@ -32,9 +32,9 @@ public class CheckinCommand implements ICommand {
     /**
      * Constructor del comando de check-in.
      */
-    public CheckinCommand(String nombre, String apellido, String cedula, String telefono,
+<span class="nc" id="L35">    public CheckinCommand(String nombre, String apellido, String cedula, String telefono,</span>
                          String habitacionDisplay, IModeloService modeloService, 
-<span class="nc" id="L37">                         ControladorVentanaPrincipal controlador) {</span>
+                         ControladorVentanaPrincipal controlador) {
 <span class="nc" id="L38">        this.nombre = nombre;</span>
 <span class="nc" id="L39">        this.apellido = apellido;</span>
 <span class="nc" id="L40">        this.cedula = cedula;</span>
@@ -65,7 +65,7 @@ public class CheckinCommand implements ICommand {
 <span class="nc" id="L65">                Cliente clienteExistente = modeloService.buscarClientePorCedula(cedula);</span>
 <span class="nc bnc" id="L66" title="All 2 branches missed.">                if (clienteExistente != null) {</span>
 <span class="nc" id="L67">                    clienteCreado = clienteExistente;</span>
-                } else {
+<span class="nc" id="L68">                } else {</span>
                     // Crear cliente nuevo
 <span class="nc" id="L70">                    String idCliente = java.util.UUID.randomUUID().toString();</span>
 <span class="nc" id="L71">                    clienteCreado = new Cliente(idCliente, nombre, apellido, cedula, telefono);</span>
@@ -97,7 +97,7 @@ public class CheckinCommand implements ICommand {
             
 <span class="nc" id="L98">        } catch (Exception e) {</span>
 <span class="nc" id="L99">            throw new RuntimeException(&quot;Error al ejecutar check-in: &quot; + e.getMessage(), e);</span>
-<span class="nc" id="L100">        }</span>
+        }
 <span class="nc" id="L101">    }</span>
 
     @Override
@@ -121,7 +121,7 @@ public class CheckinCommand implements ICommand {
             
 <span class="nc" id="L122">        } catch (Exception e) {</span>
 <span class="nc" id="L123">            throw new RuntimeException(&quot;Error al deshacer check-in: &quot; + e.getMessage(), e);</span>
-<span class="nc" id="L124">        }</span>
+        }
 <span class="nc" id="L125">    }</span>
 
     @Override

@@ -4,6 +4,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  * Panel de gestión de habitaciones.
@@ -18,6 +20,9 @@ public class PanelHabitaciones extends JPanel {
 	private final JButton btnCheckinRapido;
 	private final JButton btnLiberar;
 	private final JButton btnVolver;
+
+	// Flag para evitar bucles recursivos al limpiar selecciones
+	private boolean cambiandoSeleccion = false;
 
 	public PanelHabitaciones() {
 		setLayout(new BorderLayout(15, 15));
@@ -78,12 +83,75 @@ public class PanelHabitaciones extends JPanel {
 
 		acciones.add(fila1);
 		add(acciones, BorderLayout.SOUTH);
+
+		// Listeners de selección mutuamente excluyentes
+		instalarListenersSeleccion();
+		actualizarEstadoBotones();
 	}
 
 	private void estilizarTabla(JTable tabla) {
 		tabla.setRowHeight(26);
 		tabla.getTableHeader().setReorderingAllowed(false);
 		tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	}
+
+	/**
+	 * Configura listeners para que solo una tabla pueda tener selección a la vez
+	 * y actualiza el estado de los botones de acción.
+	 */
+	private void instalarListenersSeleccion() {
+		ListSelectionListener listenerDisponibles = new ListSelectionListener() {
+			@Override public void valueChanged(ListSelectionEvent e) {
+				if (e.getValueIsAdjusting() || cambiandoSeleccion) return;
+				if (tablaDisponibles.getSelectedRow() != -1) {
+					cambiandoSeleccion = true;
+					tablaOcupadas.clearSelection();
+					cambiandoSeleccion = false;
+				}
+				actualizarEstadoBotones();
+			}
+		};
+
+		ListSelectionListener listenerOcupadas = new ListSelectionListener() {
+			@Override public void valueChanged(ListSelectionEvent e) {
+				if (e.getValueIsAdjusting() || cambiandoSeleccion) return;
+				if (tablaOcupadas.getSelectedRow() != -1) {
+					cambiandoSeleccion = true;
+					tablaDisponibles.clearSelection();
+					cambiandoSeleccion = false;
+				}
+				actualizarEstadoBotones();
+			}
+		};
+
+		tablaDisponibles.getSelectionModel().addListSelectionListener(listenerDisponibles);
+		tablaOcupadas.getSelectionModel().addListSelectionListener(listenerOcupadas);
+	}
+
+	/**
+	 * Habilita / deshabilita botones según la selección actual.
+	 */
+	private void actualizarEstadoBotones() {
+		boolean disponibleSeleccionada = tablaDisponibles.getSelectedRow() != -1;
+		boolean ocupadaSeleccionada = tablaOcupadas.getSelectedRow() != -1;
+		btnCheckinRapido.setEnabled(disponibleSeleccionada);
+		btnLiberar.setEnabled(ocupadaSeleccionada);
+	}
+
+	/**
+	 * Devuelve el número (String) de la habitación seleccionada en cualquiera de las tablas.
+	 * @return número de habitación o null si nada seleccionado
+	 */
+	public String getHabitacionSeleccionada() {
+		int idx = tablaDisponibles.getSelectedRow();
+		if (idx != -1) {
+			return tablaDisponibles.getValueAt(idx, 0).toString();
+		}
+		idx = tablaOcupadas.getSelectedRow();
+		if (idx != -1) {
+			return tablaOcupadas.getValueAt(idx, 0).toString();
+		}
+		return null;
 	}
 
 	// Getters para el controlador

@@ -17,6 +17,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
      */
     public VentanaPrincipal() {
         initComponents();
+        setLocationRelativeTo(null);
         initCustomComponents();
     }
     
@@ -274,8 +275,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         BtnLimpiarCampos.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         BtnLimpiarCampos.setText("Limpiar campos");
 
+        GruposBtnMetodoPagos.add(RBtnMetodoTransferencia);
         RBtnMetodoTransferencia.setText("Transferencia");
 
+        GruposBtnMetodoPagos.add(RBtnMetodoEfectivo);
         RBtnMetodoEfectivo.setText("Efectivo");
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 17)); // NOI18N

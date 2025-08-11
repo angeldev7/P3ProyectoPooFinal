@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ControladorVentanaPrincipal.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">P3ProyectoPooFinal</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">ControladorVentanaPrincipal.java</span></div><h1>ControladorVentanaPrincipal.java</h1><pre class="source lang-java linenums"> package controller;
+
+import model.*;
+import view.VentanaPrincipal;
+import command.*;
+import singleton.GestorDisponibilidad;
+import builder.ReservaBuilder;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.UUID;
+
+/**
+ * Controlador principal de la ventana del sistema hotelero.
+ * Implementa MVC con inyección de dependencias y patrón Command para Undo/Redo.
+ * 
+ * Aplica principios SOLID:
+ * - SRP: Se encarga únicamente de coordinar la vista con el modelo
+ * - DIP: Depende de abstracciones (interfaces) no de implementaciones concretas
+ * - OCP: Extensible mediante nuevos comandos sin modificar el controlador
+ * 
+ * @author asdw
+ * @version 2.0
+ */
+public class ControladorVentanaPrincipal {
+    
+    private final VentanaPrincipal vista;
+    private final IModeloService modeloService;
+    private final ICommandInvoker commandInvoker;
+    private final GestorDisponibilidad gestorDisponibilidad;
+    private final ControladorHabitaciones controladorHabitaciones;
+
+    /**
+     * Constructor con inyección de dependencias.
+     * Aplica DIP al recibir abstracciones como parámetros.
+     * 
+     * @param vista Interfaz gráfica
+     * @param modeloService Servicio del modelo (abstracción)
+     * @param commandInvoker Gestor de comandos para Undo/Redo
+     * @param gestorDisponibilidad Singleton para gestión de disponibilidad
+     */
+    public ControladorVentanaPrincipal(VentanaPrincipal vista, IModeloService modeloService, 
+                                     ICommandInvoker commandInvoker, 
+<span class="nc" id="L45">                                     GestorDisponibilidad gestorDisponibilidad) {</span>
+<span class="nc" id="L46">        this.vista = vista;</span>
+<span class="nc" id="L47">        this.modeloService = modeloService;</span>
+<span class="nc" id="L48">        this.commandInvoker = commandInvoker;</span>
+<span class="nc" id="L49">        this.gestorDisponibilidad = gestorDisponibilidad;</span>
+        
+        // Crear controlador de habitaciones con inyección de dependencias
+<span class="nc" id="L52">        this.controladorHabitaciones = new ControladorHabitaciones(modeloService, gestorDisponibilidad);</span>
+        
+        // Inicializar sistema
+<span class="nc" id="L55">        inicializarSistema();</span>
+<span class="nc" id="L56">        inicializarEventos();</span>
+<span class="nc" id="L57">        actualizarVista();</span>
+<span class="nc" id="L58">    }</span>
+
+    /**
+     * Inicializa el sistema cargando datos básicos.
+     */
+    private void inicializarSistema() {
+<span class="nc" id="L64">        controladorHabitaciones.inicializarHabitaciones();</span>
+<span class="nc" id="L65">        actualizarGestorDisponibilidad();</span>
+<span class="nc" id="L66">    }</span>
+
+    /**
+     * Actualiza el gestor de disponibilidad con el estado actual de las habitaciones.
+     */
+    private void actualizarGestorDisponibilidad() {
+<span class="nc" id="L72">        List&lt;Habitacion&gt; habitaciones = modeloService.obtenerTodasHabitaciones();</span>
+<span class="nc" id="L73">        gestorDisponibilidad.inicializar(habitaciones);</span>
+<span class="nc" id="L74">    }</span>
+
+    /**
+     * Inicializa los eventos de la interfaz gráfica.
+     */
+    private void inicializarEventos() {
+        // Eventos principales
+<span class="nc" id="L81">        vista.BtnCheckin.addActionListener(e -&gt; ejecutarCheckin());</span>
+<span class="nc" id="L82">        vista.BtnLimpiarCampos.addActionListener(e -&gt; limpiarCamposCheckin());</span>
+<span class="nc" id="L83">        vista.jButton2.addActionListener(e -&gt; ejecutarAnularReserva());</span>
+        
+        // Eventos de Undo/Redo
+<span class="nc" id="L86">        vista.BtnUndo.addActionListener(e -&gt; ejecutarUndo());</span>
+<span class="nc" id="L87">        vista.BtnRedo.addActionListener(e -&gt; ejecutarRedo());</span>
+        
+        // Actualizar estado de botones Undo/Redo periódicamente
+<span class="nc" id="L90">        Timer timer = new Timer(500, e -&gt; actualizarBotonesUndoRedo());</span>
+<span class="nc" id="L91">        timer.start();</span>
+<span class="nc" id="L92">    }</span>
+
+    /**
+     * Ejecuta el comando de check-in.
+     */
+    private void ejecutarCheckin() {
+        try {
+            // Validar datos de entrada
+<span class="nc" id="L100">            String nombre = vista.TxtNombre.getText().trim();</span>
+<span class="nc" id="L101">            String apellido = vista.TxtApellido.getText().trim();</span>
+<span class="nc" id="L102">            String cedula = vista.TxtCedula.getText().trim();</span>
+<span class="nc" id="L103">            String telefono = vista.TxtTelefono.getText().trim();</span>
+<span class="nc" id="L104">            String habitacionDisplay = (String) vista.CmboxHabitaciones.getSelectedItem();</span>
+
+<span class="nc bnc" id="L106" title="All 2 branches missed.">            if (!validarDatosCheckin(nombre, apellido, cedula, telefono, habitacionDisplay)) {</span>
+<span class="nc" id="L107">                return;</span>
+            }
+
+            // Crear comando de check-in
+<span class="nc" id="L111">            CheckinCommand comando = new CheckinCommand(</span>
+                nombre, apellido, cedula, telefono, habitacionDisplay,
+                modeloService, this
+            );
+
+            // Ejecutar comando
+<span class="nc" id="L117">            commandInvoker.executeCommand(comando);</span>
+            
+            // Limpiar campos y actualizar vista
+<span class="nc" id="L120">            limpiarCamposCheckin();</span>
+<span class="nc" id="L121">            actualizarVista();</span>
+            
+<span class="nc" id="L123">        } catch (Exception e) {</span>
+<span class="nc" id="L124">            mostrarError(&quot;Error al realizar check-in: &quot; + e.getMessage());</span>
+<span class="nc" id="L125">        }</span>
+<span class="nc" id="L126">    }</span>
+
+    /**
+     * Ejecuta el comando de anular reserva.
+     */
+    private void ejecutarAnularReserva() {
+        try {
+<span class="nc" id="L133">            String cedula = vista.TxtBuscarCedulaAnular.getText().trim();</span>
+            
+<span class="nc bnc" id="L135" title="All 2 branches missed.">            if (cedula.isEmpty()) {</span>
+<span class="nc" id="L136">                mostrarError(&quot;Ingrese su cédula.&quot;);</span>
+<span class="nc" id="L137">                return;</span>
+            }
+
+            // Crear comando de anulación
+<span class="nc" id="L141">            AnularReservaCommand comando = new AnularReservaCommand(</span>
+                cedula, modeloService, gestorDisponibilidad, this
+            );
+
+            // Ejecutar comando
+<span class="nc" id="L146">            commandInvoker.executeCommand(comando);</span>
+            
+            // Limpiar campo y actualizar vista
+<span class="nc" id="L149">            vista.TxtBuscarCedulaAnular.setText(&quot;&quot;);</span>
+<span class="nc" id="L150">            actualizarVista();</span>
+            
+<span class="nc" id="L152">        } catch (Exception e) {</span>
+<span class="nc" id="L153">            mostrarError(&quot;Error al anular reserva: &quot; + e.getMessage());</span>
+<span class="nc" id="L154">        }</span>
+<span class="nc" id="L155">    }</span>
+
+    /**
+     * Ejecuta undo del último comando.
+     */
+    private void ejecutarUndo() {
+        // Obtener descripción del próximo comando a deshacer
+<span class="nc" id="L162">        String descripcion = commandInvoker.getNextUndoDescription();</span>
+<span class="nc bnc" id="L163" title="All 4 branches missed.">        if (descripcion == null || descripcion.isEmpty()) {</span>
+<span class="nc" id="L164">            mostrarMensaje(&quot;No hay operaciones para deshacer.&quot;);</span>
+<span class="nc" id="L165">            return;</span>
+        }
+        
+        // Mostrar confirmación con mensaje personalizado
+<span class="nc" id="L169">        String mensaje = &quot;¿Está seguro que desea deshacer la siguiente operación?\n\n&quot; +</span>
+                        &quot;⚠️ &quot; + descripcion + &quot;\n\n&quot; +
+                        &quot;Esta acción liberará recursos y modificará el estado del sistema.&quot;;
+        
+<span class="nc bnc" id="L173" title="All 2 branches missed.">        if (mostrarConfirmacion(mensaje, &quot;Confirmar Deshacer&quot;)) {</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">            if (commandInvoker.undo()) {</span>
+<span class="nc" id="L175">                actualizarVista();</span>
+<span class="nc" id="L176">                mostrarMensaje(&quot;✅ Operación deshecha correctamente: &quot; + descripcion);</span>
+            } else {
+<span class="nc" id="L178">                mostrarError(&quot;No se pudo deshacer la operación.&quot;);</span>
+            }
+        }
+<span class="nc" id="L181">    }</span>
+
+    /**
+     * Ejecuta redo del último comando deshecho.
+     */
+    private void ejecutarRedo() {
+        // Obtener descripción del próximo comando a rehacer
+<span class="nc" id="L188">        String descripcion = commandInvoker.getNextRedoDescription();</span>
+<span class="nc bnc" id="L189" title="All 4 branches missed.">        if (descripcion == null || descripcion.isEmpty()) {</span>
+<span class="nc" id="L190">            mostrarMensaje(&quot;No hay operaciones para rehacer.&quot;);</span>
+<span class="nc" id="L191">            return;</span>
+        }
+        
+        // Mostrar confirmación con mensaje personalizado
+<span class="nc" id="L195">        String mensaje = &quot;¿Está seguro que desea rehacer la siguiente operación?\n\n&quot; +</span>
+                        &quot;🔄 &quot; + descripcion + &quot;\n\n&quot; +
+                        &quot;Esta acción volverá a ejecutar la operación y ocupará recursos.&quot;;
+        
+<span class="nc bnc" id="L199" title="All 2 branches missed.">        if (mostrarConfirmacion(mensaje, &quot;Confirmar Rehacer&quot;)) {</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">            if (commandInvoker.redo()) {</span>
+<span class="nc" id="L201">                actualizarVista();</span>
+<span class="nc" id="L202">                mostrarMensaje(&quot;✅ Operación rehecha correctamente: &quot; + descripcion);</span>
+            } else {
+<span class="nc" id="L204">                mostrarError(&quot;No se pudo rehacer la operación.&quot;);</span>
+            }
+        }
+<span class="nc" id="L207">    }</span>
+
+    /**
+     * Actualiza el estado de los botones Undo/Redo.
+     */
+    private void actualizarBotonesUndoRedo() {
+<span class="nc" id="L213">        vista.BtnUndo.setEnabled(commandInvoker.canUndo());</span>
+<span class="nc" id="L214">        vista.BtnRedo.setEnabled(commandInvoker.canRedo());</span>
+        
+        // Actualizar tooltips
+<span class="nc bnc" id="L217" title="All 2 branches missed.">        if (commandInvoker.canUndo()) {</span>
+<span class="nc" id="L218">            vista.BtnUndo.setToolTipText(&quot;Deshacer: &quot; + commandInvoker.getNextUndoDescription());</span>
+        } else {
+<span class="nc" id="L220">            vista.BtnUndo.setToolTipText(&quot;No hay operaciones para deshacer&quot;);</span>
+        }
+        
+<span class="nc bnc" id="L223" title="All 2 branches missed.">        if (commandInvoker.canRedo()) {</span>
+<span class="nc" id="L224">            vista.BtnRedo.setToolTipText(&quot;Rehacer: &quot; + commandInvoker.getNextRedoDescription());</span>
+        } else {
+<span class="nc" id="L226">            vista.BtnRedo.setToolTipText(&quot;No hay operaciones para rehacer&quot;);</span>
+        }
+<span class="nc" id="L228">    }</span>
+
+    /**
+     * Valida los datos de entrada para check-in.
+     */
+    private boolean validarDatosCheckin(String nombre, String apellido, String cedula, 
+                                       String telefono, String habitacionDisplay) {
+<span class="nc bnc" id="L235" title="All 6 branches missed.">        if (nombre.isEmpty() || apellido.isEmpty() || cedula.isEmpty() || </span>
+<span class="nc bnc" id="L236" title="All 4 branches missed.">            telefono.isEmpty() || habitacionDisplay == null) {</span>
+<span class="nc" id="L237">            mostrarError(&quot;Por favor, complete todos los campos.&quot;);</span>
+<span class="nc" id="L238">            return false;</span>
+        }
+
+<span class="nc bnc" id="L241" title="All 2 branches missed.">        if (!cedula.matches(&quot;\\d{10}&quot;)) {</span>
+<span class="nc" id="L242">            mostrarError(&quot;La cédula debe tener exactamente 10 dígitos numéricos.&quot;);</span>
+<span class="nc" id="L243">            return false;</span>
+        }
+
+<span class="nc bnc" id="L246" title="All 2 branches missed.">        if (!telefono.matches(&quot;\\d{10}&quot;)) {</span>
+<span class="nc" id="L247">            mostrarError(&quot;El teléfono debe tener exactamente 10 dígitos numéricos.&quot;);</span>
+<span class="nc" id="L248">            return false;</span>
+        }
+
+        // Validar unicidad
+<span class="nc bnc" id="L252" title="All 2 branches missed.">        if (existeCedula(cedula)) {</span>
+<span class="nc" id="L253">            mostrarError(&quot;La cédula ya está registrada.&quot;);</span>
+<span class="nc" id="L254">            return false;</span>
+        }
+
+<span class="nc bnc" id="L257" title="All 2 branches missed.">        if (existeTelefono(telefono)) {</span>
+<span class="nc" id="L258">            mostrarError(&quot;El teléfono ya está registrado a otro cliente.&quot;);</span>
+<span class="nc" id="L259">            return false;</span>
+        }
+
+<span class="nc" id="L262">        return true;</span>
+    }
+
+    /**
+     * Verifica si una cédula ya existe en el sistema.
+     */
+    private boolean existeCedula(String cedula) {
+<span class="nc" id="L269">        return modeloService.existeCedula(cedula);</span>
+    }
+
+    /**
+     * Verifica si un teléfono ya existe en el sistema.
+     */
+    private boolean existeTelefono(String telefono) {
+<span class="nc" id="L276">        return modeloService.existeTelefono(telefono);</span>
+    }
+
+    /**
+     * Actualiza toda la vista con los datos actuales.
+     */
+    public void actualizarVista() {
+<span class="nc" id="L283">        controladorHabitaciones.cargarHabitaciones(</span>
+            vista.TablaHabitacionesDisponibles, 
+            vista.TablaHabitacionesOcupadas, 
+            vista.CmboxHabitaciones
+        );
+<span class="nc" id="L288">        actualizarGestorDisponibilidad();</span>
+<span class="nc" id="L289">    }</span>
+
+    /**
+     * Limpia los campos del formulario de check-in.
+     */
+    private void limpiarCamposCheckin() {
+<span class="nc" id="L295">        vista.TxtNombre.setText(&quot;&quot;);</span>
+<span class="nc" id="L296">        vista.TxtApellido.setText(&quot;&quot;);</span>
+<span class="nc" id="L297">        vista.TxtCedula.setText(&quot;&quot;);</span>
+<span class="nc" id="L298">        vista.TxtTelefono.setText(&quot;&quot;);</span>
+<span class="nc" id="L299">        vista.CmboxHabitaciones.setSelectedIndex(-1);</span>
+<span class="nc" id="L300">    }</span>
+
+    /**
+     * Muestra un mensaje de error al usuario.
+     */
+    public void mostrarError(String mensaje) {
+<span class="nc" id="L306">        JOptionPane.showMessageDialog(vista, mensaje, &quot;Error&quot;, JOptionPane.ERROR_MESSAGE);</span>
+<span class="nc" id="L307">    }</span>
+
+    /**
+     * Muestra un mensaje informativo al usuario.
+     */
+    public void mostrarMensaje(String mensaje) {
+<span class="nc" id="L313">        JOptionPane.showMessageDialog(vista, mensaje, &quot;Información&quot;, JOptionPane.INFORMATION_MESSAGE);</span>
+<span class="nc" id="L314">    }</span>
+    
+    /**
+     * Muestra un diálogo de confirmación al usuario.
+     * 
+     * @param mensaje El mensaje a mostrar
+     * @param titulo El título del diálogo
+     * @return true si el usuario confirma, false si cancela
+     */
+    public boolean mostrarConfirmacion(String mensaje, String titulo) {
+<span class="nc" id="L324">        int opcion = JOptionPane.showConfirmDialog(</span>
+            vista, 
+            mensaje, 
+            titulo, 
+            JOptionPane.YES_NO_OPTION, 
+            JOptionPane.QUESTION_MESSAGE
+        );
+<span class="nc bnc" id="L331" title="All 2 branches missed.">        return opcion == JOptionPane.YES_OPTION;</span>
+    }
+
+    /**
+     * Muestra la factura de check-in.
+     */
+    public void mostrarFactura(Cliente cliente, Habitacion habitacion, Reserva reserva) {
+<span class="nc" id="L338">        StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L339">        sb.append(&quot;========= FACTURA DE CHECK-IN =========\n&quot;);</span>
+<span class="nc" id="L340">        sb.append(&quot;Cliente: &quot;).append(cliente.getNombreCompleto()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L341">        sb.append(&quot;Cédula: &quot;).append(cliente.getCedula()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L342">        sb.append(&quot;Teléfono: &quot;).append(cliente.getTelefono()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L343">        sb.append(&quot;---------------------------------------\n&quot;);</span>
+<span class="nc" id="L344">        sb.append(&quot;Habitación: &quot;).append(habitacion.getDisplayText()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L345">        sb.append(&quot;Fecha ingreso: &quot;).append(reserva.getFechaIngreso()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L346">        sb.append(&quot;---------------------------------------\n&quot;);</span>
+<span class="nc" id="L347">        sb.append(&quot;TOTAL: $&quot;).append(String.format(&quot;%.2f&quot;, habitacion.getPrecio())).append(&quot;\n&quot;);</span>
+<span class="nc" id="L348">        sb.append(&quot;=======================================&quot;);</span>
+        
+<span class="nc" id="L350">        JOptionPane.showMessageDialog(vista, sb.toString(), &quot;Factura&quot;, JOptionPane.INFORMATION_MESSAGE);</span>
+<span class="nc" id="L351">    }</span>
+
+    /**
+     * Obtiene el servicio del modelo para uso de los comandos.
+     */
+    public IModeloService getModeloService() {
+<span class="nc" id="L357">        return modeloService;</span>
+    }
+
+    /**
+     * Obtiene el gestor de disponibilidad.
+     */
+    public GestorDisponibilidad getGestorDisponibilidad() {
+<span class="nc" id="L364">        return gestorDisponibilidad;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

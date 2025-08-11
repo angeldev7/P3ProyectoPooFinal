@@ -9,13 +9,13 @@ import command.FinalizarReservaCommand;
 import singleton.GestorDisponibilidad;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 
 /**
  * Controlador para la ventana de administración moderna del hotel.
@@ -606,24 +606,46 @@ public class ControladorVentanaAdmin {
 
     private void crearNuevaReserva() {
         try {
-            // Seleccionar cliente existente
             java.util.List<Cliente> clientes = modeloService.obtenerTodosClientes();
             if (clientes.isEmpty()) {mostrarMensaje("No hay clientes. Cree uno primero."); return;}
-            Cliente seleccionado = (Cliente) JOptionPane.showInputDialog(vista, "Seleccione Cliente", "Cliente", JOptionPane.PLAIN_MESSAGE, null, clientes.toArray(), null);
-            if (seleccionado==null) return;
-            // Seleccionar habitación disponible
             java.util.List<Habitacion> disponibles = modeloService.obtenerHabitacionesDisponibles();
             if (disponibles.isEmpty()) {mostrarMensaje("No hay habitaciones disponibles."); return;}
-            Habitacion hab = (Habitacion) JOptionPane.showInputDialog(vista, "Seleccione Habitación", "Habitación", JOptionPane.PLAIN_MESSAGE, null, disponibles.toArray(), null);
-            if (hab==null) return;
-            String diasStr = JOptionPane.showInputDialog(vista, "Número de noches:", "1");
-            int noches = Integer.parseInt(diasStr==null?"1":diasStr);
-            double total = hab.getPrecio()*noches;
-            // Ejecutar mediante comando para soportar Undo
-            ejecutarComando(new CrearReservaCommand(modeloService, seleccionado.getId(), hab.getId(), total, "Cliente "+seleccionado.getCedula()+" Hab "+hab.getNumero()));
-            mostrarMensaje("Reserva creada.");
+
+            JComboBox<Cliente> comboCliente = new JComboBox<>(clientes.toArray(new Cliente[0]));
+            JComboBox<Habitacion> comboHab = new JComboBox<>(disponibles.toArray(new Habitacion[0]));
+            JSpinner spinnerNoches = new JSpinner(new SpinnerNumberModel(1,1,30,1));
+            JTextArea observaciones = new JTextArea(3,25);
+            observaciones.setLineWrap(true);
+            observaciones.setWrapStyleWord(true);
+            JPanel panel = new JPanel(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new java.awt.Insets(4,4,4,4);
+            gbc.anchor = GridBagConstraints.WEST;
+            gbc.gridx=0; gbc.gridy=0; panel.add(new JLabel("Cliente:"), gbc);
+            gbc.gridx=1; panel.add(comboCliente, gbc);
+            gbc.gridx=0; gbc.gridy=1; panel.add(new JLabel("Habitación:"), gbc);
+            gbc.gridx=1; panel.add(comboHab, gbc);
+            gbc.gridx=0; gbc.gridy=2; panel.add(new JLabel("Noches:"), gbc);
+            gbc.gridx=1; panel.add(spinnerNoches, gbc);
+            gbc.gridx=0; gbc.gridy=3; gbc.anchor=GridBagConstraints.NORTHWEST; panel.add(new JLabel("Observaciones:"), gbc);
+            gbc.gridx=1; panel.add(new JScrollPane(observaciones), gbc);
+
+            int opt = JOptionPane.showConfirmDialog(vista, panel, "Nueva Reserva", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (opt != JOptionPane.OK_OPTION) return;
+
+            Cliente seleccionado = (Cliente) comboCliente.getSelectedItem();
+            Habitacion hab = (Habitacion) comboHab.getSelectedItem();
+            int noches = (Integer) spinnerNoches.getValue();
+            double total = hab.getPrecio() * noches;
+            String obs = observaciones.getText()!=null?observaciones.getText().trim():"";
+            ejecutarComando(new CrearReservaCommand(modeloService, seleccionado.getId(), hab.getId(), total, obs));
+            mostrarMensaje("Reserva creada correctamente. Total: $"+String.format("%.2f", total));
             cargarDatosReservas();
-        } catch (Exception ex) {mostrarError("Error creando reserva: "+ex.getMessage());}
+        } catch (NumberFormatException nfe) {
+            mostrarError("Número de noches inválido.");
+        } catch (Exception ex) {
+            mostrarError("Error creando reserva: "+ex.getMessage());
+        }
     }
 
     private void finalizarReservaSeleccionada() {
@@ -643,6 +665,8 @@ public class ControladorVentanaAdmin {
         panelClientes.getBtnNuevoCliente().addActionListener(e -> agregarNuevoCliente());
         panelClientes.getBtnEditarCliente().addActionListener(e -> editarClienteSeleccionado());
         panelClientes.getBtnEliminarCliente().addActionListener(e -> eliminarClienteSeleccionado());
+    panelClientes.getBtnBuscarCedula().addActionListener(e -> buscarClientePorCedula());
+    panelClientes.getBtnLimpiarBusqueda().addActionListener(e -> {panelClientes.getTxtBuscarCedula().setText(""); actualizarTablaClientes();});
     }
 
     /**
@@ -662,29 +686,48 @@ public class ControladorVentanaAdmin {
             "Teléfono:", telefonoField
         };
 
-        int option = JOptionPane.showConfirmDialog(vista, message, "Agregar Nuevo Cliente", JOptionPane.OK_CANCEL_OPTION);
+    int option = JOptionPane.showConfirmDialog(vista, message, "Agregar Nuevo Cliente", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
             try {
-                Cliente nuevoCliente = new Cliente(
-                    null, // ID se genera en la BD
-                    nombreField.getText(),
-                    apellidoField.getText(),
-                    cedulaField.getText(),
-                    telefonoField.getText()
-                );
-                
-                boolean ok = modeloService.registrarCliente(nuevoCliente);
-                if (ok) {
-                    actualizarTablaClientes();
-                    JOptionPane.showMessageDialog(vista, "Cliente agregado exitosamente.");
-                } else {
-                    mostrarError("No se pudo registrar el cliente (cédula o teléfono existentes).");
-                }
+        String nombre = nombreField.getText().trim();
+        String apellido = apellidoField.getText().trim();
+        String cedula = cedulaField.getText().trim();
+        String telefono = telefonoField.getText().trim();
+
+        String validacion = validarDatosCliente(nombre, apellido, cedula, telefono, true);
+        if (validacion != null) {mostrarError(validacion); return;}
+
+        Cliente nuevoCliente = new Cliente(null, nombre, apellido, cedula, telefono);
+        boolean ok = modeloService.registrarCliente(nuevoCliente);
+        if (ok) {actualizarTablaClientes(); mostrarMensaje("Cliente agregado exitosamente.");}
+        else {mostrarError("No se pudo registrar. Cédula o teléfono ya existentes.");}
 
             } catch (Exception ex) {
                 logger.severe("Error al agregar cliente: " + ex.getMessage());
                 mostrarError("No se pudo agregar el cliente. Verifique los datos.");
             }
+        }
+    }
+
+    private String validarDatosCliente(String nombre, String apellido, String cedula, String telefono, boolean nuevo){
+        if (nombre.isEmpty() || apellido.isEmpty() || cedula.isEmpty() || telefono.isEmpty()) return "Todos los campos son obligatorios";
+        if (!cedula.matches("\\d{6,13}")) return "La cédula debe tener entre 6 y 13 dígitos";
+        if (!telefono.matches("\\d{7,15}")) return "El teléfono debe ser numérico (7-15 dígitos)";
+        if (nuevo && modeloService.existeCedula(cedula)) return "La cédula ya está registrada";
+        if (nuevo && modeloService.existeTelefono(telefono)) return "El teléfono ya está registrado";
+        return null;
+    }
+
+    private void buscarClientePorCedula(){
+        String cedula = panelClientes.getTxtBuscarCedula().getText().trim();
+        if (cedula.isEmpty()) {mostrarMensaje("Ingrese una cédula para buscar"); return;}
+        Cliente c = modeloService.buscarClientePorCedula(cedula);
+        DefaultTableModel model = (DefaultTableModel) panelClientes.getTablaClientes().getModel();
+        model.setRowCount(0);
+        if (c != null) {
+            model.addRow(new Object[]{c.getId(), c.getNombre(), c.getApellido(), c.getCedula(), c.getTelefono()});
+        } else {
+            mostrarMensaje("No se encontró cliente con esa cédula");
         }
     }
 

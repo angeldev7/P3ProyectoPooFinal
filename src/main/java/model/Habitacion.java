@@ -104,12 +104,6 @@ public class Habitacion {
 
     @Override
     public String toString() {
-        return "Habitacion{" +
-                "id='" + id + '\'' +
-                ", numero='" + numero + '\'' +
-                ", tipo='" + tipo + '\'' +
-                ", ocupada=" + ocupada +
-                ", precio=" + precio +
-                '}';
+    return "#"+numero+" - "+tipo+" - $"+String.format("%.2f",precio)+(ocupada?" (Ocupada)":"");
     }
 }

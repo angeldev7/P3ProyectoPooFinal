@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConexionBD.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">P3ProyectoPooFinal</a> &gt; <a href="index.source.html" class="el_package">model</a> &gt; <span class="el_source">ConexionBD.java</span></div><h1>ConexionBD.java</h1><pre class="source lang-java linenums">package model;
+
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
+
+/**
+ * Clase para gestionar la conexión a MongoDB y obtener colecciones.
+ * Implementa el patrón de conexión centralizada para la base de datos.
+ * 
+ * @author asdw
+ * @version 1.0
+ */
+public class ConexionBD {
+    public static final String URI = &quot;mongodb://localhost:27017&quot;;
+    public static final String NOMBRE_BD = &quot;HotelRefactorizado&quot;; 
+    
+    private MongoClient mongoClient;
+    private MongoDatabase database;
+
+    /**
+     * Constructor que inicializa la conexión a la base de datos.
+     */
+<span class="nc" id="L26">    public ConexionBD() {</span>
+<span class="nc" id="L27">        conectar();</span>
+<span class="nc" id="L28">    }</span>
+
+    /**
+     * Establece la conexión con MongoDB.
+     */
+    private void conectar() {
+        try {
+<span class="nc" id="L35">            mongoClient = MongoClients.create(URI);</span>
+<span class="nc" id="L36">            database = mongoClient.getDatabase(NOMBRE_BD);</span>
+<span class="nc" id="L37">        } catch (Exception e) {</span>
+<span class="nc" id="L38">            javax.swing.JOptionPane.showMessageDialog(null, </span>
+<span class="nc" id="L39">                &quot;Error al conectar a la base de datos: &quot; + e.toString());</span>
+<span class="nc" id="L40">        }</span>
+<span class="nc" id="L41">    }</span>
+
+    /**
+     * Obtiene una colección de la base de datos por su nombre.
+     * 
+     * @param nombreColeccion Nombre de la colección (&quot;habitaciones&quot;, &quot;clientes&quot;, &quot;reservas&quot;, etc.)
+     * @return La colección solicitada
+     */
+    public MongoCollection&lt;Document&gt; getColeccion(String nombreColeccion) {
+<span class="nc" id="L50">        return database.getCollection(nombreColeccion);</span>
+    }
+
+    /**
+     * Obtiene la colección de habitaciones.
+     * 
+     * @return MongoCollection para habitaciones
+     */
+    public MongoCollection&lt;Document&gt; getHabitacionesCollection() {
+<span class="nc" id="L59">        return getColeccion(&quot;habitaciones&quot;);</span>
+    }
+    
+    /**
+     * Obtiene la colección de clientes.
+     * 
+     * @return MongoCollection para clientes
+     */
+    public MongoCollection&lt;Document&gt; getClientesCollection() {
+<span class="nc" id="L68">        return getColeccion(&quot;clientes&quot;);</span>
+    }
+    
+    /**
+     * Obtiene la colección de reservas.
+     * 
+     * @return MongoCollection para reservas
+     */
+    public MongoCollection&lt;Document&gt; getReservasCollection() {
+<span class="nc" id="L77">        return getColeccion(&quot;reservas&quot;);</span>
+    }
+
+    /**
+     * Verifica si la conexión está activa.
+     * 
+     * @return true si está conectado, false en caso contrario
+     */
+    public boolean isConectado() {
+        try {
+<span class="nc bnc" id="L87" title="All 4 branches missed.">            return mongoClient != null &amp;&amp; database != null;</span>
+<span class="nc" id="L88">        } catch (Exception e) {</span>
+<span class="nc" id="L89">            return false;</span>
+        }
+    }
+
+    /**
+     * Cierra la conexión a la base de datos.
+     */
+    public void cerrar() {
+<span class="nc bnc" id="L97" title="All 2 branches missed.">        if (mongoClient != null) {</span>
+<span class="nc" id="L98">            mongoClient.close();</span>
+        }
+<span class="nc" id="L100">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CheckinRapidoAdminCommand.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">P3ProyectoPooFinal</a> &gt; <a href="index.source.html" class="el_package">command</a> &gt; <span class="el_source">CheckinRapidoAdminCommand.java</span></div><h1>CheckinRapidoAdminCommand.java</h1><pre class="source lang-java linenums">package command;
+
+import model.*;
+import builder.ReservaBuilder;
+
+/**
+ * Comando para check-in rápido desde panel de habitaciones en admin.
+ */
+public class CheckinRapidoAdminCommand implements ICommand {
+    private final IModeloService modeloService;
+    private final Cliente cliente;
+    private final Habitacion habitacion;
+    private Reserva reserva;
+    private final long executionTime;
+
+<span class="nc" id="L16">    public CheckinRapidoAdminCommand(IModeloService modeloService, Cliente cliente, Habitacion habitacion) {</span>
+<span class="nc" id="L17">        this.modeloService = modeloService;</span>
+<span class="nc" id="L18">        this.cliente = cliente;</span>
+<span class="nc" id="L19">        this.habitacion = habitacion;</span>
+<span class="nc" id="L20">        this.executionTime = System.currentTimeMillis();</span>
+<span class="nc" id="L21">    }</span>
+
+    @Override
+    public void execute() {
+<span class="nc bnc" id="L25" title="All 4 branches missed.">        if (cliente.getId() == null || modeloService.buscarClientePorId(cliente.getId()) == null) {</span>
+<span class="nc bnc" id="L26" title="All 2 branches missed.">            if (!modeloService.registrarCliente(cliente)) {</span>
+<span class="nc" id="L27">                throw new RuntimeException(&quot;No se pudo registrar el cliente&quot;);</span>
+            }
+        }
+<span class="nc" id="L30">        reserva = ReservaBuilder.paraCheckin(cliente.getId(), habitacion.getId(), habitacion.getPrecio()).build();</span>
+<span class="nc bnc" id="L31" title="All 2 branches missed.">        if (!modeloService.crearReserva(reserva)) {</span>
+<span class="nc" id="L32">            throw new RuntimeException(&quot;No se pudo crear la reserva de check-in&quot;);</span>
+        }
+<span class="nc" id="L34">    }</span>
+
+    @Override
+    public void undo() {
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        if (reserva != null) {</span>
+<span class="nc" id="L39">            modeloService.finalizarReserva(reserva.getId());</span>
+        }
+<span class="nc" id="L41">    }</span>
+
+    @Override
+<span class="nc" id="L44">    public String getDescription() {return &quot;Check-in rápido hab &quot; + habitacion.getNumero();}</span>
+    @Override
+<span class="nc" id="L46">    public long getExecutionTime() {return executionTime;}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

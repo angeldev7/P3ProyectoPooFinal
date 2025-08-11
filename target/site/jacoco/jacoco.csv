@@ -1,0 +1,50 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+P3ProyectoPooFinal,singleton,GestorDisponibilidad,1,186,3,13,0,43,3,21,0,16
+P3ProyectoPooFinal,principal,P3ProyectoPooFinal,58,0,0,0,16,0,3,0,3,0
+P3ProyectoPooFinal,view,VentanaAdmin,1156,0,40,0,237,0,53,0,33,0
+P3ProyectoPooFinal,view,VentanaPrincipal,1320,0,4,0,261,0,11,0,9,0
+P3ProyectoPooFinal,view,VentanaAdmin.new MouseAdapter() {...},33,0,0,0,7,0,3,0,3,0
+P3ProyectoPooFinal,view,VentanaAdmin.new ActionListener() {...},20,0,2,0,4,0,3,0,2,0
+P3ProyectoPooFinal,view,RoundedBorder,89,0,0,0,15,0,5,0,5,0
+P3ProyectoPooFinal,view,VentanaSelector,627,0,6,0,138,0,18,0,15,0
+P3ProyectoPooFinal,view,VentanaPrincipal.new AbstractAction() {...},16,0,2,0,4,0,3,0,2,0
+P3ProyectoPooFinal,view,VentanaPrincipal.new AbstractAction() {...},16,0,2,0,4,0,3,0,2,0
+P3ProyectoPooFinal,view,VentanaSelector.new MouseAdapter() {...},13,0,0,0,3,0,2,0,2,0
+P3ProyectoPooFinal,view,VentanaSelector.new MouseAdapter() {...},35,0,0,0,7,0,3,0,3,0
+P3ProyectoPooFinal,view,VentanaPrincipal.new DefaultTableModel() {...},33,0,0,0,3,0,2,0,2,0
+P3ProyectoPooFinal,view,VentanaPrincipal.new DefaultTableModel() {...},29,0,0,0,3,0,2,0,2,0
+P3ProyectoPooFinal,controller,ControladorVentanaAdmin,2220,0,145,0,428,0,150,0,71,0
+P3ProyectoPooFinal,controller,ControladorVentanaPrincipal,617,0,44,0,131,0,48,0,26,0
+P3ProyectoPooFinal,controller,ControladorHabitaciones,177,0,6,0,33,0,9,0,6,0
+P3ProyectoPooFinal,view.util,TableSelectionCoordinator.new ListSelectionListener() {...},78,0,16,0,15,0,10,0,2,0
+P3ProyectoPooFinal,view.util,TableSelectionCoordinator,65,0,8,0,14,0,8,0,4,0
+P3ProyectoPooFinal,builder,ReservaBuilder,56,128,5,7,19,36,11,11,6,10
+P3ProyectoPooFinal,memento,ModeloMemento,67,256,9,17,5,42,10,11,4,4
+P3ProyectoPooFinal,view.panels,PanelHabitaciones.new DefaultTableModel() {...},10,0,0,0,2,0,2,0,2,0
+P3ProyectoPooFinal,view.panels,PanelHabitaciones.new ListSelectionListener() {...},38,0,6,0,8,0,5,0,2,0
+P3ProyectoPooFinal,view.panels,PanelHabitaciones.new DefaultTableModel() {...},10,0,0,0,2,0,2,0,2,0
+P3ProyectoPooFinal,view.panels,PanelHabitaciones.new ListSelectionListener() {...},38,0,6,0,8,0,5,0,2,0
+P3ProyectoPooFinal,view.panels,PanelReportes,164,0,0,0,27,0,4,0,4,0
+P3ProyectoPooFinal,view.panels,PanelReservas,358,0,6,0,53,0,10,0,7,0
+P3ProyectoPooFinal,view.panels,PanelClientes,557,0,4,0,113,0,13,0,11,0
+P3ProyectoPooFinal,view.panels,PanelClientes.new DefaultTableModel() {...},37,0,0,0,3,0,2,0,2,0
+P3ProyectoPooFinal,view.panels,PanelClientes.new ListSelectionListener() {...},31,0,4,0,6,0,4,0,2,0
+P3ProyectoPooFinal,view.panels,PanelHabitaciones,373,0,8,0,73,0,16,0,12,0
+P3ProyectoPooFinal,view.panels,PanelDashboard,11,0,0,0,4,0,1,0,1,0
+P3ProyectoPooFinal,view.panels,PanelReservas.new ListSelectionListener() {...},24,0,4,0,4,0,4,0,2,0
+P3ProyectoPooFinal,view.panels,PanelReservas.new DefaultTableModel() {...},10,0,0,0,2,0,2,0,2,0
+P3ProyectoPooFinal,model,ModeloServiceImpl,1466,0,152,0,295,0,106,0,30,0
+P3ProyectoPooFinal,model,Cliente,66,101,4,4,16,17,11,9,7,9
+P3ProyectoPooFinal,model,Reserva,161,102,5,3,25,33,13,15,10,14
+P3ProyectoPooFinal,model,ConexionBD,66,0,6,0,20,0,11,0,8,0
+P3ProyectoPooFinal,model,Habitacion,141,44,6,2,20,14,12,9,9,8
+P3ProyectoPooFinal,model,MongoCRUD,152,0,8,0,33,0,14,0,10,0
+P3ProyectoPooFinal,model,HabitacionOcupadaInfo,149,0,0,0,28,0,19,0,19,0
+P3ProyectoPooFinal,command,ICommand,0,2,0,0,0,1,0,1,0,1
+P3ProyectoPooFinal,command,CommandInvoker,114,201,19,19,28,45,22,12,7,8
+P3ProyectoPooFinal,command,CrearReservaCommand,8,71,3,3,2,21,4,4,1,4
+P3ProyectoPooFinal,command,FinalizarReservaCommand,10,94,7,7,3,20,8,4,1,4
+P3ProyectoPooFinal,command,CommandInvoker.CommandSnapshot,0,9,0,0,0,2,0,1,0,1
+P3ProyectoPooFinal,command,CheckinRapidoAdminCommand,87,0,10,0,18,0,10,0,5,0
+P3ProyectoPooFinal,command,AnularReservaCommand,251,0,28,0,56,0,20,0,6,0
+P3ProyectoPooFinal,command,CheckinCommand,223,0,14,0,51,0,12,0,5,0

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PanelReportes.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">P3ProyectoPooFinal</a> &gt; <a href="index.source.html" class="el_package">view.panels</a> &gt; <span class="el_source">PanelReportes.java</span></div><h1>PanelReportes.java</h1><pre class="source lang-java linenums">package view.panels;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+
+/**
+ * Panel simple de reportes (placeholder enriquecido) mostrando KPIs y permitirá filtros.
+ */
+public class PanelReportes extends JPanel {
+    private final JLabel titulo;
+    private final JTextArea areaResumen;
+    private final JButton btnRefrescar;
+    private final JComboBox&lt;String&gt; rangoFechas;
+
+<span class="nc" id="L16">    public PanelReportes() {</span>
+<span class="nc" id="L17">        setLayout(new BorderLayout(15,15));</span>
+<span class="nc" id="L18">        setBorder(new EmptyBorder(15,15,15,15));</span>
+<span class="nc" id="L19">        setBackground(new Color(240,242,247));</span>
+<span class="nc" id="L20">        titulo = new JLabel(&quot;Reportes &amp; Analítica&quot;);</span>
+<span class="nc" id="L21">        titulo.setFont(new Font(&quot;Segoe UI&quot;, Font.BOLD, 22));</span>
+<span class="nc" id="L22">        add(titulo, BorderLayout.NORTH);</span>
+
+<span class="nc" id="L24">        JPanel centro = new JPanel(new BorderLayout(10,10));</span>
+<span class="nc" id="L25">        centro.setOpaque(false);</span>
+<span class="nc" id="L26">        areaResumen = new JTextArea(8,40);</span>
+<span class="nc" id="L27">        areaResumen.setEditable(false);</span>
+<span class="nc" id="L28">        areaResumen.setFont(new Font(&quot;Consolas&quot;, Font.PLAIN, 13));</span>
+<span class="nc" id="L29">        areaResumen.setBorder(BorderFactory.createTitledBorder(&quot;Resumen&quot;));</span>
+<span class="nc" id="L30">        centro.add(new JScrollPane(areaResumen), BorderLayout.CENTER);</span>
+
+<span class="nc" id="L32">        JPanel filtros = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L33">        filtros.setOpaque(false);</span>
+<span class="nc" id="L34">        filtros.add(new JLabel(&quot;Rango:&quot;));</span>
+<span class="nc" id="L35">        rangoFechas = new JComboBox&lt;&gt;(new String[]{&quot;Hoy&quot;,&quot;Últimos 7 días&quot;,&quot;Este mes&quot;});</span>
+<span class="nc" id="L36">        filtros.add(rangoFechas);</span>
+<span class="nc" id="L37">        btnRefrescar = new JButton(&quot;Refrescar&quot;);</span>
+<span class="nc" id="L38">        filtros.add(btnRefrescar);</span>
+<span class="nc" id="L39">        centro.add(filtros, BorderLayout.NORTH);</span>
+
+<span class="nc" id="L41">        add(centro, BorderLayout.CENTER);</span>
+<span class="nc" id="L42">    }</span>
+
+<span class="nc" id="L44">    public void setResumen(String texto) {areaResumen.setText(texto);}    </span>
+<span class="nc" id="L45">    public JButton getBtnRefrescar(){return btnRefrescar;}</span>
+<span class="nc" id="L46">    public JComboBox&lt;String&gt; getRangoFechas(){return rangoFechas;}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

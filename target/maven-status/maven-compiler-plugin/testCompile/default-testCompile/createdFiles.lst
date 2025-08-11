@@ -1,0 +1,10 @@
+memento\MementoIntegrationTest.class
+model\ReservaTest.class
+singleton\GestorDisponibilidadTest.class
+command\CommandInvokerFallbackTest.class
+command\CommandPatternsTest.class
+support\FakeModeloService.class
+model\ClienteTest.class
+builder\ReservaBuilderTest.class
+command\FinalizarReservaUndoLogicTest.class
+model\IdGenerationTest.class

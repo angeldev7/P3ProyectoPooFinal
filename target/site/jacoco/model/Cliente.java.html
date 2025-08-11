@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Cliente.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">P3ProyectoPooFinal</a> &gt; <a href="index.source.html" class="el_package">model</a> &gt; <span class="el_source">Cliente.java</span></div><h1>Cliente.java</h1><pre class="source lang-java linenums">package model;
+
+import org.bson.Document;
+
+/**
+ * Entidad Cliente que representa a un huésped del hotel.
+ * Implementa conversión hacia y desde MongoDB Document.
+ * 
+ * @author asdw
+ * @version 1.0
+ */
+public class Cliente {
+    private String id;
+    private String nombre;
+    private String apellido;
+    private String cedula;
+    private String telefono;
+
+    /**
+     * Constructor por defecto.
+     */
+<span class="nc" id="L22">    public Cliente() {}</span>
+
+    /**
+     * Constructor completo para crear un cliente.
+     * 
+     * @param id Identificador único del cliente
+     * @param nombre Nombre del cliente
+     * @param apellido Apellido del cliente
+     * @param cedula Cédula de identidad (debe ser única)
+     * @param telefono Número telefónico (debe ser único)
+     */
+<span class="fc" id="L33">    public Cliente(String id, String nombre, String apellido, String cedula, String telefono) {</span>
+<span class="fc" id="L34">        this.id = id;</span>
+<span class="fc" id="L35">        this.nombre = nombre;</span>
+<span class="fc" id="L36">        this.apellido = apellido;</span>
+<span class="fc" id="L37">        this.cedula = cedula;</span>
+<span class="fc" id="L38">        this.telefono = telefono;</span>
+<span class="fc" id="L39">    }</span>
+
+    // Getters y setters
+<span class="fc" id="L42">    public String getId() { return id; }</span>
+<span class="fc" id="L43">    public void setId(String id) { this.id = id; }</span>
+<span class="fc" id="L44">    public String getNombre() { return nombre; }</span>
+<span class="nc" id="L45">    public void setNombre(String nombre) { this.nombre = nombre; }</span>
+<span class="fc" id="L46">    public String getApellido() { return apellido; }</span>
+<span class="nc" id="L47">    public void setApellido(String apellido) { this.apellido = apellido; }</span>
+<span class="fc" id="L48">    public String getCedula() { return cedula; }</span>
+<span class="nc" id="L49">    public void setCedula(String cedula) { this.cedula = cedula; }</span>
+<span class="fc" id="L50">    public String getTelefono() { return telefono; }</span>
+<span class="nc" id="L51">    public void setTelefono(String telefono) { this.telefono = telefono; }</span>
+
+    /**
+     * Convierte el cliente a un Document de MongoDB.
+     * 
+     * @return Document para insertar en MongoDB
+     */
+    public Document toDocument() {
+<span class="nc" id="L59">        return new Document(&quot;_id&quot;, id)</span>
+<span class="nc" id="L60">                .append(&quot;nombre&quot;, nombre)</span>
+<span class="nc" id="L61">                .append(&quot;apellido&quot;, apellido)</span>
+<span class="nc" id="L62">                .append(&quot;cedula&quot;, cedula)</span>
+<span class="nc" id="L63">                .append(&quot;telefono&quot;, telefono);</span>
+    }
+
+    /**
+     * Crea un Cliente desde un Document de MongoDB.
+     * 
+     * @param doc Document obtenido de MongoDB
+     * @return Nueva instancia de Cliente
+     */
+    public static Cliente fromDocument(Document doc) {
+<span class="nc" id="L73">        return new Cliente(</span>
+<span class="nc" id="L74">            doc.getString(&quot;_id&quot;),</span>
+<span class="nc" id="L75">            doc.getString(&quot;nombre&quot;),</span>
+<span class="nc" id="L76">            doc.getString(&quot;apellido&quot;),</span>
+<span class="nc" id="L77">            doc.getString(&quot;cedula&quot;),</span>
+<span class="nc" id="L78">            doc.getString(&quot;telefono&quot;)</span>
+        );
+    }
+
+    /**
+     * Obtiene el nombre completo del cliente.
+     * 
+     * @return Nombre y apellido concatenados
+     */
+    public String getNombreCompleto() {
+<span class="fc" id="L88">        return nombre + &quot; &quot; + apellido;</span>
+    }
+
+    @Override
+    public String toString() {
+    // Representación amigable para listas/combo boxes
+<span class="pc bpc" id="L94" title="2 of 4 branches missed.">    String base = (nombre!=null?nombre:&quot;&quot;) + &quot; &quot; + (apellido!=null?apellido:&quot;&quot;).trim();</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">    String doc = cedula!=null?cedula:&quot;&quot;;</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">    return base.trim() + (doc.isEmpty()?&quot;&quot;:&quot; (&quot;+doc+&quot;)&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

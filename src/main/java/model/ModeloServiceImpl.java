@@ -44,7 +44,7 @@ public class ModeloServiceImpl implements IModeloService {
         try {
             // Generar ID si no existe
             if (cliente.getId() == null || cliente.getId().trim().isEmpty()) {
-                cliente.setId(java.util.UUID.randomUUID().toString());
+                cliente.setId(generarCodigoCliente());
             }
             
             mongoCRUD.insertar("clientes", cliente.toDocument());
@@ -148,6 +148,41 @@ public class ModeloServiceImpl implements IModeloService {
         } catch (Exception e) {
             System.err.println("Error al verificar teléfono: " + e.getMessage());
             return false;
+        }
+    }
+
+    // === GENERACIÓN DE CÓDIGOS LEGIBLES ===
+    /** Genera código incremental CLI-0001, CLI-0002 ... basándose en los IDs existentes. */
+    private String generarCodigoCliente(){
+        try {
+            List<Document> docs = mongoCRUD.listarTodos("clientes");
+            int max = 0;
+            for (Document d: docs){
+                String id = d.getString("_id");
+                if (id != null && id.startsWith("CLI-")){
+                    try {int n = Integer.parseInt(id.substring(4)); if (n>max) max=n;} catch(Exception ignore){}
+                }
+            }
+            return String.format("CLI-%04d", max+1);
+        } catch (Exception e){
+            return "CLI-"+java.util.UUID.randomUUID().toString().substring(0,8).toUpperCase();
+        }
+    }
+
+    /** Genera código incremental RES-0001, RES-0002 ... */
+    private String generarCodigoReserva(){
+        try {
+            List<Document> docs = mongoCRUD.listarTodos("reservas");
+            int max = 0;
+            for (Document d: docs){
+                String id = d.getString("_id");
+                if (id != null && id.startsWith("RES-")){
+                    try {int n = Integer.parseInt(id.substring(4)); if (n>max) max=n;} catch(Exception ignore){}
+                }
+            }
+            return String.format("RES-%04d", max+1);
+        } catch (Exception e){
+            return "RES-"+java.util.UUID.randomUUID().toString().substring(0,8).toUpperCase();
         }
     }
     
@@ -294,8 +329,8 @@ public class ModeloServiceImpl implements IModeloService {
                 
                 // Crear las 20 habitaciones como en el código original
                 for (int i = 1; i <= 20; i++) {
-                    String id = java.util.UUID.randomUUID().toString();
                     String numero = String.format("%03d", i); // 001, 002, 003...
+                    String id = "HAB-" + numero; // ID legible
                     String tipo = (i <= 5) ? "Suite" : (i <= 12) ? "Doble" : "Simple";
                     double precio = (i <= 5) ? 120.0 : (i <= 12) ? 80.0 : 50.0;
                     
@@ -338,7 +373,7 @@ public class ModeloServiceImpl implements IModeloService {
         try {
             // Generar ID si no existe
             if (reserva.getId() == null || reserva.getId().trim().isEmpty()) {
-                reserva.setId(java.util.UUID.randomUUID().toString());
+                reserva.setId(generarCodigoReserva());
             }
             
             // Crear la reserva
@@ -373,7 +408,6 @@ public class ModeloServiceImpl implements IModeloService {
             // Luego buscar la reserva activa por ID del cliente
             Document filtro = new Document("idCliente", cliente.getId()).append("fechaSalida", null);
             List<Document> documentos = mongoCRUD.buscarPorFiltro("reservas", filtro);
-            
             if (!documentos.isEmpty()) {
                 return Reserva.fromDocument(documentos.get(0));
             }

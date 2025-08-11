@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VentanaAdmin.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">P3ProyectoPooFinal</a> &gt; <a href="index.source.html" class="el_package">view</a> &gt; <span class="el_source">VentanaAdmin.java</span></div><h1>VentanaAdmin.java</h1><pre class="source lang-java linenums">package view;
+
+import controller.ControladorVentanaAdmin;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Ventana de administración del hotel con diseño moderno
+ * @author asdw
+ */
+public class VentanaAdmin extends javax.swing.JFrame {
+    
+    // Colores del tema (simplificados para NetBeans)
+<span class="nc" id="L20">    private static final Color BACKGROUND_COLOR = new Color(240, 242, 247);</span>
+<span class="nc" id="L21">    private static final Color SIDEBAR_COLOR = new Color(52, 58, 76);</span>
+<span class="nc" id="L22">    private static final Color CARD_COLOR = Color.WHITE;</span>
+<span class="nc" id="L23">    private static final Color ACCENT_COLOR = new Color(72, 126, 176);</span>
+<span class="nc" id="L24">    private static final Color TEXT_COLOR = new Color(52, 58, 76);</span>
+<span class="nc" id="L25">    private static final Color TEXT_WHITE = Color.WHITE;</span>
+    
+<span class="nc" id="L27">    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VentanaAdmin.class.getName());</span>
+    
+    // Controlador
+    private ControladorVentanaAdmin controlador;
+    
+    // Componentes principales para acceso público
+    public JTable tablaReservas;
+    public Map&lt;String, JLabel&gt; tarjetasInfo;
+    public JPanel contenidoPrincipal;
+    private JPanel dashboardInicial; // referencia estable al panel dashboard original
+
+    /**
+     * Creates new form VentanaAdmin
+     */
+<span class="nc" id="L41">    public VentanaAdmin() {</span>
+<span class="nc" id="L42">        initComponents();</span>
+<span class="nc" id="L43">        inicializarComponentes();</span>
+<span class="nc" id="L44">        setupModernUI();</span>
+<span class="nc" id="L45">    }</span>
+    
+    /**
+     * Inicializa los componentes adicionales.
+     */
+    private void inicializarComponentes() {
+<span class="nc" id="L51">        tarjetasInfo = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L52">    }</span>
+    
+    /**
+     * Establece el controlador para esta vista.
+     * 
+     * @param controlador Controlador de la ventana admin
+     */
+    public void setControlador(ControladorVentanaAdmin controlador) {
+<span class="nc" id="L60">        this.controlador = controlador;</span>
+<span class="nc" id="L61">    }</span>
+    
+    /**
+     * Configura la interfaz moderna después de initComponents()
+     */
+    private void setupModernUI() {
+        // Configurar ventana principal
+<span class="nc" id="L68">        this.setTitle(&quot;Hotel Admin - Sistema de Gestión&quot;);</span>
+<span class="nc" id="L69">        this.setExtendedState(JFrame.MAXIMIZED_BOTH);</span>
+<span class="nc" id="L70">        this.getContentPane().setBackground(BACKGROUND_COLOR);</span>
+        
+        // Crear layout principal
+<span class="nc" id="L73">        createModernLayout();</span>
+        
+        // Aplicar estilos
+<span class="nc" id="L76">        applyModernStyles();</span>
+<span class="nc" id="L77">    }</span>
+    
+    /**
+     * Crea el layout moderno de la interfaz
+     */
+    private void createModernLayout() {
+        // Limpiar contenido existente
+<span class="nc" id="L84">        getContentPane().removeAll();</span>
+        
+        // Layout principal
+<span class="nc" id="L87">        setLayout(new BorderLayout());</span>
+        
+        // Crear sidebar
+<span class="nc" id="L90">        JPanel sidebar = createSidebar();</span>
+<span class="nc" id="L91">        add(sidebar, BorderLayout.WEST);</span>
+        
+        // Crear contenido principal
+<span class="nc" id="L94">        JPanel mainContent = createMainContent();</span>
+<span class="nc" id="L95">        add(mainContent, BorderLayout.CENTER);</span>
+        
+<span class="nc" id="L97">        revalidate();</span>
+<span class="nc" id="L98">        repaint();</span>
+<span class="nc" id="L99">    }</span>
+    
+    /**
+     * Crea la barra lateral de navegación
+     */
+    private JPanel createSidebar() {
+<span class="nc" id="L105">        JPanel sidebar = new JPanel();</span>
+<span class="nc" id="L106">        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));</span>
+<span class="nc" id="L107">        sidebar.setBackground(SIDEBAR_COLOR);</span>
+<span class="nc" id="L108">        sidebar.setPreferredSize(new Dimension(250, getHeight()));</span>
+<span class="nc" id="L109">        sidebar.setBorder(new EmptyBorder(20, 20, 20, 20));</span>
+        
+        // Header del sidebar
+<span class="nc" id="L112">        JLabel hotelLabel = new JLabel(&quot;🏨 HOTEL ADMIN&quot;);</span>
+<span class="nc" id="L113">        hotelLabel.setForeground(TEXT_WHITE);</span>
+<span class="nc" id="L114">        hotelLabel.setFont(new Font(&quot;Segoe UI&quot;, Font.BOLD, 18));</span>
+<span class="nc" id="L115">        hotelLabel.setAlignmentX(Component.LEFT_ALIGNMENT);</span>
+        
+        // Espaciador
+<span class="nc" id="L118">        sidebar.add(hotelLabel);</span>
+<span class="nc" id="L119">        sidebar.add(Box.createVerticalStrut(30));</span>
+        
+        // Botones de navegación
+<span class="nc" id="L122">        String[] menuItems = {&quot;Dashboard&quot;, &quot;Habitaciones&quot;, &quot;Reservas&quot;, &quot;Clientes&quot;, &quot;Check-in&quot;, &quot;Reportes&quot;};</span>
+        
+<span class="nc bnc" id="L124" title="All 2 branches missed.">        for (String item : menuItems) {</span>
+<span class="nc" id="L125">            JButton button = createMenuButton(item);</span>
+            // Conectar el botón con el controlador
+<span class="nc" id="L127">            button.addActionListener(e -&gt; handleMenuSelection(item));</span>
+<span class="nc" id="L128">            sidebar.add(button);</span>
+<span class="nc" id="L129">            sidebar.add(Box.createVerticalStrut(10));</span>
+        }
+        
+        // Espaciador flexible
+<span class="nc" id="L133">        sidebar.add(Box.createVerticalGlue());</span>
+        
+<span class="nc" id="L135">        return sidebar;</span>
+    }
+    
+    /**
+     * Crea un botón de menú estilizado
+     */
+    private JButton createMenuButton(String text) {
+<span class="nc" id="L142">        JButton button = new JButton(text);</span>
+<span class="nc" id="L143">        button.setBackground(new Color(0, 0, 0, 0)); // Transparente</span>
+<span class="nc" id="L144">        button.setForeground(TEXT_WHITE);</span>
+<span class="nc" id="L145">        button.setFont(new Font(&quot;Segoe UI&quot;, Font.PLAIN, 14));</span>
+<span class="nc" id="L146">        button.setBorderPainted(false);</span>
+<span class="nc" id="L147">        button.setFocusPainted(false);</span>
+<span class="nc" id="L148">        button.setHorizontalAlignment(SwingConstants.LEFT);</span>
+<span class="nc" id="L149">        button.setMaximumSize(new Dimension(210, 35));</span>
+<span class="nc" id="L150">        button.setPreferredSize(new Dimension(210, 35));</span>
+<span class="nc" id="L151">        button.setCursor(new Cursor(Cursor.HAND_CURSOR));</span>
+        
+        // Agregar listener para navegación
+<span class="nc" id="L154">        button.addActionListener(new ActionListener() {</span>
+            @Override
+            public void actionPerformed(ActionEvent e) {
+<span class="nc bnc" id="L157" title="All 2 branches missed.">                if (controlador != null) {</span>
+<span class="nc" id="L158">                    controlador.navegarA(text);</span>
+                }
+<span class="nc" id="L160">            }</span>
+        });
+        
+        // Efectos hover (simulado)
+<span class="nc" id="L164">        button.addMouseListener(new java.awt.event.MouseAdapter() {</span>
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+<span class="nc" id="L166">                button.setBackground(ACCENT_COLOR);</span>
+<span class="nc" id="L167">                button.setOpaque(true);</span>
+<span class="nc" id="L168">            }</span>
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+<span class="nc" id="L170">                button.setBackground(new Color(0, 0, 0, 0));</span>
+<span class="nc" id="L171">                button.setOpaque(false);</span>
+<span class="nc" id="L172">            }</span>
+        });
+        
+<span class="nc" id="L175">        return button;</span>
+    }
+    
+    /**
+     * Crea el contenido principal
+     */
+    private JPanel createMainContent() {
+<span class="nc" id="L182">        JPanel mainPanel = new JPanel(new BorderLayout());</span>
+<span class="nc" id="L183">        mainPanel.setBackground(BACKGROUND_COLOR);</span>
+<span class="nc" id="L184">        mainPanel.setBorder(new EmptyBorder(20, 20, 20, 20));</span>
+        
+        // Header
+<span class="nc" id="L187">        JPanel header = createHeader();</span>
+<span class="nc" id="L188">        mainPanel.add(header, BorderLayout.NORTH);</span>
+        
+        // Dashboard cards
+<span class="nc" id="L191">    contenidoPrincipal = createDashboard();</span>
+    // Guardar referencia inicial para navegación de regreso
+<span class="nc" id="L193">    dashboardInicial = contenidoPrincipal;</span>
+<span class="nc" id="L194">    mainPanel.add(contenidoPrincipal, BorderLayout.CENTER);</span>
+        
+<span class="nc" id="L196">        return mainPanel;</span>
+    }
+    
+    /**
+     * Crea el header superior
+     */
+    private JLabel headerTitle; // para actualizar dinámicamente
+    private JButton btnUndo; 
+    private JButton btnRedo;
+    private Timer undoRedoTooltipTimer;
+
+    private JPanel createHeader() {
+<span class="nc" id="L208">        JPanel header = new JPanel(new BorderLayout());</span>
+<span class="nc" id="L209">        header.setBackground(BACKGROUND_COLOR);</span>
+
+<span class="nc" id="L211">        headerTitle = new JLabel(&quot;Dashboard&quot;);</span>
+<span class="nc" id="L212">        headerTitle.setFont(new Font(&quot;Segoe UI&quot;, Font.BOLD, 24));</span>
+<span class="nc" id="L213">        headerTitle.setForeground(TEXT_COLOR);</span>
+<span class="nc" id="L214">        header.add(headerTitle, BorderLayout.WEST);</span>
+
+<span class="nc" id="L216">        JPanel acciones = new JPanel(new FlowLayout(FlowLayout.RIGHT,10,5));</span>
+<span class="nc" id="L217">        acciones.setOpaque(false);</span>
+<span class="nc" id="L218">        btnUndo = new JButton(&quot;⮪ Undo&quot;);</span>
+<span class="nc" id="L219">        btnRedo = new JButton(&quot;⮫ Redo&quot;);</span>
+<span class="nc" id="L220">        JButton[] arr = {btnUndo, btnRedo};</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">        for (JButton b: arr){</span>
+<span class="nc" id="L222">            b.setFocusPainted(false);</span>
+<span class="nc" id="L223">            b.setBackground(ACCENT_COLOR);</span>
+<span class="nc" id="L224">            b.setForeground(Color.WHITE);</span>
+        }
+<span class="nc" id="L226">        btnUndo.addActionListener(e -&gt; {</span>
+<span class="nc bnc" id="L227" title="All 2 branches missed.">            if (controlador!=null) controlador.ejecutarUndo();</span>
+<span class="nc" id="L228">            actualizarEstadoUndoRedo();</span>
+<span class="nc" id="L229">        });</span>
+<span class="nc" id="L230">        btnRedo.addActionListener(e -&gt; {</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">            if (controlador!=null) controlador.ejecutarRedo();</span>
+<span class="nc" id="L232">            actualizarEstadoUndoRedo();</span>
+<span class="nc" id="L233">        });</span>
+<span class="nc" id="L234">        btnUndo.setToolTipText(&quot;Deshacer última acción&quot;);</span>
+<span class="nc" id="L235">        btnRedo.setToolTipText(&quot;Rehacer acción deshecha&quot;);</span>
+<span class="nc" id="L236">        acciones.add(btnUndo);</span>
+<span class="nc" id="L237">        acciones.add(btnRedo);</span>
+<span class="nc" id="L238">        header.add(acciones, BorderLayout.EAST);</span>
+<span class="nc" id="L239">        iniciarActualizacionUndoRedo();</span>
+<span class="nc" id="L240">        return header;</span>
+    }
+
+    public void actualizarTitulo(String titulo){
+<span class="nc" id="L244">        SwingUtilities.invokeLater(() -&gt; headerTitle.setText(titulo));</span>
+<span class="nc" id="L245">    }</span>
+
+    private void iniciarActualizacionUndoRedo(){
+<span class="nc" id="L248">        undoRedoTooltipTimer = new Timer(1500, e -&gt; actualizarEstadoUndoRedo());</span>
+<span class="nc" id="L249">        undoRedoTooltipTimer.setRepeats(true);</span>
+<span class="nc" id="L250">        undoRedoTooltipTimer.start();</span>
+<span class="nc" id="L251">    }</span>
+
+    private void actualizarEstadoUndoRedo(){
+<span class="nc bnc" id="L254" title="All 2 branches missed.">        if (controlador==null) return;</span>
+<span class="nc" id="L255">        String siguienteUndo = controlador.getCommandInvoker().getNextUndoDescription();</span>
+<span class="nc" id="L256">        String siguienteRedo = controlador.getCommandInvoker().getNextRedoDescription();</span>
+<span class="nc" id="L257">        boolean canUndo = controlador.puedeDeshacer();</span>
+<span class="nc" id="L258">        boolean canRedo = controlador.puedeRehacer();</span>
+<span class="nc" id="L259">        btnUndo.setEnabled(canUndo);</span>
+<span class="nc" id="L260">        btnRedo.setEnabled(canRedo);</span>
+<span class="nc bnc" id="L261" title="All 2 branches missed.">        btnUndo.setText(canUndo?&quot;⮪ Undo&quot; : &quot;⮪ Undo&quot;);</span>
+<span class="nc bnc" id="L262" title="All 2 branches missed.">        btnRedo.setText(canRedo?&quot;⮫ Redo&quot; : &quot;⮫ Redo&quot;);</span>
+<span class="nc bnc" id="L263" title="All 2 branches missed.">        btnUndo.setToolTipText(canUndo?&quot;Deshacer: &quot;+siguienteUndo:&quot;No hay acciones para deshacer&quot;);</span>
+<span class="nc bnc" id="L264" title="All 2 branches missed.">        btnRedo.setToolTipText(canRedo?&quot;Rehacer: &quot;+siguienteRedo:&quot;No hay acciones para rehacer&quot;);</span>
+<span class="nc" id="L265">    }</span>
+    
+    /**
+     * Crea el dashboard con tarjetas de información
+     */
+    private JPanel createDashboard() {
+<span class="nc" id="L271">        JPanel dashboard = new JPanel(new GridBagLayout());</span>
+<span class="nc" id="L272">        dashboard.setBackground(BACKGROUND_COLOR);</span>
+        
+<span class="nc" id="L274">        GridBagConstraints gbc = new GridBagConstraints();</span>
+<span class="nc" id="L275">        gbc.fill = GridBagConstraints.BOTH;</span>
+<span class="nc" id="L276">        gbc.insets = new Insets(10, 10, 10, 10);</span>
+<span class="nc" id="L277">        gbc.weightx = 1.0;</span>
+<span class="nc" id="L278">        gbc.weighty = 1.0;</span>
+        
+        // Tarjetas de información
+<span class="nc" id="L281">        gbc.gridx = 0; gbc.gridy = 0;</span>
+<span class="nc" id="L282">        dashboard.add(createInfoCard(&quot;Habitaciones Disponibles&quot;, &quot;15&quot;, &quot;🛏️&quot;), gbc);</span>
+        
+<span class="nc" id="L284">        gbc.gridx = 1; gbc.gridy = 0;</span>
+<span class="nc" id="L285">        dashboard.add(createInfoCard(&quot;Habitaciones Ocupadas&quot;, &quot;5&quot;, &quot;🔒&quot;), gbc);</span>
+        
+<span class="nc" id="L287">        gbc.gridx = 2; gbc.gridy = 0;</span>
+<span class="nc" id="L288">        dashboard.add(createInfoCard(&quot;Check-ins Hoy&quot;, &quot;3&quot;, &quot;✅&quot;), gbc);</span>
+        
+<span class="nc" id="L290">        gbc.gridx = 3; gbc.gridy = 0;</span>
+<span class="nc" id="L291">        dashboard.add(createInfoCard(&quot;Ingresos del Día&quot;, &quot;$1,250&quot;, &quot;💰&quot;), gbc);</span>
+        
+        // Tabla de reservas recientes
+<span class="nc" id="L294">        gbc.gridx = 0; gbc.gridy = 1;</span>
+<span class="nc" id="L295">        gbc.gridwidth = 4;</span>
+<span class="nc" id="L296">        gbc.weighty = 2.0;</span>
+<span class="nc" id="L297">        dashboard.add(createReservationsTable(), gbc);</span>
+        
+<span class="nc" id="L299">        return dashboard;</span>
+    }
+    
+    /**
+     * Crea una tarjeta de información
+     */
+    private JPanel createInfoCard(String title, String value, String icon) {
+<span class="nc" id="L306">        JPanel card = new JPanel();</span>
+<span class="nc" id="L307">        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));</span>
+<span class="nc" id="L308">        card.setBackground(CARD_COLOR);</span>
+<span class="nc" id="L309">        card.setBorder(BorderFactory.createCompoundBorder(</span>
+<span class="nc" id="L310">            BorderFactory.createLineBorder(new Color(230, 230, 230), 1),</span>
+            new EmptyBorder(20, 20, 20, 20)
+        ));
+        
+        // Icono
+<span class="nc" id="L315">        JLabel iconLabel = new JLabel(icon, SwingConstants.CENTER);</span>
+<span class="nc" id="L316">        iconLabel.setFont(new Font(&quot;Segoe UI Emoji&quot;, Font.PLAIN, 32));</span>
+<span class="nc" id="L317">        iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);</span>
+        
+        // Valor
+<span class="nc" id="L320">        JLabel valueLabel = new JLabel(value, SwingConstants.CENTER);</span>
+<span class="nc" id="L321">        valueLabel.setFont(new Font(&quot;Segoe UI&quot;, Font.BOLD, 28));</span>
+<span class="nc" id="L322">        valueLabel.setForeground(ACCENT_COLOR);</span>
+<span class="nc" id="L323">        valueLabel.setAlignmentX(Component.CENTER_ALIGNMENT);</span>
+        
+        // Título
+<span class="nc" id="L326">        JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);</span>
+<span class="nc" id="L327">        titleLabel.setFont(new Font(&quot;Segoe UI&quot;, Font.PLAIN, 12));</span>
+<span class="nc" id="L328">        titleLabel.setForeground(TEXT_COLOR);</span>
+<span class="nc" id="L329">        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);</span>
+        
+<span class="nc" id="L331">        card.add(iconLabel);</span>
+<span class="nc" id="L332">        card.add(Box.createVerticalStrut(10));</span>
+<span class="nc" id="L333">        card.add(valueLabel);</span>
+<span class="nc" id="L334">        card.add(Box.createVerticalStrut(5));</span>
+<span class="nc" id="L335">        card.add(titleLabel);</span>
+        
+        // Guardar referencia al valor para actualizaciones
+<span class="nc" id="L338">        tarjetasInfo.put(title, valueLabel);</span>
+        
+<span class="nc" id="L340">        return card;</span>
+    }
+    
+    /**
+     * Crea la tabla de reservas
+     */
+    private JScrollPane createReservationsTable() {
+<span class="nc" id="L347">        String[] columnNames = {&quot;Cliente&quot;, &quot;Habitación&quot;, &quot;Check-in&quot;, &quot;Check-out&quot;, &quot;Estado&quot;};</span>
+<span class="nc" id="L348">        DefaultTableModel model = new DefaultTableModel(columnNames, 0);</span>
+        
+<span class="nc" id="L350">        tablaReservas = new JTable(model);</span>
+<span class="nc" id="L351">        tablaReservas.setBackground(CARD_COLOR);</span>
+<span class="nc" id="L352">        tablaReservas.setSelectionBackground(ACCENT_COLOR);</span>
+<span class="nc" id="L353">        tablaReservas.setSelectionForeground(TEXT_WHITE);</span>
+<span class="nc" id="L354">        tablaReservas.setRowHeight(30);</span>
+<span class="nc" id="L355">        tablaReservas.getTableHeader().setBackground(SIDEBAR_COLOR);</span>
+<span class="nc" id="L356">        tablaReservas.getTableHeader().setForeground(TEXT_WHITE);</span>
+<span class="nc" id="L357">        tablaReservas.getTableHeader().setFont(new Font(&quot;Segoe UI&quot;, Font.BOLD, 12));</span>
+        
+<span class="nc" id="L359">        JScrollPane scrollPane = new JScrollPane(tablaReservas);</span>
+<span class="nc" id="L360">        scrollPane.setBackground(CARD_COLOR);</span>
+<span class="nc" id="L361">        scrollPane.setBorder(BorderFactory.createCompoundBorder(</span>
+<span class="nc" id="L362">            BorderFactory.createTitledBorder(</span>
+<span class="nc" id="L363">                BorderFactory.createLineBorder(new Color(230, 230, 230), 1),</span>
+                &quot;Reservas Recientes&quot;,
+                0, 0,
+                new Font(&quot;Segoe UI&quot;, Font.BOLD, 14),
+                TEXT_COLOR
+            ),
+            new EmptyBorder(10, 10, 10, 10)
+        ));
+        
+<span class="nc" id="L372">        return scrollPane;</span>
+    }
+    
+    /**
+     * Aplica estilos modernos a los componentes
+     */
+    private void applyModernStyles() {
+        // Establecer Look and Feel más moderno si está disponible
+        try {
+<span class="nc bnc" id="L381" title="All 2 branches missed.">            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {</span>
+<span class="nc bnc" id="L382" title="All 4 branches missed.">                if (&quot;Windows&quot;.equals(info.getName()) || &quot;Nimbus&quot;.equals(info.getName())) {</span>
+<span class="nc" id="L383">                    UIManager.setLookAndFeel(info.getClassName());</span>
+<span class="nc" id="L384">                    SwingUtilities.updateComponentTreeUI(this);</span>
+<span class="nc" id="L385">                    break;</span>
+                }
+            }
+<span class="nc" id="L388">        } catch (Exception e) {</span>
+<span class="nc" id="L389">            logger.warning(&quot;No se pudo establecer Look and Feel moderno: &quot; + e.getMessage());</span>
+<span class="nc" id="L390">        }</span>
+<span class="nc" id="L391">    }</span>
+    
+    /**
+     * Actualiza el valor de una tarjeta informativa.
+     * 
+     * @param titulo Título de la tarjeta
+     * @param nuevoValor Nuevo valor a mostrar
+     */
+    public void actualizarTarjeta(String titulo, String nuevoValor) {
+<span class="nc" id="L400">        SwingUtilities.invokeLater(() -&gt; {</span>
+<span class="nc" id="L401">            JLabel label = tarjetasInfo.get(titulo);</span>
+<span class="nc bnc" id="L402" title="All 2 branches missed.">            if (label != null) {</span>
+<span class="nc" id="L403">                label.setText(nuevoValor);</span>
+            }
+<span class="nc" id="L405">        });</span>
+<span class="nc" id="L406">    }</span>
+    
+    /**
+     * Actualiza la tabla de reservas con nuevos datos.
+     * 
+     * @param datos Matriz con los datos de las reservas
+     */
+    public void actualizarTablaReservas(String[][] datos) {
+<span class="nc" id="L414">        SwingUtilities.invokeLater(() -&gt; {</span>
+<span class="nc bnc" id="L415" title="All 2 branches missed.">            if (tablaReservas != null) {</span>
+<span class="nc" id="L416">                DefaultTableModel model = (DefaultTableModel) tablaReservas.getModel();</span>
+<span class="nc" id="L417">                model.setRowCount(0); // Limpiar filas existentes</span>
+<span class="nc bnc" id="L418" title="All 2 branches missed.">                for (String[] fila : datos) {</span>
+<span class="nc" id="L419">                    model.addRow(fila);</span>
+                }
+            }
+<span class="nc" id="L422">        });</span>
+<span class="nc" id="L423">    }</span>
+    
+    /**
+     * Cambia el contenido principal del dashboard.
+     * 
+     * @param nuevoContenido Panel con el nuevo contenido
+     */
+    public void cambiarContenidoPrincipal(JPanel nuevoContenido) {
+<span class="nc" id="L431">        SwingUtilities.invokeLater(() -&gt; {</span>
+<span class="nc bnc" id="L432" title="All 4 branches missed.">            if (contenidoPrincipal != null &amp;&amp; contenidoPrincipal.getParent() != null) {</span>
+<span class="nc" id="L433">                Container parent = contenidoPrincipal.getParent();</span>
+<span class="nc" id="L434">                parent.remove(contenidoPrincipal);</span>
+<span class="nc" id="L435">                contenidoPrincipal = nuevoContenido;</span>
+<span class="nc" id="L436">                parent.add(contenidoPrincipal, BorderLayout.CENTER);</span>
+<span class="nc" id="L437">                parent.revalidate();</span>
+<span class="nc" id="L438">                parent.repaint();</span>
+            }
+<span class="nc" id="L440">        });</span>
+<span class="nc" id="L441">    }</span>
+
+    /**
+     * Maneja la selección de un item del menú.
+     * Notifica al controlador para que realice la acción correspondiente.
+     * 
+     * @param item El texto del item del menú seleccionado.
+     */
+    private void handleMenuSelection(String item) {
+<span class="nc bnc" id="L450" title="All 2 branches missed.">        if (controlador != null) {</span>
+<span class="nc" id="L451">            controlador.navegarHacia(item);</span>
+        } else {
+<span class="nc" id="L453">            logger.warning(&quot;Controlador no está inicializado en VentanaAdmin.&quot;);</span>
+        }
+<span class="nc" id="L455">    }</span>
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    // &lt;editor-fold defaultstate=&quot;collapsed&quot; desc=&quot;Generated Code&quot;&gt;//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+<span class="nc" id="L465">        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);</span>
+
+<span class="nc" id="L467">        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());</span>
+<span class="nc" id="L468">        getContentPane().setLayout(layout);</span>
+<span class="nc" id="L469">        layout.setHorizontalGroup(</span>
+<span class="nc" id="L470">            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)</span>
+<span class="nc" id="L471">            .addGap(0, 552, Short.MAX_VALUE)</span>
+        );
+<span class="nc" id="L473">        layout.setVerticalGroup(</span>
+<span class="nc" id="L474">            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)</span>
+<span class="nc" id="L475">            .addGap(0, 520, Short.MAX_VALUE)</span>
+        );
+
+<span class="nc" id="L478">        pack();</span>
+<span class="nc" id="L479">    }// &lt;/editor-fold&gt;//GEN-END:initComponents</span>
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //&lt;editor-fold defaultstate=&quot;collapsed&quot; desc=&quot; Look and feel setting code (optional) &quot;&gt;
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+<span class="nc bnc" id="L491" title="All 2 branches missed.">            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {</span>
+<span class="nc bnc" id="L492" title="All 2 branches missed.">                if (&quot;Nimbus&quot;.equals(info.getName())) {</span>
+<span class="nc" id="L493">                    javax.swing.UIManager.setLookAndFeel(info.getClassName());</span>
+<span class="nc" id="L494">                    break;</span>
+                }
+            }
+<span class="nc" id="L497">        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {</span>
+<span class="nc" id="L498">            logger.log(java.util.logging.Level.SEVERE, null, ex);</span>
+<span class="nc" id="L499">        }</span>
+        //&lt;/editor-fold&gt;
+
+        /* Create and display the form */
+<span class="nc" id="L503">        java.awt.EventQueue.invokeLater(() -&gt; new VentanaAdmin().setVisible(true));</span>
+<span class="nc" id="L504">    }</span>
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // End of variables declaration//GEN-END:variables
+
+    /**
+     * Devuelve el panel dashboard original (no el contenedor padre),
+     * permitiendo volver a mostrarlo tras navegar a otras vistas.
+     */
+    public JPanel getDashboardPanel() {
+<span class="nc" id="L514">        return dashboardInicial;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

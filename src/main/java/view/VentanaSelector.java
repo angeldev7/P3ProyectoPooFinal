@@ -110,7 +110,7 @@ public class VentanaSelector extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
         JPanel tradicionCard = createInterfaceCard(
-            "Interfaz Tradicional",
+            "Check-in",
             "Vista clásica con formularios\ny tablas estándar",
             "📋",
             () -> abrirInterfazTradicional()

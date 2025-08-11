@@ -1,7 +1,5 @@
 package principal;
 
-import controller.ControladorVentanaPrincipal;
-import view.VentanaPrincipal;
 import view.VentanaSelector;
 import model.*;
 import command.*;
@@ -26,7 +24,7 @@ public class P3ProyectoPooFinal {
                 IModeloService modeloService = new ModeloServiceImpl();
                 
                 // Crear el command invoker para Undo/Redo
-                ICommandInvoker commandInvoker = new CommandInvoker();
+                ICommandInvoker commandInvoker = new CommandInvoker(modeloService);
                 
                 // Inicializar el gestor de disponibilidad (Singleton)
                 GestorDisponibilidad gestor = GestorDisponibilidad.getInstance();

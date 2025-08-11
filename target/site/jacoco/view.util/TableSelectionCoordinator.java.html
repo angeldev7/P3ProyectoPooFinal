@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TableSelectionCoordinator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">P3ProyectoPooFinal</a> &gt; <a href="index.source.html" class="el_package">view.util</a> &gt; <span class="el_source">TableSelectionCoordinator.java</span></div><h1>TableSelectionCoordinator.java</h1><pre class="source lang-java linenums">package view.util;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
+
+/**
+ * Coordina la selección exclusiva entre varias JTable.
+ * Cuando una tabla gana selección, se limpia en las demás.
+ * Permite callback para actualizar botones u otros componentes.
+ */
+public class TableSelectionCoordinator {
+    private final List&lt;JTable&gt; tablas;
+    private final Consumer&lt;JTable&gt; onSelectionChanged;
+<span class="nc" id="L18">    private boolean internalChange = false;</span>
+
+<span class="nc" id="L20">    public TableSelectionCoordinator(Consumer&lt;JTable&gt; onSelectionChanged, JTable... tablas) {</span>
+<span class="nc" id="L21">        this.tablas = Arrays.asList(tablas);</span>
+<span class="nc bnc" id="L22" title="All 2 branches missed.">        this.onSelectionChanged = onSelectionChanged != null ? onSelectionChanged : t -&gt; {};</span>
+<span class="nc" id="L23">        instalar();</span>
+<span class="nc" id="L24">    }</span>
+
+    private void instalar() {
+<span class="nc" id="L27">        ListSelectionListener listener = new ListSelectionListener() {</span>
+            @Override public void valueChanged(ListSelectionEvent e) {
+<span class="nc bnc" id="L29" title="All 4 branches missed.">                if (e.getValueIsAdjusting() || internalChange) return;</span>
+<span class="nc" id="L30">                JTable source = null;</span>
+<span class="nc bnc" id="L31" title="All 2 branches missed.">                for (JTable t: tablas) {</span>
+<span class="nc bnc" id="L32" title="All 2 branches missed.">                    if (t.getSelectionModel() == e.getSource()) { source = t; break; }</span>
+<span class="nc" id="L33">                }</span>
+<span class="nc bnc" id="L34" title="All 2 branches missed.">                if (source == null) return;</span>
+<span class="nc bnc" id="L35" title="All 2 branches missed.">                if (source.getSelectedRow() != -1) {</span>
+<span class="nc" id="L36">                    internalChange = true;</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">                    for (JTable t: tablas) {</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">                        if (t != source) t.clearSelection();</span>
+<span class="nc" id="L39">                    }</span>
+<span class="nc" id="L40">                    internalChange = false;</span>
+                }
+<span class="nc" id="L42">                onSelectionChanged.accept(source);</span>
+<span class="nc" id="L43">            }</span>
+        };
+
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        for (JTable t: tablas) {</span>
+<span class="nc" id="L47">            t.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);</span>
+<span class="nc" id="L48">            t.getSelectionModel().addListSelectionListener(listener);</span>
+<span class="nc" id="L49">        }</span>
+<span class="nc" id="L50">    }</span>
+
+    /**
+     * Obtiene la tabla actualmente con selección (o null).
+     */
+    public JTable getTablaActiva() {
+<span class="nc bnc" id="L56" title="All 4 branches missed.">        for (JTable t: tablas) if (t.getSelectedRow() != -1) return t;</span>
+<span class="nc" id="L57">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

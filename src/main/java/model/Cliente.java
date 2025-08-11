@@ -90,12 +90,9 @@ public class Cliente {
 
     @Override
     public String toString() {
-        return "Cliente{" +
-                "id='" + id + '\'' +
-                ", nombre='" + nombre + '\'' +
-                ", apellido='" + apellido + '\'' +
-                ", cedula='" + cedula + '\'' +
-                ", telefono='" + telefono + '\'' +
-                '}';
+    // Representación amigable para listas/combo boxes
+    String base = (nombre!=null?nombre:"") + " " + (apellido!=null?apellido:"").trim();
+    String doc = cedula!=null?cedula:"";
+    return base.trim() + (doc.isEmpty()?"":" ("+doc+")");
     }
 }

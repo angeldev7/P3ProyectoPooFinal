@@ -1,0 +1,139 @@
+@startuml
+'title: Vista Simplificada de la Arquitectura (Capas + Patrones)
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rect
+skinparam ArrowColor #555555
+skinparam defaultTextAlignment center
+skinparam BackgroundColor #FFFFFF
+skinparam LegendBackgroundColor #FFFFFF
+skinparam LegendBorderColor #999999
+
+' ====== CAPAS PRINCIPALES ======
+package "Capa View (Swing)" #F4F6FA {
+  class VentanaPrincipal
+  class VentanaAdmin
+  class VentanaSelector
+  package Panels {
+    class PanelClientes
+    class PanelHabitaciones
+    class PanelReservas
+    class PanelCheckin
+  }
+}
+
+package "Capa Controller" #E9F8E7 {
+  class ControladorVentanaPrincipal
+  class ControladorVentanaAdmin
+  class ControladorHabitaciones
+}
+
+package "Capa Servicio (Fachada Model)" #FFF8E6 {
+  interface IModeloService
+  class ModeloServiceImpl <<Fachada>>
+}
+
+package "Capa Dominio" #F9F5F2 {
+  class Cliente
+  class Habitacion
+  class Reserva
+  class HabitacionOcupadaInfo
+}
+
+package "Persistencia" #F2F2F2 {
+  class MongoCRUD
+  class ConexionBD
+}
+
+package "Patrones de Comportamiento" #FFF0F3 {
+  interface ICommand
+  class CommandInvoker
+  class CrearReservaCommand
+  class FinalizarReservaCommand
+  class CheckinCommand
+  class CheckinRapidoAdminCommand
+  class AnularReservaCommand
+}
+
+package "Estado / Historial" #F2E8FF {
+  class ModeloMemento
+}
+
+package "Builder" #E8F4FF {
+  class ReservaBuilder
+}
+
+package "Singleton" #FFEFD6 {
+  class GestorDisponibilidad <<Singleton>>
+}
+
+' ====== RELACIONES SIMPLIFICADAS ======
+VentanaPrincipal --> ControladorVentanaPrincipal
+VentanaAdmin --> ControladorVentanaAdmin
+VentanaSelector --> ControladorVentanaPrincipal
+PanelClientes --> ControladorVentanaAdmin
+PanelHabitaciones --> ControladorHabitaciones
+PanelReservas --> ControladorVentanaAdmin
+PanelCheckin --> ControladorVentanaAdmin
+
+ControladorVentanaPrincipal --> IModeloService
+ControladorVentanaAdmin --> IModeloService
+ControladorHabitaciones --> IModeloService
+
+IModeloService <|.. ModeloServiceImpl
+ModeloServiceImpl --> MongoCRUD
+MongoCRUD --> ConexionBD
+ModeloServiceImpl --> GestorDisponibilidad
+ModeloServiceImpl --> ReservaBuilder
+ModeloServiceImpl --> ModeloMemento
+
+ModeloServiceImpl --> Cliente
+ModeloServiceImpl --> Habitacion
+ModeloServiceImpl --> Reserva
+ModeloServiceImpl --> HabitacionOcupadaInfo
+
+ICommand <|.. CrearReservaCommand
+ICommand <|.. FinalizarReservaCommand
+ICommand <|.. CheckinCommand
+ICommand <|.. CheckinRapidoAdminCommand
+ICommand <|.. AnularReservaCommand
+CommandInvoker --> ICommand : ejecuta
+CommandInvoker --> ModeloMemento : snapshot
+CommandInvoker --> IModeloService : coordina
+
+ReservaBuilder --> Reserva : build()
+GestorDisponibilidad --> Habitacion : controla disponibilidad
+ModeloMemento --> Cliente
+ModeloMemento --> Habitacion
+ModeloMemento --> Reserva
+
+' ====== NOTAS ======
+note right of ModeloServiceImpl
+Fachada central:
+- Regla de negocio
+- Orquesta patrones
+end note
+
+note top of CommandInvoker
+Gestiona:
+- Undo / Redo
+- Pila de comandos
+- Mementos
+end note
+
+note bottom of GestorDisponibilidad
+Inventario global
+(O(1) consultas rápidas)
+end note
+
+note left of ReservaBuilder
+Construcción segura
+de Reserva
+end note
+
+' ====== LEYENDA ======
+legend left
+== Colores ==\n#F4F6FA View\n#E9F8E7 Controller\n#FFF8E6 Servicio/Fachada\n#F9F5F2 Dominio\n#F2F2F2 Persistencia\n#FFF0F3 Command\n#F2E8FF Memento\n#E8F4FF Builder\n#FFEFD6 Singleton
+endlegend
+
+@enduml

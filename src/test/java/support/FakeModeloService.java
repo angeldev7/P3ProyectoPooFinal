@@ -49,4 +49,24 @@ public class FakeModeloService implements IModeloService {
     @Override public ModeloMemento crearMemento(){ return new ModeloMemento(clientes, habitaciones, reservas);}    
     @Override public void restaurarEstadoCompleto(ModeloMemento m){ if(m==null) return; clientes.clear(); clientes.addAll(m.getClientes()); habitaciones.clear(); habitaciones.addAll(m.getHabitaciones()); reservas.clear(); reservas.addAll(m.getReservas()); }
     @Override public boolean verificarDisponibilidad(){ return true; }
+
+    @Override
+    public boolean registrarServicioHabitacion(ServicioHabitacion servicio) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public List<ServicioHabitacion> obtenerServiciosPorReserva(String idReserva) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public String generarCodigoServicio() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public boolean actualizarPlanificacionReserva(String idReserva, Date nuevaFechaInicioPlanificada, int noches, String nuevasObservaciones) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

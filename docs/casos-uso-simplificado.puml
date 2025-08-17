@@ -1,0 +1,113 @@
+@startuml
+' Diagrama de Casos de Uso Simplificado - Gestión Hotelera
+left to right direction
+skinparam actorStyle awesome
+skinparam shadowing false
+skinparam packageStyle rect
+skinparam usecaseBackgroundColor #FFFFFF
+skinparam usecaseBorderColor #666666
+skinparam defaultFontName Segoe UI
+skinparam ArrowColor #555555
+
+' ===== Actores =====
+actor Recepcionista as R
+actor Administrador as Admin
+actor "MongoDB" as DB
+Admin --|> R  : hereda tareas
+
+' ===== Clusters de Casos =====
+package "Clientes" #F4F8FF {
+  usecase (Registrar Cliente) as UC_Reg
+  usecase (Editar Cliente) as UC_Edit
+  usecase (Eliminar Cliente) as UC_Del
+  usecase (Buscar Cliente) as UC_Buscar
+}
+
+package "Habitaciones" #F6FFF4 {
+  usecase (Ver Disponibilidad) as UC_VerHab
+}
+
+package "Reservas" #FFF8F0 {
+  usecase (Crear Reserva / Check-in) as UC_CrearRes
+  usecase (Finalizar Reserva / Check-out) as UC_FinalRes
+  usecase (Anular Reserva) as UC_AnularRes
+  usecase (Listar Reservas) as UC_ListRes
+}
+
+package "Historial" #F9F4FF {
+  usecase (Deshacer Cambios) as UC_Undo
+  usecase (Rehacer Cambios) as UC_Redo
+}
+
+package "Mantenimiento (Solo Admin)" #FFF4F4 {
+  usecase (Migrar IDs Legibles) as UC_Migrar
+  usecase (Inicializar Habitaciones) as UC_InitHab
+}
+
+' ===== Relaciones Actor -> Caso =====
+R --> UC_Reg
+R --> UC_Buscar
+R --> UC_CrearRes
+R --> UC_FinalRes
+R --> UC_AnularRes
+R --> UC_ListRes
+R --> UC_VerHab
+R --> UC_Undo
+R --> UC_Redo
+
+Admin --> UC_Edit
+Admin --> UC_Del
+Admin --> UC_Migrar
+Admin --> UC_InitHab
+' Admin hereda las de Recepcionista por generalización
+
+' ===== Relaciones Entre Casos =====
+UC_CrearRes --> UC_VerHab : <<include>>
+UC_FinalRes --> UC_ListRes : <<include>>
+UC_AnularRes --> UC_ListRes : <<include>>
+UC_Undo ..> UC_CrearRes : <<extiende>>
+UC_Undo ..> UC_FinalRes : <<extiende>>
+UC_Undo ..> UC_AnularRes : <<extiende>>
+UC_Redo --> UC_Undo : <<include>>
+UC_Migrar ..> UC_Reg : <<extiende>>
+UC_InitHab ..> UC_VerHab : <<extiende>>
+
+' ===== Persistencia Principal =====
+DB <-- UC_Reg
+DB <-- UC_CrearRes
+DB <-- UC_FinalRes
+DB <-- UC_AnularRes
+DB <-- UC_Migrar
+DB <-- UC_InitHab
+
+' ===== Notas =====
+note right of R
+Rol base operación diaria
+end note
+
+note right of Admin
+Incluye permisos avanzados:
+- Edición / Eliminación cliente
+- Mantenimiento
+end note
+
+note bottom of UC_Undo
+Revierte última acción
+(command + memento)
+end note
+
+note bottom of UC_Redo
+Reaplica acción previamente
+revertida
+end note
+
+note bottom of UC_Migrar
+Normaliza IDs antiguos a
+formato CLI-####
+end note
+
+legend left
+== Colores ==\n#F4F8FF Clientes\n#F6FFF4 Habitaciones\n#FFF8F0 Reservas\n#F9F4FF Historial\n#FFF4F4 Mantenimiento
+endlegend
+
+@enduml

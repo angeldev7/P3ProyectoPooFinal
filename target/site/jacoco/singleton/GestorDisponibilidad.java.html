@@ -38,7 +38,7 @@ public class GestorDisponibilidad {
 <span class="pc bpc" id="L38" title="1 of 2 branches missed.">                if (instance == null) {</span>
 <span class="fc" id="L39">                    instance = new GestorDisponibilidad();</span>
                 }
-            }
+<span class="fc" id="L41">            }</span>
         }
 <span class="fc" id="L43">        return instance;</span>
     }
@@ -55,7 +55,7 @@ public class GestorDisponibilidad {
 <span class="fc bfc" id="L55" title="All 2 branches covered.">        for (Habitacion hab : habitaciones) {</span>
 <span class="fc" id="L56">            disponibilidadHabitaciones.put(hab.getId(), hab.isDisponible());</span>
 <span class="fc" id="L57">            habitacionesCache.put(hab.getId(), hab);</span>
-        }
+<span class="fc" id="L58">        }</span>
 <span class="fc" id="L59">    }</span>
 
     /**

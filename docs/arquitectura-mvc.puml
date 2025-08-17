@@ -1,0 +1,152 @@
+@startuml
+title Arquitectura General del Sistema (MVC + Patrones)
+
+skinparam packageStyle rect
+skinparam shadowing false
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam defaultTextAlignment center
+
+package "view (UI Swing)" #F4F6FA {
+  class VentanaPrincipal
+  class VentanaAdmin
+  class VentanaSelector
+  package panels {
+    class PanelClientes
+    class PanelHabitaciones
+    class PanelReservas
+    class PanelCheckin
+  }
+}
+
+package "controller" #F2F9F1 {
+  class ControladorVentanaPrincipal
+  class ControladorVentanaAdmin
+  class ControladorHabitaciones
+}
+
+package "model" #F9F5F2 {
+  interface IModeloService
+  class ModeloServiceImpl
+  class MongoCRUD
+  class ConexionBD
+  class Cliente
+  class Habitacion
+  class Reserva
+  class HabitacionOcupadaInfo
+}
+
+package "singleton" #FFF4E5 {
+  class GestorDisponibilidad <<Singleton>>
+}
+
+package "builder" #E8F4FF {
+  class ReservaBuilder
+}
+
+package "command" #FFF0F3 {
+  interface ICommand
+  class CrearReservaCommand
+  class FinalizarReservaCommand
+  class CheckinCommand
+  class CheckinRapidoAdminCommand
+  class AnularReservaCommand
+  class CommandInvoker
+}
+
+package "memento" #F2E8FF {
+  class ModeloMemento
+  interface ICaretaker
+}
+
+package "support (tests)" #EEEEEE {
+  class FakeModeloService
+}
+
+VentanaPrincipal --> ControladorVentanaPrincipal : eventos
+VentanaAdmin --> ControladorVentanaAdmin : eventos
+VentanaSelector --> ControladorVentanaPrincipal : inicia
+PanelClientes --> ControladorVentanaAdmin : CRUD
+PanelHabitaciones --> ControladorHabitaciones : acciones
+PanelReservas --> ControladorVentanaAdmin : acciones
+PanelCheckin --> ControladorVentanaAdmin : check-in/out
+
+ControladorVentanaPrincipal --> IModeloService
+ControladorVentanaAdmin --> IModeloService
+ControladorHabitaciones --> IModeloService
+ControladorVentanaAdmin --> CommandInvoker
+ControladorVentanaAdmin ..> ICommand : crea
+
+ModeloServiceImpl ..|> IModeloService
+ModeloServiceImpl --> MongoCRUD
+ModeloServiceImpl --> GestorDisponibilidad
+ModeloServiceImpl --> ReservaBuilder
+ModeloServiceImpl --> ModeloMemento
+MongoCRUD --> ConexionBD
+ModeloServiceImpl --> Cliente
+ModeloServiceImpl --> Habitacion
+ModeloServiceImpl --> Reserva
+ModeloServiceImpl --> HabitacionOcupadaInfo
+
+ReservaBuilder --> Reserva : build()
+
+ICommand <|.. CrearReservaCommand
+ICommand <|.. FinalizarReservaCommand
+ICommand <|.. CheckinCommand
+ICommand <|.. CheckinRapidoAdminCommand
+ICommand <|.. AnularReservaCommand
+CrearReservaCommand --> IModeloService
+FinalizarReservaCommand --> IModeloService
+CheckinCommand --> IModeloService
+CheckinRapidoAdminCommand --> IModeloService
+AnularReservaCommand --> IModeloService
+CommandInvoker --> ICommand : ejecuta
+CommandInvoker --> ModeloMemento : snapshot
+CommandInvoker ..> ICaretaker
+
+ModeloMemento --> Cliente
+ModeloMemento --> Habitacion
+ModeloMemento --> Reserva
+ICaretaker <|.. CommandInvoker
+
+GestorDisponibilidad <.. ModeloServiceImpl : getInstance()
+GestorDisponibilidad --> Habitacion : gestiona
+
+FakeModeloService ..|> IModeloService
+FakeModeloService -[dashed]-> Habitacion
+FakeModeloService -[dashed]-> Reserva
+FakeModeloService -[dashed]-> Cliente
+
+note top of ModeloServiceImpl
+  Fachada de negocio
+  (Model)
+end note
+
+note right of CommandInvoker
+  Pila undo/redo &
+  snapshots (Memento)
+end note
+
+note bottom of GestorDisponibilidad
+  Estado global de
+  disponibilidad
+end note
+
+note left of ReservaBuilder
+  Construcción fluida
+  de Reserva
+end note
+
+legend left
+  == Colores ==
+  #F4F6FA View
+  #F2F9F1 Controller
+  #F9F5F2 Model
+  #FFF4E5 Singleton
+  #E8F4FF Builder
+  #FFF0F3 Command
+  #F2E8FF Memento
+  #EEEEEE Tests
+endlegend
+
+@enduml

@@ -52,7 +52,11 @@ public class FinalizarReservaCommand implements ICommand {
             null,
             reservaOriginal.getTotal(),
             reservaOriginal.getObservaciones(),
-            true
+            true,
+            new java.util.Date(),
+            reservaOriginal.getFechaInicioPlanificada()!=null?reservaOriginal.getFechaInicioPlanificada():new java.util.Date(),
+            reservaOriginal.getFechaFinPlanificada(),
+            reservaOriginal.getNoches()>0?reservaOriginal.getNoches():1
         );
         modeloService.crearReserva(reactivada);
     }

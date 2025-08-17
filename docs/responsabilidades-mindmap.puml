@@ -1,0 +1,48 @@
+@startmindmap
+* Responsabilidades
+** View
+*** Selector (inicio)
+*** Principal (navegación)
+*** Admin (undo/redo)
+*** Clientes (tabla/buscar)
+*** Habitaciones (estado)
+*** Reservas (lista)
+*** Checkin (rápido)
+** Controllers
+*** Admin Ctrl (CRUD + comandos)
+*** Principal Ctrl
+*** Hab Ctrl (lecturas)
+** Service
+*** IModeloService (contrato)
+*** Impl
+**** Orquesta reglas
+**** IDs legibles
+**** Snapshots
+**** Inicializa HAB
+** Dominio
+*** Cliente
+*** Habitacion (disp & precio)
+*** Reserva (activo)
+*** OcupadaInfo
+** Persistencia
+*** MongoCRUD
+*** ConexionBD
+** Patrones
+*** Singleton (GestorDisp)
+*** Builder (ReservaBuilder)
+*** Memento (ModeloMemento)
+*** CommandInvoker
+*** Comandos
+**** Crear
+**** Finalizar
+**** Checkin / Rápido
+**** Anular
+** Utilidades
+*** migrar IDs
+*** inicializar HAB
+*** debug estado
+** Tests/CI
+*** FakeModeloService
+*** JUnit + JaCoCo
+*** GitHub Actions
+@endmindmap

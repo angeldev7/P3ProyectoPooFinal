@@ -45,14 +45,14 @@ public class FinalizarReservaCommand implements ICommand {
 <span class="fc bfc" id="L45" title="All 2 branches covered.">        if (yaExisteActiva) return;</span>
 
 <span class="fc" id="L47">        Reserva reactivada = new Reserva(</span>
-<span class="fc" id="L48">            null,</span>
+            null,
 <span class="fc" id="L49">            reservaOriginal.getIdCliente(),</span>
 <span class="fc" id="L50">            reservaOriginal.getIdHabitacion(),</span>
-<span class="fc" id="L51">            new java.util.Date(),</span>
-<span class="fc" id="L52">            null,</span>
+            new java.util.Date(),
+            null,
 <span class="fc" id="L53">            reservaOriginal.getTotal(),</span>
 <span class="fc" id="L54">            reservaOriginal.getObservaciones(),</span>
-<span class="fc" id="L55">            true</span>
+            true
         );
 <span class="fc" id="L57">        modeloService.crearReserva(reactivada);</span>
 <span class="fc" id="L58">    }</span>

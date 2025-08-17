@@ -22,6 +22,9 @@ public class CheckinCommand implements ICommand {
     private final IModeloService modeloService;
     private final ControladorVentanaPrincipal controlador;
     private final long executionTime;
+    // nuevos campos de planificación
+    private final int offsetDiasLlegada; // 0 = hoy
+    private final int nochesPlanificadas; // >=1
     
     // Estados para undo
     private Cliente clienteCreado;
@@ -33,8 +36,9 @@ public class CheckinCommand implements ICommand {
      * Constructor del comando de check-in.
      */
     public CheckinCommand(String nombre, String apellido, String cedula, String telefono,
-                         String habitacionDisplay, IModeloService modeloService, 
-                         ControladorVentanaPrincipal controlador) {
+                         String habitacionDisplay, IModeloService modeloService,
+                         ControladorVentanaPrincipal controlador,
+                         int offsetDiasLlegada, int nochesPlanificadas) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.cedula = cedula;
@@ -43,6 +47,8 @@ public class CheckinCommand implements ICommand {
         this.modeloService = modeloService;
         this.controlador = controlador;
         this.executionTime = System.currentTimeMillis();
+        this.offsetDiasLlegada = Math.max(0, offsetDiasLlegada);
+        this.nochesPlanificadas = Math.max(1, nochesPlanificadas);
     }
 
     @Override
@@ -77,13 +83,29 @@ public class CheckinCommand implements ICommand {
                 primeraEjecucion = false;
             }
             
-            // Crear nueva reserva (tanto para primera ejecución como para redo)
-            reservaCreada = new ReservaBuilder()
+            // Calcular fechas planificadas usando offset y noches
+            java.time.LocalDate hoy = java.time.LocalDate.now();
+            java.time.LocalDate inicioPlan = hoy.plusDays(offsetDiasLlegada);
+            java.time.LocalDate finPlan = inicioPlan.plusDays(nochesPlanificadas);
+            java.util.Date fechaInicioPlan = java.util.Date.from(inicioPlan.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
+            java.util.Date fechaFinPlan = java.util.Date.from(finPlan.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
+
+            // Crear nueva reserva: si llegada es hoy => checkin inmediato, si no => reserva futura (sin ocupar aún)
+            ReservaBuilder rb = new ReservaBuilder()
                 .setCliente(clienteCreado.getId())
                 .setHabitacion(idHabitacion)
-                .setTotal(habitacion.getPrecio())
-                .setCheckinInmediato()
-                .build();
+                .setTotal(habitacion.getPrecio() * nochesPlanificadas);
+            if (offsetDiasLlegada == 0) {
+                rb.setCheckinInmediato();
+            } else {
+                // futura: fijamos fechaIngreso planificada pero no ocupamos todavía (fechaIngreso null)
+                rb.setFechaIngreso(fechaInicioPlan); // Registro como planificada
+            }
+            reservaCreada = rb.build();
+            reservaCreada.setFechaReserva(new java.util.Date());
+            reservaCreada.setFechaInicioPlanificada(fechaInicioPlan);
+            reservaCreada.setFechaFinPlanificada(fechaFinPlan);
+            reservaCreada.setNoches(nochesPlanificadas);
                 
             if (!modeloService.crearReserva(reservaCreada)) {
                 throw new RuntimeException("Error al crear reserva.");
@@ -126,8 +148,10 @@ public class CheckinCommand implements ICommand {
 
     @Override
     public String getDescription() {
-        return "Check-in de " + nombre + " " + apellido + " en habitación " + 
-               habitacionDisplay.split(" \\|")[0];
+    String accion = (offsetDiasLlegada==0?"Check-in":"Reserva planificada");
+    return accion+" de " + nombre + " " + apellido + " en habitación " + 
+           habitacionDisplay.split(" \\|")[0] +
+           (offsetDiasLlegada>0?" (en "+offsetDiasLlegada+" días, "+nochesPlanificadas+" noches)":"");
     }
 
     @Override

@@ -7,12 +7,32 @@ import singleton.GestorDisponibilidad;
 
 /**
  * Clase principal del sistema de gestión hotelera.
- * Implementa arquitectura MVC con patrones Command, Memento, Builder y Singleton.
- * Aplica principio DIP inyectando abstracciones en lugar de implementaciones concretas.
+ * Arquitectura: MVC reforzado con principios SOLID (DIP aplicado mediante {@link model.IModeloService}).
+ * Patrones implementados: Command (operaciones con Undo/Redo), Memento (snapshots completos del modelo),
+ * Builder (creación segura de reservas), Singleton (gestión de disponibilidad), y extensión para Servicios a Habitación.
  * 
- * Versión 2.0 - Incluye nueva interfaz de administración moderna.
+ * Responsabilidades clave:
+ * - Inicializar capa de modelo y gestor de disponibilidad.
+ * - Configurar invoker de comandos con soporte de snapshots (Memento) para operaciones atómicas con Undo/Redo.
+ * - Lanzar interfaz de selección / administración moderna.
  * 
- * @version 2.0
+ * Historial de versiones:
+ * 1.0.0: Estructura base MVC, CRUD básico de Clientes / Habitaciones / Reservas, patrón Builder inicial.
+ * 2.0.0: Interfaz de administración moderna (dashboard con métricas), integración completa de Command + Memento,
+ *        mejoras de ID legibles (CLI-xxxx, RES-xxxx), métricas de reservas recientes.
+ * 3.0.0: Panel de Servicios a la Habitación (solo para habitaciones ocupadas o reservas activas) con nueva entidad
+ *        {@link model.ServicioHabitacion}, validaciones de negocio (reserva activa + habitación ocupada),
+ *        ampliación de la interfaz `IModeloService`, y preparación para futura integración de costos dinámicos.
+ * 
+ * Mejores prácticas aplicadas:
+ * - DIP: la UI y controladores solo conocen interfaces (ej. {@link command.ICommandInvoker}, {@link model.IModeloService}).
+ * - Cohesión alta: lógica de persistencia encapsulada en {@link model.ModeloServiceImpl}.
+ * - Separación de responsabilidades: nuevos paneles modulares (Clientes, Reservas, Habitaciones, Servicios, Reportes).
+ * - Extensibilidad: nuevos comandos pueden agregarse sin modificar el invoker.
+ * 
+ * Nota: Cualquier error crítico durante el arranque se notifica al usuario y se registra antes de terminar el proceso.
+ * 
+ * @version 3.0.0
  */
 public class P3ProyectoPooFinal {
 
@@ -40,7 +60,7 @@ public class P3ProyectoPooFinal {
                     javax.swing.JOptionPane.ERROR_MESSAGE);
                 
                 java.util.logging.Logger.getLogger(P3ProyectoPooFinal.class.getName())
-                    .severe("Error crítico iniciando sistema: " + e.getMessage());
+                    .severe("Error critico iniciando sistema: " + e.getMessage());
                 
                 System.exit(1);
             }

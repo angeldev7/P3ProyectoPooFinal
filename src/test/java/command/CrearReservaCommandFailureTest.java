@@ -34,6 +34,26 @@ public class CrearReservaCommandFailureTest {
         @Override public ModeloMemento crearMemento(){ return null; }
         @Override public void restaurarEstadoCompleto(ModeloMemento m){}
         @Override public boolean verificarDisponibilidad(){ return true; }
+
+        @Override
+        public boolean registrarServicioHabitacion(ServicioHabitacion servicio) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+
+        @Override
+        public List<ServicioHabitacion> obtenerServiciosPorReserva(String idReserva) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+
+        @Override
+        public String generarCodigoServicio() {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+
+        @Override
+        public boolean actualizarPlanificacionReserva(String idReserva, Date nuevaFechaInicioPlanificada, int noches, String nuevasObservaciones) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
     }
 
     @Test

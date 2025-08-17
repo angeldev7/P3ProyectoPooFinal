@@ -34,13 +34,13 @@ public class ModeloMemento {
 <span class="fc bfc" id="L34" title="All 2 branches covered.">        for (Cliente cliente : clientes) {</span>
 <span class="fc" id="L35">            this.clientes.add(new Cliente(cliente.getId(), cliente.getNombre(), </span>
 <span class="fc" id="L36">                                        cliente.getApellido(), cliente.getCedula(), cliente.getTelefono()));</span>
-        }
+<span class="fc" id="L37">        }</span>
         
 <span class="fc" id="L39">        this.habitaciones = new ArrayList&lt;&gt;();</span>
 <span class="fc bfc" id="L40" title="All 2 branches covered.">        for (Habitacion hab : habitaciones) {</span>
 <span class="fc" id="L41">            this.habitaciones.add(new Habitacion(hab.getId(), hab.getNumero(), </span>
 <span class="fc" id="L42">                                               hab.getTipo(), hab.isOcupada(), hab.getPrecio()));</span>
-        }
+<span class="fc" id="L43">        }</span>
         
 <span class="fc" id="L45">        this.reservas = new ArrayList&lt;&gt;();</span>
 <span class="fc bfc" id="L46" title="All 2 branches covered.">        for (Reserva reserva : reservas) {</span>
@@ -49,7 +49,7 @@ public class ModeloMemento {
 <span class="fc" id="L49">            this.reservas.add(new Reserva(reserva.getId(), reserva.getIdCliente(), reserva.getIdHabitacion(),</span>
 <span class="fc" id="L50">                                        fechaIngreso, fechaSalida, reserva.getTotal(), </span>
 <span class="fc" id="L51">                                        reserva.getObservaciones(), reserva.isConfirmada()));</span>
-        }
+<span class="fc" id="L52">        }</span>
         
 <span class="fc" id="L54">        this.timestamp = new Date();</span>
 <span class="fc" id="L55">    }</span>
@@ -64,7 +64,7 @@ public class ModeloMemento {
 <span class="fc bfc" id="L64" title="All 2 branches covered.">        for (Cliente cliente : clientes) {</span>
 <span class="fc" id="L65">            copy.add(new Cliente(cliente.getId(), cliente.getNombre(), </span>
 <span class="fc" id="L66">                               cliente.getApellido(), cliente.getCedula(), cliente.getTelefono()));</span>
-        }
+<span class="fc" id="L67">        }</span>
 <span class="fc" id="L68">        return copy;</span>
     }
 
@@ -78,7 +78,7 @@ public class ModeloMemento {
 <span class="fc bfc" id="L78" title="All 2 branches covered.">        for (Habitacion hab : habitaciones) {</span>
 <span class="fc" id="L79">            copy.add(new Habitacion(hab.getId(), hab.getNumero(), </span>
 <span class="fc" id="L80">                                  hab.getTipo(), hab.isOcupada(), hab.getPrecio()));</span>
-        }
+<span class="fc" id="L81">        }</span>
 <span class="fc" id="L82">        return copy;</span>
     }
 
@@ -95,7 +95,7 @@ public class ModeloMemento {
 <span class="fc" id="L95">            copy.add(new Reserva(reserva.getId(), reserva.getIdCliente(), reserva.getIdHabitacion(),</span>
 <span class="fc" id="L96">                               fechaIngreso, fechaSalida, reserva.getTotal(), </span>
 <span class="fc" id="L97">                               reserva.getObservaciones(), reserva.isConfirmada()));</span>
-        }
+<span class="fc" id="L98">        }</span>
 <span class="fc" id="L99">        return copy;</span>
     }
 

@@ -10,7 +10,7 @@ public class CrearReservaCommand implements ICommand {
     private final IModeloService modeloService;
     private final String idCliente;
     private final String idHabitacion;
-    private final double total;
+    private double total;
     private final String descripcion;
     private Reserva reservaCreada;
     private final long executionTime;
@@ -27,12 +27,38 @@ public class CrearReservaCommand implements ICommand {
     @Override
     public void execute() {
         if (reservaCreada == null) {
+            // Pedir fecha de inicio (offset en días) y noches
+            int noches = 1;
+            String inputNoches = javax.swing.JOptionPane.showInputDialog(null, "Número de noches (1+)", "1");
+            if (inputNoches != null && !inputNoches.trim().isEmpty()) {
+                try { noches = Math.max(1, Integer.parseInt(inputNoches.trim())); } catch(NumberFormatException ignored) {}
+            }
+            java.time.LocalDate inicio = java.time.LocalDate.now();
+            String inputDiasInicio = javax.swing.JOptionPane.showInputDialog(null, "Días hasta la llegada (0 = hoy)", "0");
+            if (inputDiasInicio != null && !inputDiasInicio.trim().isEmpty()) {
+                try { int offset = Integer.parseInt(inputDiasInicio.trim()); if (offset>=0) inicio = inicio.plusDays(offset); } catch(NumberFormatException ignored) {}
+            }
+            // Fin planificado = inicio + noches (si noches=1, fin es inicio+1, mostrando noche completa)
+            java.time.LocalDate finPlan = inicio.plusDays(noches);
+            java.util.Date fechaInicioPlan = java.util.Date.from(inicio.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
+            java.util.Date fechaFinPlan = java.util.Date.from(finPlan.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
+            // Recalcular total si se proporcionó uno base (precio noche estimado = total original)
+            if (total > 0) {
+                // Interpretar 'total' pasado como precio por noche si se creó desde UI anterior
+                this.total = total * noches;
+            }
             reservaCreada = new ReservaBuilder()
                 .setCliente(idCliente)
                 .setHabitacion(idHabitacion)
-                .setTotal(total)
-                .setFechaIngreso(new java.util.Date())
+                .setTotal(this.total)
+                .setFechaIngreso(fechaInicioPlan) // guardamos como inicio planificado inicial
+                .setFechaSalida(null)
                 .build();
+            // Asignar metadatos de planificación completos
+            reservaCreada.setFechaReserva(new java.util.Date());
+            reservaCreada.setFechaInicioPlanificada(fechaInicioPlan);
+            reservaCreada.setFechaFinPlanificada(fechaFinPlan);
+            reservaCreada.setNoches(noches);
         }
         if (!modeloService.crearReserva(reservaCreada)) {
             throw new RuntimeException("No se pudo crear la reserva");

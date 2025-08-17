@@ -1,0 +1,86 @@
+@startuml
+' Diagrama de Casos de Uso - Sistema de Gestión Hotelera
+left to right direction
+skinparam actorStyle awesome
+skinparam shadowing false
+skinparam packageStyle rect
+skinparam usecaseBackgroundColor #F8F9FA
+skinparam usecaseBorderColor #555555
+skinparam ArrowColor #555555
+skinparam defaultTextAlignment center
+
+actor Admin as A
+actor Recepcionista as R
+actor "DB Mongo" as DB
+
+package "Gestión de Clientes" {
+  usecase UC_RegistrarCliente as "Registrar Cliente"
+  usecase UC_EditarCliente as "Editar Cliente"
+  usecase UC_EliminarCliente as "Eliminar Cliente"
+  usecase UC_BuscarCliente as "Buscar Cliente por Cédula"
+}
+
+package "Gestión de Habitaciones" {
+  usecase UC_ListarHab as "Ver Disponibilidad"
+  usecase UC_ActualizarEstado as "Refrescar Estado"
+}
+
+package "Gestión de Reservas" {
+  usecase UC_CrearReserva as "Crear Reserva / Check-in"
+  usecase UC_FinalizarReserva as "Finalizar Reserva / Check-out"
+  usecase UC_AnularReserva as "Anular Reserva"
+  usecase UC_ListarReservas as "Listar Reservas"
+}
+
+package "Historial (Undo/Redo)" {
+  usecase UC_Undo as "Deshacer (Undo)"
+  usecase UC_Redo as "Rehacer (Redo)"
+}
+
+package "Mantenimiento" {
+  usecase UC_MigrarIds as "Migrar IDs Legibles"
+  usecase UC_InicializarHabitaciones as "Inicializar Habitaciones"
+}
+
+A --> UC_RegistrarCliente
+A --> UC_EditarCliente
+A --> UC_EliminarCliente
+A --> UC_BuscarCliente
+A --> UC_CrearReserva
+A --> UC_FinalizarReserva
+A --> UC_AnularReserva
+A --> UC_ListarReservas
+A --> UC_Undo
+A --> UC_Redo
+A --> UC_MigrarIds
+A --> UC_InicializarHabitaciones
+A --> UC_ListarHab
+A --> UC_ActualizarEstado
+
+R --> UC_RegistrarCliente
+R --> UC_BuscarCliente
+R --> UC_CrearReserva
+R --> UC_FinalizarReserva
+R --> UC_AnularReserva
+R --> UC_ListarReservas
+R --> UC_ListarHab
+R --> UC_Undo
+R --> UC_Redo
+
+UC_CrearReserva --> UC_ListarHab : <<include>>
+UC_FinalizarReserva --> UC_ListarReservas : <<include>>
+UC_AnularReserva --> UC_ListarReservas : <<include>>
+UC_Undo --> UC_CrearReserva : <<extend>>
+UC_Undo --> UC_FinalizarReserva : <<extend>>
+UC_Redo --> UC_Undo : <<include>>
+UC_MigrarIds ..> UC_RegistrarCliente : <<extend>>
+UC_InicializarHabitaciones ..> UC_ListarHab : <<extend>>
+
+DB <-- UC_RegistrarCliente : persiste
+DB <-- UC_CrearReserva : persiste
+DB <-- UC_FinalizarReserva : actualiza
+DB <-- UC_AnularReserva : elimina
+DB <-- UC_MigrarIds : reescribe IDs
+DB <-- UC_InicializarHabitaciones : crea registros
+
+@enduml

@@ -19,6 +19,11 @@ public class Reserva {
     private double total;
     private String observaciones;
     private boolean confirmada;
+    // Nuevos campos de planificación
+    private Date fechaReserva; // cuando se registró la reserva
+    private Date fechaInicioPlanificada; // día que el cliente planea llegar
+    private Date fechaFinPlanificada; // día que el cliente planea irse
+    private int noches; // número de noches planificadas
 
     /**
      * Constructor por defecto.
@@ -44,6 +49,11 @@ public class Reserva {
         this.total = total;
         this.observaciones = "";
         this.confirmada = true;
+    // Defaults planificación (compatibilidad hacia atrás)
+    this.fechaReserva = fechaIngreso != null ? new Date(fechaIngreso.getTime()) : new Date();
+    this.fechaInicioPlanificada = fechaIngreso;
+    this.fechaFinPlanificada = fechaSalida;
+    this.noches = 1;
     }
 
     /**
@@ -68,6 +78,31 @@ public class Reserva {
         this.total = total;
         this.observaciones = observaciones;
         this.confirmada = confirmada;
+        this.fechaReserva = fechaIngreso != null ? new Date(fechaIngreso.getTime()) : new Date();
+        this.fechaInicioPlanificada = fechaIngreso;
+        this.fechaFinPlanificada = fechaSalida;
+        this.noches = 1;
+    }
+
+    /**
+     * Constructor completo con planificación explícita.
+     */
+    public Reserva(String id, String idCliente, String idHabitacion,
+                   Date fechaIngreso, Date fechaSalida, double total,
+                   String observaciones, boolean confirmada,
+                   Date fechaReserva, Date fechaInicioPlanificada, Date fechaFinPlanificada, int noches) {
+        this.id = id;
+        this.idCliente = idCliente;
+        this.idHabitacion = idHabitacion;
+        this.fechaIngreso = fechaIngreso;
+        this.fechaSalida = fechaSalida;
+        this.total = total;
+        this.observaciones = observaciones;
+        this.confirmada = confirmada;
+        this.fechaReserva = fechaReserva;
+        this.fechaInicioPlanificada = fechaInicioPlanificada;
+        this.fechaFinPlanificada = fechaFinPlanificada;
+        this.noches = noches;
     }
 
     // Getters y setters
@@ -87,6 +122,14 @@ public class Reserva {
     public void setObservaciones(String observaciones) { this.observaciones = observaciones; }
     public boolean isConfirmada() { return confirmada; }
     public void setConfirmada(boolean confirmada) { this.confirmada = confirmada; }
+    public Date getFechaReserva() { return fechaReserva; }
+    public void setFechaReserva(Date fechaReserva) { this.fechaReserva = fechaReserva; }
+    public Date getFechaInicioPlanificada() { return fechaInicioPlanificada; }
+    public void setFechaInicioPlanificada(Date fechaInicioPlanificada) { this.fechaInicioPlanificada = fechaInicioPlanificada; }
+    public Date getFechaFinPlanificada() { return fechaFinPlanificada; }
+    public void setFechaFinPlanificada(Date fechaFinPlanificada) { this.fechaFinPlanificada = fechaFinPlanificada; }
+    public int getNoches() { return noches; }
+    public void setNoches(int noches) { this.noches = noches; }
 
     /**
      * Convierte la reserva a un Document de MongoDB.
@@ -101,7 +144,11 @@ public class Reserva {
                 .append("fechaSalida", fechaSalida)
                 .append("total", total)
                 .append("observaciones", observaciones)
-                .append("confirmada", confirmada);
+                .append("confirmada", confirmada)
+                .append("fechaReserva", fechaReserva)
+                .append("fechaInicioPlanificada", fechaInicioPlanificada)
+                .append("fechaFinPlanificada", fechaFinPlanificada)
+                .append("noches", noches);
     }
 
     /**
@@ -111,7 +158,7 @@ public class Reserva {
      * @return Nueva instancia de Reserva
      */
     public static Reserva fromDocument(Document doc) {
-        return new Reserva(
+        Reserva r = new Reserva(
             doc.getString("_id"),
             doc.getString("idCliente"),
             doc.getString("idHabitacion"),
@@ -121,6 +168,15 @@ public class Reserva {
             doc.getString("observaciones") != null ? doc.getString("observaciones") : "",
             doc.getBoolean("confirmada", true)
         );
+        // cargar campos nuevos si existen
+        if (doc.containsKey("fechaReserva")) r.setFechaReserva(doc.getDate("fechaReserva"));
+        if (doc.containsKey("fechaInicioPlanificada")) r.setFechaInicioPlanificada(doc.getDate("fechaInicioPlanificada"));
+        if (doc.containsKey("fechaFinPlanificada")) r.setFechaFinPlanificada(doc.getDate("fechaFinPlanificada"));
+        if (doc.containsKey("noches")) {
+            Object n = doc.get("noches");
+            if (n instanceof Number) r.setNoches(((Number) n).intValue());
+        }
+        return r;
     }
 
     /**
@@ -150,6 +206,10 @@ public class Reserva {
                 ", total=" + total +
                 ", observaciones='" + observaciones + '\'' +
                 ", confirmada=" + confirmada +
+                ", fechaReserva=" + fechaReserva +
+                ", fechaInicioPlanificada=" + fechaInicioPlanificada +
+                ", fechaFinPlanificada=" + fechaFinPlanificada +
+                ", noches=" + noches +
                 '}';
     }
 }

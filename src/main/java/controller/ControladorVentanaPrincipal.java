@@ -4,12 +4,8 @@ import model.*;
 import view.VentanaPrincipal;
 import command.*;
 import singleton.GestorDisponibilidad;
-import builder.ReservaBuilder;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Controlador principal de la ventana del sistema hotelero.
@@ -50,6 +46,13 @@ public class ControladorVentanaPrincipal {
         
         // Crear controlador de habitaciones con inyección de dependencias
         this.controladorHabitaciones = new ControladorHabitaciones(modeloService, gestorDisponibilidad);
+
+        // Inyectar dependencias también en la vista para permitir navegación de retorno
+        try {
+            this.vista.configurarDependencias(modeloService, commandInvoker, gestorDisponibilidad);
+        } catch (Exception ignored) {
+            // Si la vista aún no tiene el método (seguridad hacia atrás), continuar sin fallo
+        }
         
         // Inicializar sistema
         inicializarSistema();
@@ -107,22 +110,65 @@ public class ControladorVentanaPrincipal {
                 return;
             }
 
-            // Crear comando de check-in
+            // Validar método de pago (traslado de lógica desde la vista para evitar doble popup)
+            if (vista.getMetodoPagoSeleccionado() == null) {
+                mostrarError("Seleccione un método de pago y complete sus datos.");
+                return;
+            }
+            if ("TRANSFERENCIA".equals(vista.getMetodoPagoSeleccionado()) && !vista.pagoTransferenciaCompleto()) {
+                mostrarError("Complete todos los datos de transferencia.");
+                return;
+            }
+            if ("EFECTIVO".equals(vista.getMetodoPagoSeleccionado()) && !vista.pagoEfectivoCompleto()) {
+                mostrarError("Registre el monto entregado válido.");
+                return;
+            }
+
+            // Solicitar planificación (días hasta llegada y noches)
+            int[] plan = solicitarPlanificacionEstadia();
+            if (plan == null) { // usuario canceló
+                return;
+            }
+            int offsetDias = plan[0];
+            int noches = plan[1];
+
+            // Crear comando de check-in / reserva planificada
             CheckinCommand comando = new CheckinCommand(
                 nombre, apellido, cedula, telefono, habitacionDisplay,
-                modeloService, this
+                modeloService, this, offsetDias, noches
             );
 
             // Ejecutar comando
             commandInvoker.executeCommand(comando);
             
             // Limpiar campos y actualizar vista
-            limpiarCamposCheckin();
+            limpiarCamposCheckin(); // limpia datos básicos
+            vista.limpiarPagoSeleccion(); // limpia estado de pago
             actualizarVista();
             
         } catch (Exception e) {
             mostrarError("Error al realizar check-in: " + e.getMessage());
         }
+    }
+
+    /**
+     * Muestra un pequeño diálogo para capturar planificación de estadía.
+     * Permite seleccionar días hasta llegada (0=today) y noches (>=1).
+     * @return int[]{offsetDias, noches} o null si se cancela.
+     */
+    private int[] solicitarPlanificacionEstadia() {
+        JSpinner spDias = new JSpinner(new SpinnerNumberModel(0,0,365,1));
+        JSpinner spNoches = new JSpinner(new SpinnerNumberModel(1,1,60,1));
+        JPanel panel = new JPanel(new java.awt.GridLayout(0,2,6,6));
+        panel.add(new JLabel("Días hasta llegada:")); panel.add(spDias);
+        panel.add(new JLabel("Noches de hospedaje:")); panel.add(spNoches);
+        int op = JOptionPane.showConfirmDialog(vista, panel, "Planificación de estadía", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (op != JOptionPane.OK_OPTION) return null;
+        int offset = (Integer) spDias.getValue();
+        int noches = (Integer) spNoches.getValue();
+        // Validación adicional (defensiva)
+        if (offset < 0) offset = 0; if (noches < 1) noches = 1; if (noches > 60) noches = 60; if (offset > 365) offset = 365;
+        return new int[]{offset, noches};
     }
 
     /**
@@ -342,9 +388,14 @@ public class ControladorVentanaPrincipal {
         sb.append("Teléfono: ").append(cliente.getTelefono()).append("\n");
         sb.append("---------------------------------------\n");
         sb.append("Habitación: ").append(habitacion.getDisplayText()).append("\n");
-        sb.append("Fecha ingreso: ").append(reserva.getFechaIngreso()).append("\n");
+    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+    sb.append("Reserva registrada: ").append(reserva.getFechaReserva()!=null? sdf.format(reserva.getFechaReserva()):"-").append("\n");
+    sb.append("Llegada planificada: ").append(reserva.getFechaInicioPlanificada()!=null? sdf.format(reserva.getFechaInicioPlanificada()):"-").append("\n");
+    sb.append("Salida planificada: ").append(reserva.getFechaFinPlanificada()!=null? sdf.format(reserva.getFechaFinPlanificada()):"-").append("\n");
+    sb.append("Noches: ").append(reserva.getNoches()>0?reserva.getNoches():1).append("\n");
+    sb.append("Ingreso real: ").append(reserva.getFechaIngreso()!=null? sdf.format(reserva.getFechaIngreso()):"Pendiente").append("\n");
         sb.append("---------------------------------------\n");
-        sb.append("TOTAL: $").append(String.format("%.2f", habitacion.getPrecio())).append("\n");
+    sb.append("TOTAL: $").append(String.format("%.2f", reserva.getTotal())).append("\n");
         sb.append("=======================================");
         
         JOptionPane.showMessageDialog(vista, sb.toString(), "Factura", JOptionPane.INFORMATION_MESSAGE);

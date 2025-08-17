@@ -119,7 +119,7 @@ public class VentanaAdmin extends javax.swing.JFrame {
         sidebar.add(Box.createVerticalStrut(30));
         
         // Botones de navegación
-        String[] menuItems = {"Dashboard", "Habitaciones", "Reservas", "Clientes", "Check-in", "Reportes"};
+    String[] menuItems = {"Dashboard", "Habitaciones", "Reservas", "Clientes", "Servicios", "Check-in", "Reportes"};
         
         for (String item : menuItems) {
             JButton button = createMenuButton(item);
@@ -208,10 +208,21 @@ public class VentanaAdmin extends javax.swing.JFrame {
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(BACKGROUND_COLOR);
 
+        JPanel leftGroup = new JPanel(new FlowLayout(FlowLayout.LEFT,10,5));
+        leftGroup.setOpaque(false);
+        JButton btnVolverSelector = new JButton("← Volver");
+        btnVolverSelector.setFocusPainted(false);
+        btnVolverSelector.setBackground(ACCENT_COLOR);
+        btnVolverSelector.setForeground(Color.WHITE);
+        btnVolverSelector.addActionListener(e -> {
+            if (controlador!=null) controlador.volverASelector();
+        });
         headerTitle = new JLabel("Dashboard");
         headerTitle.setFont(new Font("Segoe UI", Font.BOLD, 24));
         headerTitle.setForeground(TEXT_COLOR);
-        header.add(headerTitle, BorderLayout.WEST);
+        leftGroup.add(btnVolverSelector);
+        leftGroup.add(headerTitle);
+        header.add(leftGroup, BorderLayout.WEST);
 
         JPanel acciones = new JPanel(new FlowLayout(FlowLayout.RIGHT,10,5));
         acciones.setOpaque(false);
@@ -231,8 +242,8 @@ public class VentanaAdmin extends javax.swing.JFrame {
             if (controlador!=null) controlador.ejecutarRedo();
             actualizarEstadoUndoRedo();
         });
-        btnUndo.setToolTipText("Deshacer última acción");
-        btnRedo.setToolTipText("Rehacer acción deshecha");
+    btnUndo.setToolTipText("Deshacer la última operación (revierte cambios realizados, como creación o finalización de reservas).");
+    btnRedo.setToolTipText("Rehacer la operación deshecha (vuelve a aplicar el cambio revertido). ");
         acciones.add(btnUndo);
         acciones.add(btnRedo);
         header.add(acciones, BorderLayout.EAST);
@@ -260,8 +271,8 @@ public class VentanaAdmin extends javax.swing.JFrame {
         btnRedo.setEnabled(canRedo);
         btnUndo.setText(canUndo?"⮪ Undo" : "⮪ Undo");
         btnRedo.setText(canRedo?"⮫ Redo" : "⮫ Redo");
-        btnUndo.setToolTipText(canUndo?"Deshacer: "+siguienteUndo:"No hay acciones para deshacer");
-        btnRedo.setToolTipText(canRedo?"Rehacer: "+siguienteRedo:"No hay acciones para rehacer");
+    btnUndo.setToolTipText(canUndo?"Deshacer: "+siguienteUndo+" (revierte efectos)":"No hay acciones para deshacer");
+    btnRedo.setToolTipText(canRedo?"Rehacer: "+siguienteRedo+" (vuelve a aplicar)":"No hay acciones para rehacer");
     }
     
     /**

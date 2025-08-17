@@ -22,6 +22,7 @@ C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\model\ModeloServ
 C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\model\MongoCRUD.java
 C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\model\Readable.java
 C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\model\Reserva.java
+C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\model\ServicioHabitacion.java
 C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\model\Writable.java
 C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\principal\P3ProyectoPooFinal.java
 C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\singleton\GestorDisponibilidad.java
@@ -30,6 +31,7 @@ C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\view\panels\Pane
 C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\view\panels\PanelHabitaciones.java
 C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\view\panels\PanelReportes.java
 C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\view\panels\PanelReservas.java
+C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\view\panels\PanelServicios.java
 C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\view\RoundedBorder.java
 C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\view\util\TableSelectionCoordinator.java
 C:\Users\asdw\Documents\GitHub\P3ProyectoPooFinal\src\main\java\view\VentanaAdmin.java

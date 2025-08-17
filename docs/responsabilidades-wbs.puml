@@ -1,0 +1,49 @@
+@startwbs
+* Responsabilidades Sistema Hotel
+** View
+*** VentanaSelector : Navegación inicial
+*** VentanaPrincipal : UI estándar
+*** VentanaAdmin : UI admin + Undo/Redo
+*** PanelClientes : Tabla + Búsqueda CRUD
+*** PanelHabitaciones : Estado habitaciones
+*** PanelReservas : Lista/acciones reservas
+*** PanelCheckin : Flujo check-in rápido
+** Controller
+*** ControladorVentanaPrincipal : Coordina UI principal
+*** ControladorVentanaAdmin : CRUD + comandos
+*** ControladorHabitaciones : Consultas estado
+** Service/Fachada
+*** IModeloService : Contrato negocio
+*** ModeloServiceImpl
+**** Orquesta lógica
+**** Genera IDs CLI/RES
+**** Snapshots (Memento)
+**** Inicializa habitaciones
+** Dominio
+*** Cliente : Datos huésped
+*** Habitacion : Datos + formato precio
+*** Reserva : Datos + estado activo
+*** HabitacionOcupadaInfo : Proyección UI
+** Persistencia
+*** MongoCRUD : CRUD genérico Mongo
+*** ConexionBD : Obtener colecciones
+** Patrones Soporte
+*** GestorDisponibilidad <<Singleton>> : Disponibilidad rápida
+*** ReservaBuilder <<Builder>> : Construcción Reserva
+*** ModeloMemento <<Memento>> : Snapshot completo
+*** CommandInvoker <<Command/Memento>> : Undo/Redo
+*** Comandos
+**** CrearReservaCommand
+**** FinalizarReservaCommand
+**** CheckinCommand
+**** CheckinRapidoAdminCommand
+**** AnularReservaCommand
+** Utilidades
+*** migrarIdsClientesLegibles : Normaliza IDs
+*** inicializarHabitaciones : Bootstrap
+*** debugEstadoHabitaciones : Diagnóstico
+** Tests/Infra
+*** FakeModeloService : Doble memoria
+*** Suite JUnit + JaCoCo : Cobertura >80%
+*** CI GitHub Actions : Build/Test/Report
+@endwbs

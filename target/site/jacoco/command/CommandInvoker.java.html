@@ -75,9 +75,9 @@ public class CommandInvoker implements ICommandInvoker {
 <span class="fc" id="L75">                history.remove(0);</span>
 <span class="pc bpc" id="L76" title="2 of 4 branches missed.">                if (modeloService!=null &amp;&amp; !undoSnapshots.isEmpty()) undoSnapshots.removeLast();</span>
             }
-<span class="pc" id="L78">        } catch (Exception e) {</span>
+<span class="nc" id="L78">        } catch (Exception e) {</span>
 <span class="nc" id="L79">            throw new RuntimeException(&quot;Error al ejecutar comando: &quot; + command.getDescription(), e);</span>
-        }
+<span class="fc" id="L80">        }</span>
 <span class="fc" id="L81">    }</span>
 
     @Override

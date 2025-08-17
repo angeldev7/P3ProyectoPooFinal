@@ -27,7 +27,20 @@ public class CheckinRapidoAdminCommand implements ICommand {
                 throw new RuntimeException("No se pudo registrar el cliente");
             }
         }
-        reserva = ReservaBuilder.paraCheckin(cliente.getId(), habitacion.getId(), habitacion.getPrecio()).build();
+        int noches = 1;
+        String inputNoches = javax.swing.JOptionPane.showInputDialog(null, "Noches de hospedaje (check-in rápido)", "1");
+        if (inputNoches != null && !inputNoches.trim().isEmpty()) {
+            try { noches = Math.max(1, Integer.parseInt(inputNoches.trim())); } catch(NumberFormatException ignored) {}
+        }
+        java.time.LocalDate hoy = java.time.LocalDate.now();
+        java.time.LocalDate finPlan = hoy.plusDays(noches);
+        java.util.Date fechaInicioPlan = java.util.Date.from(hoy.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
+        java.util.Date fechaFinPlan = java.util.Date.from(finPlan.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
+        reserva = ReservaBuilder.paraCheckin(cliente.getId(), habitacion.getId(), habitacion.getPrecio() * noches).build();
+        reserva.setFechaReserva(new java.util.Date());
+        reserva.setFechaInicioPlanificada(fechaInicioPlan);
+        reserva.setFechaFinPlanificada(fechaFinPlan);
+        reserva.setNoches(noches);
         if (!modeloService.crearReserva(reserva)) {
             throw new RuntimeException("No se pudo crear la reserva de check-in");
         }

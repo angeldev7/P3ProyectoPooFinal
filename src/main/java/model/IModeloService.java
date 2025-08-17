@@ -170,6 +170,18 @@ public interface IModeloService {
      * @return Lista de reservas recientes
      */
     List<Reserva> obtenerReservasRecientes(int limite);
+
+    /**
+     * Actualiza la planificación de una reserva (fechas planificadas, noches, total y observaciones).
+     * No permite actualizar una reserva finalizada (con fechaSalida distinta de null).
+     * Recalcula automáticamente la fecha fin planificada y el total según el precio de la habitación.
+     * @param idReserva id de la reserva a ajustar
+     * @param nuevaFechaInicioPlanificada nueva fecha de inicio planificada (no null)
+     * @param noches cantidad de noches (>=1)
+     * @param nuevasObservaciones texto de observaciones (puede ser null)
+     * @return true si se actualizó
+     */
+    boolean actualizarPlanificacionReserva(String idReserva, java.util.Date nuevaFechaInicioPlanificada, int noches, String nuevasObservaciones);
     
     // === OPERACIONES DE MEMENTO ===
     
@@ -193,4 +205,26 @@ public interface IModeloService {
      * @return true si el sistema está operativo
      */
     boolean verificarDisponibilidad();
+
+    // === SERVICIOS A HABITACIÓN ===
+    /**
+     * Registra un nuevo servicio a la habitación asociado a una reserva activa.
+     * Solo debe permitirse si la habitación está ocupada (check-in) o la reserva activa existe.
+     * @param servicio entidad de servicio (id puede ser null para autogenerar)
+     * @return true si se registró correctamente
+     */
+    boolean registrarServicioHabitacion(ServicioHabitacion servicio);
+
+    /**
+     * Obtiene todos los servicios de una reserva.
+     * @param idReserva id de la reserva
+     * @return lista de servicios
+     */
+    java.util.List<ServicioHabitacion> obtenerServiciosPorReserva(String idReserva);
+
+    /**
+     * Genera un código legible para servicio (SRV-0001...). Implementación interna.
+     * @return código generado
+     */
+    String generarCodigoServicio();
 }

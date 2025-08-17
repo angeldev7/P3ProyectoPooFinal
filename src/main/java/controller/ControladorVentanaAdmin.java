@@ -9,6 +9,11 @@ import command.FinalizarReservaCommand;
 import singleton.GestorDisponibilidad;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
+import java.awt.Toolkit;
 import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import view.VentanaSelector;
 
 /**
  * Controlador para la ventana de administración moderna del hotel.
@@ -41,11 +47,15 @@ public class ControladorVentanaAdmin {
     private final view.panels.PanelClientes panelClientes;
     private final view.panels.PanelHabitaciones panelHabitaciones;
     private final view.panels.PanelReservas panelReservas;
+    private final view.panels.PanelServicios panelServicios; // nuevo panel de servicios a la habitación
     private final JPanel panelDashboard; // El dashboard original
     private view.panels.PanelReportes panelReportes; // carga diferida
     
     private static final java.util.logging.Logger logger = 
         java.util.logging.Logger.getLogger(ControladorVentanaAdmin.class.getName());
+
+    // Reglas de validación centralizadas
+    private static final int LONGITUD_CEDULA_TELEFONO = 10; // Exactamente 10 dígitos
 
     /**
      * Constructor con inyección de dependencias.
@@ -72,6 +82,7 @@ public class ControladorVentanaAdmin {
     this.panelClientes = new view.panels.PanelClientes();
     this.panelHabitaciones = new view.panels.PanelHabitaciones();
     this.panelReservas = new view.panels.PanelReservas();
+    this.panelServicios = new view.panels.PanelServicios();
         
         // Inicializar sistema
         inicializarSistema();
@@ -79,6 +90,7 @@ public class ControladorVentanaAdmin {
     inicializarEventosClientes();
     inicializarEventosHabitaciones();
     inicializarEventosReservas();
+    inicializarEventosServicios();
         actualizarDashboard();
     }
 
@@ -353,21 +365,21 @@ public class ControladorVentanaAdmin {
      */
     public void ejecutarUndo() {
         try {
-            if (commandInvoker.canUndo()) {
-                // Mostrar diálogo de confirmación
-                int respuesta = JOptionPane.showConfirmDialog(vista,
-                    "¿Está seguro de que desea deshacer la última operación?",
-                    "Confirmar Deshacer",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE);
-                    
-                if (respuesta == JOptionPane.YES_OPTION) {
-                    commandInvoker.undo();
+            if (!commandInvoker.canUndo()) { mostrarMensaje("No hay operaciones para deshacer"); return; }
+
+            String descripcion = commandInvoker.getNextUndoDescription();
+            if (descripcion == null || descripcion.isBlank()) descripcion = "Operación previa";
+            String mensaje = "¿Está seguro que desea deshacer la siguiente operación?\n\n" +
+                             "⚠️ " + descripcion + "\n\n" +
+                             "Esta acción liberará recursos y modificará el estado del sistema.";
+            int respuesta = JOptionPane.showConfirmDialog(vista, mensaje, "Confirmar Deshacer", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (respuesta == JOptionPane.YES_OPTION) {
+                if (commandInvoker.undo()) {
                     actualizarDashboard();
-                    mostrarMensaje("Operación deshecha exitosamente");
+                    mostrarMensaje("✅ Operación deshecha correctamente: " + descripcion);
+                } else {
+                    mostrarError("No se pudo deshacer la operación.");
                 }
-            } else {
-                mostrarMensaje("No hay operaciones para deshacer");
             }
         } catch (Exception e) {
             logger.severe("Error en undo: " + e.getMessage());
@@ -380,21 +392,20 @@ public class ControladorVentanaAdmin {
      */
     public void ejecutarRedo() {
         try {
-            if (commandInvoker.canRedo()) {
-                // Mostrar diálogo de confirmación
-                int respuesta = JOptionPane.showConfirmDialog(vista,
-                    "¿Está seguro de que desea rehacer la operación?",
-                    "Confirmar Rehacer",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE);
-                    
-                if (respuesta == JOptionPane.YES_OPTION) {
-                    commandInvoker.redo();
+            if (!commandInvoker.canRedo()) { mostrarMensaje("No hay operaciones para rehacer"); return; }
+            String descripcion = commandInvoker.getNextRedoDescription();
+            if (descripcion == null || descripcion.isBlank()) descripcion = "Operación previa";
+            String mensaje = "¿Está seguro que desea rehacer la siguiente operación?\n\n" +
+                             "🔄 " + descripcion + "\n\n" +
+                             "Esta acción volverá a ejecutar la operación y ocupará recursos.";
+            int respuesta = JOptionPane.showConfirmDialog(vista, mensaje, "Confirmar Rehacer", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (respuesta == JOptionPane.YES_OPTION) {
+                if (commandInvoker.redo()) {
                     actualizarDashboard();
-                    mostrarMensaje("Operación rehecha exitosamente");
+                    mostrarMensaje("✅ Operación rehecha correctamente: " + descripcion);
+                } else {
+                    mostrarError("No se pudo rehacer la operación.");
                 }
-            } else {
-                mostrarMensaje("No hay operaciones para rehacer");
             }
         } catch (Exception e) {
             logger.severe("Error en redo: " + e.getMessage());
@@ -452,6 +463,21 @@ public class ControladorVentanaAdmin {
     }
 
     /**
+     * Cierra esta ventana y regresa al selector de interfaces.
+     */
+    public void volverASelector(){
+        SwingUtilities.invokeLater(() -> {
+            try {
+                VentanaSelector selector = new VentanaSelector(modeloService, commandInvoker, gestorDisponibilidad);
+                selector.setVisible(true);
+                vista.dispose();
+            } catch (Exception ex){
+                mostrarError("No se pudo abrir selector: "+ex.getMessage());
+            }
+        });
+    }
+
+    /**
      * Gestiona la navegación del menú principal.
      * Este es el núcleo del patrón MVC para la navegación.
      * La vista (VentanaAdmin) notifica al controlador, y el controlador
@@ -477,6 +503,12 @@ public class ControladorVentanaAdmin {
             case "Reservas":
                 vista.cambiarContenidoPrincipal(panelReservas);
                 cargarDatosReservas();
+                break;
+            case "Servicios":
+                vista.cambiarContenidoPrincipal(panelServicios);
+                cargarHabitacionesOcupadasEnServicios();
+                cargarServiciosDeHabitacionSeleccionada();
+                vista.actualizarTitulo("Servicios a la Habitación");
                 break;
             // Añadir casos para "Habitaciones", "Reservas", etc.
             default:
@@ -515,6 +547,41 @@ public class ControladorVentanaAdmin {
         panelHabitaciones.getBtnVolver().addActionListener(e -> navegarHacia("Dashboard"));
         panelHabitaciones.getBtnCheckinRapido().addActionListener(e -> checkinRapidoDesdeHabitaciones());
         panelHabitaciones.getBtnLiberar().addActionListener(e -> liberarHabitacionSeleccionada());
+
+        // Sincronizar selección tabla -> combo (check-in rápido)
+        panelHabitaciones.getTablaDisponibles().getSelectionModel().addListSelectionListener((javax.swing.event.ListSelectionEvent e) -> {
+            if (e.getValueIsAdjusting()) return;
+            int fila = panelHabitaciones.getTablaDisponibles().getSelectedRow();
+            if (fila >= 0) {
+                String numero = panelHabitaciones.getTablaDisponibles().getValueAt(fila,0).toString().trim(); // Ej: #001
+                JComboBox<String> combo = panelHabitaciones.getComboSeleccionHabitacion();
+                for (int i=0;i<combo.getItemCount();i++) {
+                    String item = combo.getItemAt(i);
+                    if (item != null && item.startsWith(numero)) { // coincide con inicio
+                        if (combo.getSelectedIndex() != i) combo.setSelectedIndex(i);
+                        break;
+                    }
+                }
+            }
+        });
+
+        // Sincronizar combo -> selección tabla
+        panelHabitaciones.getComboSeleccionHabitacion().addActionListener(ev -> {
+            String seleccion = (String) panelHabitaciones.getComboSeleccionHabitacion().getSelectedItem();
+            if (seleccion == null) return;
+            String numero = seleccion.split(" \\|")[0].trim(); // Ej: #001 (split por '|')
+            JTable tabla = panelHabitaciones.getTablaDisponibles();
+            for (int r=0; r<tabla.getRowCount(); r++) {
+                Object val = tabla.getValueAt(r,0);
+                if (val != null && val.toString().trim().equals(numero)) {
+                    if (tabla.getSelectedRow() != r) {
+                        tabla.getSelectionModel().setSelectionInterval(r,r);
+                        tabla.scrollRectToVisible(tabla.getCellRect(r,0,true));
+                    }
+                    break;
+                }
+            }
+        });
     }
 
     private void cargarDatosHabitaciones() {
@@ -537,10 +604,10 @@ public class ControladorVentanaAdmin {
             return;
         }
         // Solicitar datos mínimos del cliente
-        JTextField nombre = new JTextField();
-        JTextField apellido = new JTextField();
-        JTextField cedula = new JTextField();
-        JTextField telefono = new JTextField();
+    JTextField nombre = crearCampoSoloLetras();
+    JTextField apellido = crearCampoSoloLetras();
+    JTextField cedula = crearCampoSoloDigitos(LONGITUD_CEDULA_TELEFONO);
+    JTextField telefono = crearCampoSoloDigitos(LONGITUD_CEDULA_TELEFONO);
         Object[] msg = {"Nombre:", nombre, "Apellido:", apellido, "Cédula:", cedula, "Teléfono:", telefono};
         int op = JOptionPane.showConfirmDialog(vista, msg, "Check-in Rápido", JOptionPane.OK_CANCEL_OPTION);
         if (op == JOptionPane.OK_OPTION) {
@@ -549,8 +616,14 @@ public class ControladorVentanaAdmin {
                 String numeroHab = seleccion.split(" \\|")[0].replace("#", "").trim();
                 Habitacion hab = modeloService.buscarHabitacionPorNumero(numeroHab);
                 if (hab == null) {mostrarError("Habitación no encontrada."); return;}
-                Cliente existente = modeloService.buscarClientePorCedula(cedula.getText());
-                Cliente cli = existente != null ? existente : new Cliente(java.util.UUID.randomUUID().toString(), nombre.getText(), apellido.getText(), cedula.getText(), telefono.getText());
+        String nombreVal = capitalizarNombre(nombre.getText().trim());
+        String apellidoVal = capitalizarNombre(apellido.getText().trim());
+        String cedulaVal = cedula.getText().trim();
+        String telefonoVal = telefono.getText().trim();
+        String err = validarDatosCliente(nombreVal, apellidoVal, cedulaVal, telefonoVal, true);
+        if (err != null) {mostrarError(err); return;}
+        Cliente existente = modeloService.buscarClientePorCedula(cedulaVal);
+        Cliente cli = existente != null ? existente : new Cliente(java.util.UUID.randomUUID().toString(), nombreVal, apellidoVal, cedulaVal, telefonoVal);
                 ejecutarComando(new CheckinRapidoAdminCommand(modeloService, cli, hab));
                 mostrarMensaje("Check-in registrado.");
                 cargarDatosHabitaciones();
@@ -581,6 +654,28 @@ public class ControladorVentanaAdmin {
         panelReservas.getBtnVolver().addActionListener(e -> navegarHacia("Dashboard"));
         panelReservas.getBtnNuevaReserva().addActionListener(e -> crearNuevaReserva());
         panelReservas.getBtnFinalizarReserva().addActionListener(e -> finalizarReservaSeleccionada());
+        panelReservas.getBtnAjustarReserva().addActionListener(e -> ajustarReservaSeleccionada());
+        panelReservas.getBtnAplicarFiltros().addActionListener(e -> cargarDatosReservasFiltradas());
+        panelReservas.getBtnLimpiarFiltros().addActionListener(e -> {
+            // Reset fechas (desde = hoy -7, hasta = hoy +30) y estado
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.add(java.util.Calendar.DATE, -7);
+            panelReservas.getSpFechaDesde().setValue(cal.getTime());
+            cal = java.util.Calendar.getInstance();
+            cal.add(java.util.Calendar.DATE, 30);
+            panelReservas.getSpFechaHasta().setValue(cal.getTime());
+            panelReservas.getComboEstado().setSelectedIndex(0);
+            cargarDatosReservas();
+        });
+        // Inicializar valores por defecto de filtros
+        try {
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.add(java.util.Calendar.DATE, -7);
+            panelReservas.getSpFechaDesde().setValue(cal.getTime());
+            cal = java.util.Calendar.getInstance();
+            cal.add(java.util.Calendar.DATE, 30);
+            panelReservas.getSpFechaHasta().setValue(cal.getTime());
+        } catch (Exception ignore) {}
     }
 
     private void cargarDatosReservas() {
@@ -597,11 +692,139 @@ public class ControladorVentanaAdmin {
                 Cliente c = mapCli.get(r.getIdCliente());
                 Habitacion h = mapHab.get(r.getIdHabitacion());
                 String estado = r.getFechaSalida()!=null?"Finalizada":(h!=null && h.isOcupada()?"Check-in":"Reservada");
-                model.addRow(new Object[]{r.getId(), c!=null?c.getNombre()+" "+c.getApellido():"?", h!=null?h.getNumero():"?", sdf.format(r.getFechaIngreso()), r.getFechaSalida()!=null?sdf.format(r.getFechaSalida()):"--", estado, String.format("$%.2f", r.getTotal())});
+                String fechaReservaStr = r.getFechaReserva()!=null? sdf.format(r.getFechaReserva()):"--";
+                String inicioPlanStr = r.getFechaInicioPlanificada()!=null? sdf.format(r.getFechaInicioPlanificada()):"--";
+                String finPlanStr = r.getFechaFinPlanificada()!=null? sdf.format(r.getFechaFinPlanificada()):"--";
+                String ingresoRealStr = r.getFechaIngreso()!=null? sdf.format(r.getFechaIngreso()):"--";
+                String salidaRealStr = r.getFechaSalida()!=null? sdf.format(r.getFechaSalida()):"--";
+                int noches = r.getNoches()>0? r.getNoches():1;
+                model.addRow(new Object[]{
+                    r.getId(),
+                    c!=null?c.getNombre()+" "+c.getApellido():"?",
+                    h!=null?h.getNumero():"?",
+                    fechaReservaStr,
+                    inicioPlanStr,
+                    finPlanStr,
+                    ingresoRealStr,
+                    salidaRealStr,
+                    noches,
+                    estado,
+                    String.format("$%.2f", r.getTotal())
+                });
             }
         } catch (Exception ex) {
             mostrarError("Error cargando reservas.");
         }
+    }
+
+    private void cargarDatosReservasFiltradas() {
+        try {
+            java.util.Date desde = (java.util.Date) panelReservas.getSpFechaDesde().getValue();
+            java.util.Date hasta = (java.util.Date) panelReservas.getSpFechaHasta().getValue();
+            if (desde != null && hasta != null && desde.after(hasta)) {
+                mostrarError("Rango de fechas inválido: 'Desde' es posterior a 'Hasta'");
+                return;
+            }
+            String estadoFiltro = (String) panelReservas.getComboEstado().getSelectedItem();
+            List<Reserva> reservas = modeloService.obtenerTodasReservas();
+            java.util.List<Reserva> filtradas = new java.util.ArrayList<>();
+            for (Reserva r : reservas) {
+                // Determinar fecha para filtrar (usamos fechaReserva si existe, sino ingreso)
+                java.util.Date base = r.getFechaReserva()!=null? r.getFechaReserva(): r.getFechaIngreso();
+                if (base == null) continue;
+                if (desde != null && base.before(normalizarInicioDia(desde))) continue;
+                if (hasta != null && base.after(normalizarFinDia(hasta))) continue;
+                String estado = calcularEstadoReserva(r);
+                if (!"Todos".equalsIgnoreCase(estadoFiltro) && !estadoFiltro.equalsIgnoreCase(estado)) continue;
+                filtradas.add(r);
+            }
+            poblarTablaReservas(filtradas);
+        } catch (Exception ex) {
+            mostrarError("Error aplicando filtros.");
+        }
+    }
+
+    private java.util.Date normalizarInicioDia(java.util.Date d){
+        java.util.Calendar c = java.util.Calendar.getInstance(); c.setTime(d);
+        c.set(java.util.Calendar.HOUR_OF_DAY,0); c.set(java.util.Calendar.MINUTE,0); c.set(java.util.Calendar.SECOND,0); c.set(java.util.Calendar.MILLISECOND,0);
+        return c.getTime();
+    }
+    private java.util.Date normalizarFinDia(java.util.Date d){
+        java.util.Calendar c = java.util.Calendar.getInstance(); c.setTime(d);
+        c.set(java.util.Calendar.HOUR_OF_DAY,23); c.set(java.util.Calendar.MINUTE,59); c.set(java.util.Calendar.SECOND,59); c.set(java.util.Calendar.MILLISECOND,999);
+        return c.getTime();
+    }
+
+    private String calcularEstadoReserva(Reserva r){
+        try {
+            List<Habitacion> habitaciones = modeloService.obtenerTodasHabitaciones();
+            Habitacion h = habitaciones.stream().filter(x -> x.getId().equals(r.getIdHabitacion())).findFirst().orElse(null);
+            if (r.getFechaSalida()!=null) return "Finalizada";
+            if (h!=null && h.isOcupada()) return "Check-in";
+            return "Reservada"; // Pendiente de check-in
+        } catch (Exception e){return "Reservada";}
+    }
+
+    private void poblarTablaReservas(List<Reserva> reservas){
+        try {
+            List<Cliente> clientes = modeloService.obtenerTodosClientes();
+            List<Habitacion> habitaciones = modeloService.obtenerTodasHabitaciones();
+            java.util.Map<String,Cliente> mapCli = clientes.stream().collect(java.util.stream.Collectors.toMap(Cliente::getId,c->c));
+            java.util.Map<String,Habitacion> mapHab = habitaciones.stream().collect(java.util.stream.Collectors.toMap(Habitacion::getId,h->h));
+            javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) panelReservas.getTablaReservas().getModel();
+            model.setRowCount(0);
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+            for (Reserva r: reservas) {
+                Cliente c = mapCli.get(r.getIdCliente());
+                Habitacion h = mapHab.get(r.getIdHabitacion());
+                String estado = calcularEstadoReserva(r);
+                String fechaReservaStr = r.getFechaReserva()!=null? sdf.format(r.getFechaReserva()):"--";
+                String inicioPlanStr = r.getFechaInicioPlanificada()!=null? sdf.format(r.getFechaInicioPlanificada()):"--";
+                String finPlanStr = r.getFechaFinPlanificada()!=null? sdf.format(r.getFechaFinPlanificada()):"--";
+                String ingresoRealStr = r.getFechaIngreso()!=null? sdf.format(r.getFechaIngreso()):"--";
+                String salidaRealStr = r.getFechaSalida()!=null? sdf.format(r.getFechaSalida()):"--";
+                int noches = r.getNoches()>0? r.getNoches():1;
+                model.addRow(new Object[]{
+                    r.getId(),
+                    c!=null?c.getNombre()+" "+c.getApellido():"?",
+                    h!=null?h.getNumero():"?",
+                    fechaReservaStr,
+                    inicioPlanStr,
+                    finPlanStr,
+                    ingresoRealStr,
+                    salidaRealStr,
+                    noches,
+                    estado,
+                    String.format("$%.2f", r.getTotal())
+                });
+            }
+        } catch (Exception ex){ mostrarError("Error mostrando reservas."); }
+    }
+
+    private void ajustarReservaSeleccionada() {
+        int fila = panelReservas.getTablaReservas().getSelectedRow();
+        if (fila == -1) {mostrarMensaje("Seleccione una reserva."); return;}
+        String id = panelReservas.getTablaReservas().getValueAt(fila,0).toString();
+        // Buscar reserva
+        Reserva reserva = modeloService.obtenerTodasReservas().stream().filter(r -> r.getId().equals(id)).findFirst().orElse(null);
+        if (reserva == null) {mostrarError("Reserva no encontrada."); return;}
+        if (reserva.getFechaSalida()!=null) {mostrarMensaje("No se puede ajustar una reserva finalizada."); return;}
+        // Formulario
+        JSpinner spInicio = new JSpinner(new javax.swing.SpinnerDateModel(reserva.getFechaInicioPlanificada()!=null?reserva.getFechaInicioPlanificada():new java.util.Date(), null, null, java.util.Calendar.DAY_OF_MONTH));
+        JSpinner.DateEditor ed = new JSpinner.DateEditor(spInicio, "dd/MM/yyyy"); spInicio.setEditor(ed);
+        JSpinner spNoches = new JSpinner(new javax.swing.SpinnerNumberModel(reserva.getNoches()>0?reserva.getNoches():1,1,60,1));
+        JTextArea obs = new JTextArea(3,25); obs.setLineWrap(true); obs.setWrapStyleWord(true); obs.setText(reserva.getObservaciones()!=null?reserva.getObservaciones():"");
+        JPanel p = new JPanel(new java.awt.GridBagLayout()); java.awt.GridBagConstraints gbc = new java.awt.GridBagConstraints(); gbc.insets=new java.awt.Insets(4,4,4,4); gbc.anchor=java.awt.GridBagConstraints.WEST; gbc.gridx=0; gbc.gridy=0; p.add(new JLabel("Inicio Planificado:"),gbc); gbc.gridx=1; p.add(spInicio,gbc); gbc.gridx=0; gbc.gridy=1; p.add(new JLabel("Noches:"),gbc); gbc.gridx=1; p.add(spNoches,gbc); gbc.gridx=0; gbc.gridy=2; gbc.anchor=java.awt.GridBagConstraints.NORTHWEST; p.add(new JLabel("Observaciones:"),gbc); gbc.gridx=1; p.add(new JScrollPane(obs),gbc);
+        int opt = JOptionPane.showConfirmDialog(vista, p, "Ajustar Reserva "+id, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (opt != JOptionPane.OK_OPTION) return;
+        java.util.Date inicio = (java.util.Date) spInicio.getValue();
+        int noches = (Integer) spNoches.getValue();
+        if (!modeloService.actualizarPlanificacionReserva(id, inicio, noches, obs.getText())) {
+            mostrarError("No se pudo actualizar la reserva.");
+            return;
+        }
+        mostrarMensaje("Reserva actualizada.");
+        cargarDatosReservasFiltradas();
     }
 
     private void crearNuevaReserva() {
@@ -657,6 +880,110 @@ public class ControladorVentanaAdmin {
         cargarDatosReservas();
     }
 
+    // ====== SERVICIOS A HABITACIÓN ======
+    private void inicializarEventosServicios() {
+        panelServicios.getBtnRefrescar().addActionListener(e -> {
+            cargarHabitacionesOcupadasEnServicios();
+            cargarServiciosDeHabitacionSeleccionada();
+        });
+        panelServicios.getBtnVolver().addActionListener(e -> navegarHacia("Dashboard"));
+        panelServicios.getComboHabitacionesOcupadas().addActionListener(e -> cargarServiciosDeHabitacionSeleccionada());
+        panelServicios.getBtnAgregarServicio().addActionListener(e -> agregarServicioAHabitacion());
+    }
+
+    private void cargarHabitacionesOcupadasEnServicios() {
+        try {
+            java.util.List<Habitacion> ocupadas = modeloService.obtenerHabitacionesOcupadas();
+            javax.swing.JComboBox<String> combo = panelServicios.getComboHabitacionesOcupadas();
+            combo.removeAllItems();
+            for (Habitacion h: ocupadas) combo.addItem(h.getNumero());
+            if (combo.getItemCount()==0) mostrarMensaje("No hay habitaciones ocupadas.");
+        } catch (Exception ex) {
+            mostrarError("Error cargando habitaciones ocupadas.");
+        }
+    }
+
+    private void cargarServiciosDeHabitacionSeleccionada() {
+        String numero = (String) panelServicios.getComboHabitacionesOcupadas().getSelectedItem();
+        if (numero == null) {
+            javax.swing.table.DefaultTableModel m = (javax.swing.table.DefaultTableModel) panelServicios.getTablaServicios().getModel();
+            m.setRowCount(0);
+            return;
+        }
+        Habitacion hab = modeloService.buscarHabitacionPorNumero(numero);
+        if (hab == null) return;
+        // Buscar reserva activa para esa habitación
+        Reserva activa = modeloService.obtenerTodasReservas().stream()
+                .filter(r -> r.getIdHabitacion().equals(hab.getId()) && r.getFechaSalida()==null)
+                .findFirst().orElse(null);
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) panelServicios.getTablaServicios().getModel();
+        model.setRowCount(0);
+        if (activa == null) return; // sin reserva activa no hay servicios
+        java.util.List<ServicioHabitacion> servicios = modeloService.obtenerServiciosPorReserva(activa.getId());
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM HH:mm");
+        for (ServicioHabitacion s: servicios) {
+            model.addRow(new Object[]{s.getId(), sdf.format(s.getFecha()), s.getTipo(), s.getDescripcion(), String.format("$%.2f", s.getCosto())});
+        }
+    }
+
+    private void agregarServicioAHabitacion() {
+        String numero = (String) panelServicios.getComboHabitacionesOcupadas().getSelectedItem();
+        if (numero == null) {mostrarMensaje("Seleccione habitación ocupada."); return;}
+        Habitacion hab = modeloService.buscarHabitacionPorNumero(numero);
+        if (hab == null || !hab.isOcupada()) {mostrarError("Habitación no válida u ocupación inconsistente."); return;}
+        // Reserva activa
+        Reserva activa = modeloService.obtenerTodasReservas().stream()
+                .filter(r -> r.getIdHabitacion().equals(hab.getId()) && r.getFechaSalida()==null)
+                .findFirst().orElse(null);
+        if (activa == null) {mostrarError("No hay reserva activa para la habitación."); return;}
+
+        String[] tipos = {ServicioHabitacion.TIPO_COMIDA, ServicioHabitacion.TIPO_BEBIDA, ServicioHabitacion.TIPO_LIMPIEZA};
+        JComboBox<String> comboTipo = new JComboBox<>(tipos);
+        JTextField descripcion = new JTextField();
+        JTextField especiasField = new JTextField(); // lista separada por comas
+        JLabel especiasLabel = new JLabel("Especias (solo comida, coma separadas):");
+        JPanel panel = new JPanel(new java.awt.GridLayout(0,1,4,4));
+        panel.add(new JLabel("Tipo:")); panel.add(comboTipo);
+        panel.add(new JLabel("Descripción (opcional):")); panel.add(descripcion);
+        panel.add(especiasLabel); panel.add(especiasField);
+
+        Runnable toggleEspecias = () -> {
+            boolean visible = ServicioHabitacion.TIPO_COMIDA.equals(comboTipo.getSelectedItem());
+            especiasLabel.setVisible(visible);
+            especiasField.setVisible(visible);
+            especiasField.setEnabled(visible);
+            especiasField.setEditable(visible);
+            if (!visible) especiasField.setText("");
+            panel.revalidate();
+            panel.repaint();
+        };
+        comboTipo.addActionListener(e -> toggleEspecias.run());
+        toggleEspecias.run();
+
+        int op = JOptionPane.showConfirmDialog(vista, panel, "Nuevo Servicio", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (op != JOptionPane.OK_OPTION) return;
+        String tipoSeleccion = (String) comboTipo.getSelectedItem();
+        ServicioHabitacion servicio;
+        if (ServicioHabitacion.TIPO_COMIDA.equals(tipoSeleccion)) {
+            java.util.List<String> especias = new java.util.ArrayList<>();
+            for (String s: especiasField.getText().split(",")) {
+                String trim = s.trim(); if (!trim.isEmpty()) especias.add(trim);
+            }
+            servicio = ServicioHabitacion.crearComida(activa.getId(), hab.getId(), descripcion.getText(), especias);
+        } else if (ServicioHabitacion.TIPO_BEBIDA.equals(tipoSeleccion)) {
+            servicio = ServicioHabitacion.crearBebida(activa.getId(), hab.getId(), descripcion.getText());
+        } else { // LIMPIEZA
+            servicio = ServicioHabitacion.crearLimpieza(activa.getId(), hab.getId());
+        }
+        boolean ok = modeloService.registrarServicioHabitacion(servicio);
+        if (ok) {
+            mostrarMensaje("Servicio registrado (costo fijo: $"+String.format("%.2f", servicio.getCosto())+")");
+            cargarServiciosDeHabitacionSeleccionada();
+        } else {
+            mostrarError("No se pudo registrar el servicio (validación fallida).");
+        }
+    }
+
     /**
      * Inicializa los eventos para el panel de gestión de clientes.
      * Siguiendo MVC, el controlador asigna los listeners a los componentes de la vista.
@@ -674,10 +1001,10 @@ public class ControladorVentanaAdmin {
      */
     private void agregarNuevoCliente() {
         // Usamos JOptionPane para una entrada de datos simple
-        JTextField nombreField = new JTextField();
-        JTextField apellidoField = new JTextField();
-        JTextField cedulaField = new JTextField();
-        JTextField telefonoField = new JTextField();
+    JTextField nombreField = crearCampoSoloLetras();
+    JTextField apellidoField = crearCampoSoloLetras();
+    JTextField cedulaField = crearCampoSoloDigitos(LONGITUD_CEDULA_TELEFONO);
+    JTextField telefonoField = crearCampoSoloDigitos(LONGITUD_CEDULA_TELEFONO);
 
         Object[] message = {
             "Nombre:", nombreField,
@@ -689,8 +1016,8 @@ public class ControladorVentanaAdmin {
     int option = JOptionPane.showConfirmDialog(vista, message, "Agregar Nuevo Cliente", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
             try {
-        String nombre = nombreField.getText().trim();
-        String apellido = apellidoField.getText().trim();
+    String nombre = capitalizarNombre(nombreField.getText().trim());
+    String apellido = capitalizarNombre(apellidoField.getText().trim());
         String cedula = cedulaField.getText().trim();
         String telefono = telefonoField.getText().trim();
 
@@ -711,8 +1038,9 @@ public class ControladorVentanaAdmin {
 
     private String validarDatosCliente(String nombre, String apellido, String cedula, String telefono, boolean nuevo){
         if (nombre.isEmpty() || apellido.isEmpty() || cedula.isEmpty() || telefono.isEmpty()) return "Todos los campos son obligatorios";
-        if (!cedula.matches("\\d{6,13}")) return "La cédula debe tener entre 6 y 13 dígitos";
-        if (!telefono.matches("\\d{7,15}")) return "El teléfono debe ser numérico (7-15 dígitos)";
+        if (contieneDigitos(nombre) || contieneDigitos(apellido)) return "Nombre y Apellido no deben contener números";
+        if (!cedula.matches("\\d{"+LONGITUD_CEDULA_TELEFONO+"}")) return "La cédula debe tener exactamente "+LONGITUD_CEDULA_TELEFONO+" dígitos";
+        if (!telefono.matches("\\d{"+LONGITUD_CEDULA_TELEFONO+"}")) return "El teléfono debe tener exactamente "+LONGITUD_CEDULA_TELEFONO+" dígitos";
         if (nuevo && modeloService.existeCedula(cedula)) return "La cédula ya está registrada";
         if (nuevo && modeloService.existeTelefono(telefono)) return "El teléfono ya está registrado";
         return null;
@@ -749,10 +1077,10 @@ public class ControladorVentanaAdmin {
         String telefono = (String) panelClientes.getTablaClientes().getValueAt(filaSeleccionada, 4);
 
         // Pre-llenar el formulario de edición
-        JTextField nombreField = new JTextField(nombre);
-        JTextField apellidoField = new JTextField(apellido);
-        JTextField cedulaField = new JTextField(cedula);
-        JTextField telefonoField = new JTextField(telefono);
+    JTextField nombreField = crearCampoSoloLetras(); nombreField.setText(nombre);
+    JTextField apellidoField = crearCampoSoloLetras(); apellidoField.setText(apellido);
+    JTextField cedulaField = crearCampoSoloDigitos(LONGITUD_CEDULA_TELEFONO); cedulaField.setText(cedula);
+    JTextField telefonoField = crearCampoSoloDigitos(LONGITUD_CEDULA_TELEFONO); telefonoField.setText(telefono);
 
         Object[] message = {
             "Nombre:", nombreField,
@@ -764,13 +1092,13 @@ public class ControladorVentanaAdmin {
         int option = JOptionPane.showConfirmDialog(vista, message, "Editar Cliente", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
             try {
-                Cliente clienteActualizado = new Cliente(
-                    id,
-                    nombreField.getText(),
-                    apellidoField.getText(),
-                    cedulaField.getText(),
-                    telefonoField.getText()
-                );
+                String nombreVal = capitalizarNombre(nombreField.getText().trim());
+                String apellidoVal = capitalizarNombre(apellidoField.getText().trim());
+                String cedulaVal = cedulaField.getText().trim();
+                String telefonoVal = telefonoField.getText().trim();
+                String err = validarDatosCliente(nombreVal, apellidoVal, cedulaVal, telefonoVal, false);
+                if (err != null) {mostrarError(err); return;}
+                Cliente clienteActualizado = new Cliente(id, nombreVal, apellidoVal, cedulaVal, telefonoVal);
 
                 boolean ok = modeloService.actualizarCliente(clienteActualizado);
                 if (ok) {
@@ -785,6 +1113,48 @@ public class ControladorVentanaAdmin {
                 mostrarError("No se pudo actualizar el cliente.");
             }
         }
+    }
+
+    // ====== UTILIDADES DE VALIDACIÓN Y FORMATEO ======
+    private JTextField crearCampoSoloLetras(){
+        JTextField tf = new JTextField();
+        ((AbstractDocument) tf.getDocument()).setDocumentFilter(new DocumentFilter(){
+            @Override public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                if (string==null) return; replace(fb, offset, 0, string, attr);
+            }
+            @Override public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                if (text!=null && text.matches(".*[0-9].*")) {Toolkit.getDefaultToolkit().beep(); return;}
+                fb.replace(offset, length, text, attrs);
+            }
+        });
+        return tf;
+    }
+
+    private JTextField crearCampoSoloDigitos(int maxLen){
+        JTextField tf = new JTextField();
+        ((AbstractDocument) tf.getDocument()).setDocumentFilter(new DocumentFilter(){
+            @Override public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException { replace(fb, offset, 0, string, attr); }
+            @Override public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                if (text==null) return; String actual = fb.getDocument().getText(0, fb.getDocument().getLength());
+                String nuevo = actual.substring(0, offset) + text + actual.substring(offset+length);
+                if (!nuevo.matches("\\d{0,"+maxLen+"}")) {Toolkit.getDefaultToolkit().beep(); return;}
+                fb.replace(offset, length, text.replaceAll("[^0-9]", ""), attrs);
+            }
+        });
+        return tf;
+    }
+
+    private boolean contieneDigitos(String s){ return s != null && s.matches(".*\\d.*"); }
+
+    private String capitalizarNombre(String input){
+        if (input == null) return "";
+        String[] partes = input.toLowerCase().split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for (String p: partes){
+            if (p.isEmpty()) continue;
+            sb.append(Character.toUpperCase(p.charAt(0))).append(p.length()>1? p.substring(1): "").append(' ');
+        }
+        return sb.toString().trim();
     }
 
     /**

@@ -29,6 +29,8 @@ public class ModeloServiceImpl implements IModeloService {
         ConexionBD conexion = new ConexionBD();
         this.mongoCRUD = new MongoCRUD(conexion);
         this.gestorDisponibilidad = GestorDisponibilidad.getInstance();
+    // Migraciones de IDs legibles
+    migrarIdsReservasLegibles();
     }
     
     // === OPERACIONES DE CLIENTES ===
@@ -219,6 +221,89 @@ public class ModeloServiceImpl implements IModeloService {
             return String.format("RES-%04d", max+1);
         } catch (Exception e){
             return "RES-"+java.util.UUID.randomUUID().toString().substring(0,8).toUpperCase();
+        }
+    }
+
+    /**
+     * MIGRACIÓN: Convierte IDs de reservas existentes que no sigan el formato RES-0001
+     * a uno nuevo incremental. Es idempotente.
+     */
+    public void migrarIdsReservasLegibles(){
+        try {
+            List<Document> docs = mongoCRUD.listarTodos("reservas");
+            if (docs.isEmpty()) return;
+            MongoCollection<Document> colReservas = mongoCRUD.getConexion().getColeccion("reservas");
+            // Obtener max actual para continuar secuencia
+            int max = 0;
+            for (Document d: docs){
+                String id = d.getString("_id");
+                if (id != null && id.startsWith("RES-")){
+                    try {int n=Integer.parseInt(id.substring(4)); if(n>max) max=n;} catch(Exception ignore){}
+                }
+            }
+            for (Document doc : docs){
+                String oldId = doc.getString("_id");
+                boolean necesitaNuevoId = (oldId == null || !oldId.matches("RES-\\d{4}"));
+                if (necesitaNuevoId) { max++; }
+                String nuevoId = necesitaNuevoId? String.format("RES-%04d", max) : oldId;
+                // Asegurar campos de planificación
+                Date fechaReserva = doc.getDate("fechaReserva");
+                Date inicioPlan = doc.getDate("fechaInicioPlanificada");
+                Date finPlan = doc.getDate("fechaFinPlanificada");
+                Integer noches = doc.getInteger("noches", 1);
+                if (inicioPlan == null && doc.getDate("fechaIngreso") != null) inicioPlan = doc.getDate("fechaIngreso");
+                if (fechaReserva == null) fechaReserva = (inicioPlan!=null? new Date(inicioPlan.getTime()): new Date());
+                if (finPlan == null && inicioPlan != null) {
+                    java.util.Calendar cal = java.util.Calendar.getInstance();
+                    cal.setTime(inicioPlan); cal.add(java.util.Calendar.DATE, noches!=null?noches:1);
+                    finPlan = cal.getTime();
+                }
+                Document nuevo = new Document("_id", nuevoId)
+                        .append("idCliente", doc.getString("idCliente"))
+                        .append("idHabitacion", doc.getString("idHabitacion"))
+                        .append("fechaIngreso", doc.getDate("fechaIngreso"))
+                        .append("fechaSalida", doc.getDate("fechaSalida"))
+                        .append("total", doc.get("total"))
+                        .append("observaciones", doc.getString("observaciones"))
+                        .append("confirmada", doc.get("confirmada"))
+                        .append("fechaReserva", fechaReserva)
+                        .append("fechaInicioPlanificada", inicioPlan)
+                        .append("fechaFinPlanificada", finPlan)
+                        .append("noches", noches!=null?noches:1);
+                if (necesitaNuevoId){
+                    colReservas.deleteOne(Filters.eq("_id", oldId));
+                    colReservas.insertOne(nuevo);
+                } else {
+                    // Actualizar documento existente solo si faltan campos de planificación
+                    boolean faltanCampos = !doc.containsKey("fechaReserva") || !doc.containsKey("fechaInicioPlanificada") || !doc.containsKey("fechaFinPlanificada") || !doc.containsKey("noches");
+                    if (faltanCampos){
+                        colReservas.updateOne(Filters.eq("_id", oldId), new Document("$set", new Document()
+                                .append("fechaReserva", fechaReserva)
+                                .append("fechaInicioPlanificada", inicioPlan)
+                                .append("fechaFinPlanificada", finPlan)
+                                .append("noches", noches!=null?noches:1)));
+                    }
+                }
+            }
+        } catch (Exception e){
+            System.err.println("Error en migrarIdsReservasLegibles: "+e.getMessage());
+        }
+    }
+
+    @Override
+    public String generarCodigoServicio(){
+        try {
+            List<Document> docs = mongoCRUD.listarTodos("servicios");
+            int max = 0;
+            for (Document d: docs){
+                String id = d.getString("_id");
+                if (id != null && id.startsWith("SRV-")) {
+                    try {int n = Integer.parseInt(id.substring(4)); if (n>max) max=n;} catch(Exception ignore){}
+                }
+            }
+            return String.format("SRV-%04d", max+1);
+        } catch (Exception e){
+            return "SRV-"+java.util.UUID.randomUUID().toString().substring(0,8).toUpperCase();
         }
     }
     
@@ -524,6 +609,37 @@ public class ModeloServiceImpl implements IModeloService {
             return new ArrayList<>();
         }
     }
+
+    @Override
+    public boolean actualizarPlanificacionReserva(String idReserva, Date nuevaFechaInicioPlanificada, int noches, String nuevasObservaciones) {
+        if (idReserva == null || nuevaFechaInicioPlanificada == null || noches < 1) return false;
+        try {
+            Document actual = mongoCRUD.buscarPorId("reservas", idReserva);
+            if (actual == null) return false;
+            Reserva reserva = Reserva.fromDocument(actual);
+            if (reserva.getFechaSalida() != null) return false; // ya finalizada
+            // Obtener habitación para precio actual
+            List<Habitacion> habitaciones = obtenerTodasHabitaciones();
+            Habitacion hab = habitaciones.stream().filter(h -> h.getId().equals(reserva.getIdHabitacion())).findFirst().orElse(null);
+            if (hab == null) return false;
+            // Calcular fecha fin planificada = inicio + noches
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.setTime(nuevaFechaInicioPlanificada);
+            cal.add(java.util.Calendar.DATE, noches); // fin exclusiva
+            Date fechaFinPlanificada = cal.getTime();
+            double nuevoTotal = hab.getPrecio() * noches;
+            Document update = new Document("fechaInicioPlanificada", nuevaFechaInicioPlanificada)
+                    .append("fechaFinPlanificada", fechaFinPlanificada)
+                    .append("noches", noches)
+                    .append("total", nuevoTotal)
+                    .append("observaciones", nuevasObservaciones);
+            Document set = new Document("$set", update);
+            return mongoCRUD.actualizarPorId("reservas", idReserva, set);
+        } catch (Exception e){
+            System.err.println("Error actualizando planificación reserva: "+e.getMessage());
+            return false;
+        }
+    }
     
     // === OPERACIONES DE MEMENTO ===
     
@@ -579,6 +695,50 @@ public class ModeloServiceImpl implements IModeloService {
             System.err.println("Error en verificación de disponibilidad: " + e.getMessage());
             return false;
         }
+    }
+
+    // === SERVICIOS A HABITACIÓN ===
+    @Override
+    public boolean registrarServicioHabitacion(ServicioHabitacion servicio) {
+        if (servicio == null || servicio.getIdHabitacion() == null || servicio.getIdReserva() == null) return false;
+        try {
+            if (!ServicioHabitacion.tipoValido(servicio.getTipo())) return false;
+            // Validar que la reserva esté activa y corresponda a la habitación
+            Document reservaDoc = mongoCRUD.buscarPorId("reservas", servicio.getIdReserva());
+            if (reservaDoc == null) return false;
+            Reserva reserva = Reserva.fromDocument(reservaDoc);
+            if (reserva.getFechaSalida() != null) return false; // ya finalizada
+            if (!reserva.getIdHabitacion().equals(servicio.getIdHabitacion())) return false; // mismatch
+            // Validar habitación ocupada
+            List<Habitacion> habitaciones = obtenerTodasHabitaciones();
+            Habitacion hab = habitaciones.stream().filter(h -> h.getId().equals(servicio.getIdHabitacion())).findFirst().orElse(null);
+            if (hab == null || !hab.isOcupada()) return false;
+            if (servicio.getId()==null || servicio.getId().trim().isEmpty()) {
+                servicio.setId(generarCodigoServicio());
+            }
+            if (servicio.getFecha()==null) servicio.setFecha(new Date());
+            // Recalcular costo fijo antes de persistir
+            servicio.setCosto(ServicioHabitacion.costoPorTipo(servicio.getTipo()));
+            mongoCRUD.insertar("servicios", servicio.toDocument());
+            return true;
+        } catch (Exception e){
+            System.err.println("Error registrando servicio: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public List<ServicioHabitacion> obtenerServiciosPorReserva(String idReserva) {
+        List<ServicioHabitacion> lista = new ArrayList<>();
+        if (idReserva == null) return lista;
+        try {
+            Document filtro = new Document("idReserva", idReserva);
+            List<Document> docs = mongoCRUD.buscarPorFiltro("servicios", filtro);
+            for (Document d: docs) lista.add(ServicioHabitacion.fromDocument(d));
+        } catch (Exception e){
+            System.err.println("Error listando servicios: " + e.getMessage());
+        }
+        return lista;
     }
     
     /**

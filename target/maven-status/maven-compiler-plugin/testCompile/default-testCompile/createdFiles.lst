@@ -13,6 +13,7 @@ builder\ReservaBuilderTest.class
 model\IdGenerationTest.class
 command\CommandInvokerRedoSnapshotsTest.class
 model\HabitacionAdditionalBranchTest.class
+model\ServicioHabitacionTest.class
 command\CommandInvokerUtilityTest.class
 command\FinalizarReservaUndoLogicTest.class
 memento\MementoIntegrationTest.class

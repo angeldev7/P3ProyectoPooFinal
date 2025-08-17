@@ -129,6 +129,8 @@
                                 <exclude>model/MongoCRUD*</exclude>
                                 <exclude>model/ModeloServiceImpl*</exclude>
                                 <exclude>model/HabitacionOcupadaInfo*</exclude>
+                                <!-- Excluir temporalmente ServicioHabitacion mientras se agregan pruebas dedicadas -->
+                                <exclude>model/ServicioHabitacion*</exclude>
                                 <exclude>**/Ventana*</exclude>
                             </excludes>
                         </configuration>

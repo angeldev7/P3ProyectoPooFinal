@@ -1,0 +1,40 @@
+@startsalt
+{+
+= Componente | Tipo | Responsabilidad Principal | No Debe | Nota
+VentanaSelector | View | Inicio / routing | Reglas negocio | Simple
+VentanaPrincipal | View | Menú navegación | Ejecutar lógica | Delegar
+VentanaAdmin | View | Dashboard + Undo/Redo | Acceder DB directo | Orquesta UI
+PanelClientes | View | CRUD Clientes | Persistir directo | Usa CtrlAdmin
+PanelHabitaciones | View | Estado + Check-in rápido | Ocupar al planificar | Muestra ocupación
+PanelReservas | View | Listar/crear/ajustar/finalizar | Ocupar en planificación | Separa estados
+PanelServicios | View | Agregar servicios | A reserva inactiva | Valida activa
+PanelReportes | View | Métricas / dashboard | Cálculo complejo | Usa fachada
+CtrlPrincipal | Controller | Eventos menú | Reglas dominio | Fino
+CtrlAdmin | Controller | Coordina comandos + undo | Guardar snapshots | Usa Invoker
+CtrlHabitaciones | Controller | Consultar disponibilidad | Crear reservas | Lecturas
+IModeloService | Interface | Contrato negocio | Implementación | Estable
+ModeloServiceImpl | Fachada | Orquestar reglas | Exponer DB | Validaciones
+Cliente | Dominio | Datos cliente | Reglas globales | ID legible
+Habitacion | Dominio | Ocupación / precio | Ver otras reservas | Estado simple
+HabitacionOcupadaInfo | DTO | Datos ocupación enriquecidos | Lógica | Para vistas
+Reserva | Dominio | Estado/fechas/servicios | Acceso DB | Consistencia
+ServicioHabitacion | Dominio | Tipo + costo | Cambiar reserva directa | Asociado por ID
+GestorDisponibilidad | Singleton | Calcular solapes | Persistir | Cache ligera
+ReservaBuilder | Builder | Construir reserva | Ocupar hab | Testable
+ICommand | Interface | Contrato execute() | Conocer UI | Uniforme
+CrearReservaCommand | Command | Crear planificada | Ocupar hab | Snapshot previo
+CheckinRapidoAdminCommand | Command | Crear activa + ocupar | Crear planificada | Usa now()
+FinalizarReservaCommand | Command | Calcular total + liberar | Cambiar cliente | Idempotencia
+AnularReservaCommand | Command | Cancelar reserva | Finalizar | Libera si aplica
+CommandInvoker | Invoker | Ejecutar + undo/redo | Reglas | Maneja pilas
+ModeloMemento | Memento | Snapshot completo | Mutar post-guardar | Restauración
+MongoCRUD | Persistencia | CRUD Mongo | Reglas | Aislado
+ConexionBD | Infra | Conexión Mongo | Lógica dominio | Reutilizable
+migrarIdsLegibles() | Utilidad | IDs legibles | Cambiar semántica | Entorno estable
+inicializarHabitaciones() | Utilidad | Dataset base | Borrar datos | Uso único
+ajustarPlanificacionReserva() | Utilidad | Ajustar fechas planificadas | Cambiar activas | Valida solape
+FakeModeloService | Test Double | Simular fachada | Producción | Determinista
+JUnit+JaCoCo | Testing | Cobertura/regresión | Sustituir juicio humano | CI
+Undo/Redo Pilas | Infra Lógica | Historial comandos | Omitir snapshots | Tamaño control
+}
+@endsalt

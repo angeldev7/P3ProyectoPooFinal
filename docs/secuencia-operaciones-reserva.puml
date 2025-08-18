@@ -1,0 +1,148 @@
+@startuml
+' Diagrama de Secuencia: Ciclo completo de operaciones sobre una Reserva
+' Incluye: Planificar -> Check-in -> Agregar Servicio -> Finalizar -> Undo -> Redo
+
+skinparam shadowing false
+skinparam ArrowColor #444444
+skinparam ParticipantBorderColor #444444
+skinparam ParticipantBackgroundColor #F8F9FA
+skinparam SequenceLifeLineBorderColor #888888
+skinparam SequenceLifeLineBackgroundColor #FFFFFF
+skinparam sequenceMessageAlign center
+
+actor Admin as Usuario
+participant VentanaAdmin as UI
+participant ControladorVentanaAdmin as Ctrl
+participant CommandInvoker as Invoker
+participant IModeloService as Servicio
+participant ModeloMemento as Memento
+participant CrearReservaCommand as CmdCrear
+participant CheckinRapidoAdminCommand as CmdCheckin
+participant AgregarServicioCommand as CmdServicio
+participant FinalizarReservaCommand as CmdFinalizar
+
+== Planificar Reserva ==
+Usuario -> UI : Clic "Nueva Reserva"
+UI -> Ctrl : crearReservaPlanificada(datos)
+Ctrl -> Invoker : execute(CmdCrear)
+activate Invoker
+Invoker -> Servicio : crearMemento()
+Servicio --> Invoker : Memento inicial
+Invoker -> CmdCrear : execute()
+activate CmdCrear
+CmdCrear -> Servicio : crearReserva(planificada)
+Servicio --> CmdCrear : OK
+deactivate CmdCrear
+Invoker -> Invoker : push(CmdCrear,Memento)
+Invoker --> Ctrl : éxito
+deactivate Invoker
+Ctrl --> UI : refrescar (estado=Planificada)
+
+== Check-in (sobre habitación o reserva planificada) ==
+Usuario -> UI : Clic "Check-in Rápido"
+UI -> Ctrl : checkinRapido(habitacion)
+Ctrl -> Invoker : execute(CmdCheckin)
+activate Invoker
+Invoker -> Servicio : crearMemento()
+Servicio --> Invoker : Memento 2
+Invoker -> CmdCheckin : execute()
+activate CmdCheckin
+CmdCheckin -> Servicio : crearReserva(activa) / ocuparHabitacion
+Servicio --> CmdCheckin : OK
+deactivate CmdCheckin
+Invoker -> Invoker : push(CmdCheckin,Memento 2)
+Invoker --> Ctrl : éxito
+deactivate Invoker
+Ctrl --> UI : refrescar (estado=Activa)
+
+== Agregar Servicio a la Reserva Activa ==
+Usuario -> UI : Clic "Agregar Servicio"
+UI -> Ctrl : agregarServicio(reserva, tipo)
+Ctrl -> Invoker : execute(CmdServicio)
+activate Invoker
+Invoker -> Servicio : crearMemento()
+Servicio --> Invoker : Memento 3
+Invoker -> CmdServicio : execute()
+activate CmdServicio
+CmdServicio -> Servicio : anexarServicio(reserva,tipo)
+Servicio --> CmdServicio : OK
+deactivate CmdServicio
+Invoker -> Invoker : push(CmdServicio,Memento 3)
+Invoker --> Ctrl : éxito
+deactivate Invoker
+Ctrl --> UI : refrescar (servicios++)
+
+== Finalizar Reserva (Check-out) ==
+Usuario -> UI : Clic "Finalizar"
+UI -> Ctrl : finalizarReserva(reserva)
+Ctrl -> Invoker : execute(CmdFinalizar)
+activate Invoker
+Invoker -> Servicio : crearMemento()
+Servicio --> Invoker : Memento 4
+Invoker -> CmdFinalizar : execute()
+activate CmdFinalizar
+CmdFinalizar -> Servicio : calcularTotal() / liberarHabitacion
+Servicio --> CmdFinalizar : OK (total)
+deactivate CmdFinalizar
+Invoker -> Invoker : push(CmdFinalizar,Memento 4)
+Invoker --> Ctrl : éxito
+deactivate Invoker
+Ctrl --> UI : refrescar (estado=Finalizada)
+
+== Undo (revierte última acción) ==
+Usuario -> UI : Clic "Undo"
+UI -> Ctrl : undo()
+Ctrl -> Invoker : undo()
+activate Invoker
+Invoker -> Invoker : pop() -> (CmdFinalizar,Memento 4)
+Invoker -> Servicio : restaurar(Memento 4)
+Servicio --> Invoker : restaurado
+Invoker --> Ctrl : undo OK
+deactivate Invoker
+Ctrl --> UI : refrescar (regresa a Activa)
+
+== Redo (reaplica) ==
+Usuario -> UI : Clic "Redo"
+UI -> Ctrl : redo()
+Ctrl -> Invoker : redo()
+activate Invoker
+Invoker -> CmdFinalizar : execute()
+activate CmdFinalizar
+CmdFinalizar -> Servicio : calcularTotal() / liberarHabitacion
+Servicio --> CmdFinalizar : OK (total)
+deactivate CmdFinalizar
+Invoker -> Servicio : crearMemento()
+Servicio --> Invoker : Memento 5
+Invoker -> Invoker : push(CmdFinalizar,Memento 5)
+Invoker --> Ctrl : redo OK
+deactivate Invoker
+Ctrl --> UI : refrescar (Finalizada)
+
+== Notas ==
+note right of CmdCrear
+No ocupa habitación.
+fechaIngreso = null
+end note
+
+note right of CmdCheckin
+fechaIngreso = now()
+habitación.ocupada = true
+end note
+
+note right of CmdServicio
+Sólo permitido
+si reserva Activa
+end note
+
+note right of CmdFinalizar
+Libera habitación
+Calcula total
+end note
+
+note over Memento
+Snapshot completo del modelo:
+Clientes, Habitaciones,
+Reservas, Servicios
+end note
+
+@enduml

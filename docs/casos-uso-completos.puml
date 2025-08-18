@@ -1,122 +1,92 @@
 @startuml
+' Versión simplificada corregida (sintaxis estándar)
 left to right direction
-title Casos de Uso Completos - Gestión Hotelera (Actualizado)
+title Casos de Uso (Vista Simplificada)
 skinparam actorStyle awesome
 skinparam shadowing false
 skinparam packageStyle rect
 skinparam usecaseBackgroundColor #F8F9FA
-skinparam usecaseBorderColor #555555
+skinparam usecaseBorderColor #777777
 skinparam ArrowColor #555555
 
 actor Admin as A
 actor Recepcionista as R
-actor "DB Mongo" as DB
 
-package "Clientes" {
-  usecase UC_Reg as "Registrar Cliente"
-  usecase UC_Edit as "Editar Cliente"
-  usecase UC_Del as "Eliminar Cliente"
-  usecase UC_Find as "Buscar Cliente"
+package "Reservas" #FFF8F0 {
+  usecase UC_Plan as "Planificar Reserva"
+  usecase UC_Ck as "Check-in Rápido"
+  usecase UC_Ajustar as "Ajustar Fechas"
+  usecase UC_Fin as "Finalizar / Check-out"
+  usecase UC_Anular as "Anular"
 }
-package "Habitaciones" {
-  usecase UC_VerHab as "Ver Disponibilidad"
-  usecase UC_RefHab as "Refrescar Estado"
-}
-package "Reservas" {
-  usecase UC_Crear as "Crear Reserva (Planificación)"
-  usecase UC_CheckinRap as "Check-in Rápido"
-  usecase UC_Final as "Finalizar Reserva / Check-out"
-  usecase UC_Anular as "Anular Reserva"
-  usecase UC_List as "Listar Reservas"
-  usecase UC_Ajustar as "Ajustar Planificación"
-}
-package "Servicios Habitación" {
-  usecase UC_ListSrv as "Listar Servicios"
+package "Servicios" #F4F8FF {
   usecase UC_AddSrv as "Agregar Servicio"
 }
-package "Reportes / Dashboard" {
-  usecase UC_Dashboard as "Ver Dashboard"
-  usecase UC_Reporte as "Generar Reporte Diario"
+package "Habitaciones" #F0FFF6 {
+  usecase UC_VerHab as "Ver Disponibilidad"
 }
-package "Historial" {
-  usecase UC_Undo as "Deshacer"
-  usecase UC_Redo as "Rehacer"
+package "Reportes" #F2E8FF {
+  usecase UC_Dash as "Dashboard"
 }
-package "Mantenimiento" {
-  usecase UC_Migrar as "Migrar IDs Legibles"
+package "Historial" #F9F4FF {
+  usecase UC_U as "Undo"
+  usecase UC_R as "Redo"
+}
+package "Mantenimiento" #FFEFD6 {
+  usecase UC_Mig as "Migrar IDs"
   usecase UC_Init as "Inicializar Habitaciones"
 }
 
-A --> UC_Reg
-A --> UC_Edit
-A --> UC_Del
-A --> UC_Find
-A --> UC_Crear
-A --> UC_CheckinRap
-A --> UC_Final
-A --> UC_Anular
-A --> UC_List
+' Relaciones actores
+A --> UC_Plan
+A --> UC_Ck
 A --> UC_Ajustar
-A --> UC_ListSrv
+A --> UC_Fin
+A --> UC_Anular
 A --> UC_AddSrv
-A --> UC_Dashboard
-A --> UC_Reporte
-A --> UC_Undo
-A --> UC_Redo
-A --> UC_Migrar
-A --> UC_Init
 A --> UC_VerHab
-A --> UC_RefHab
+A --> UC_Dash
+A --> UC_U
+A --> UC_R
+A --> UC_Mig
+A --> UC_Init
 
-R --> UC_Reg
-R --> UC_Find
-R --> UC_Crear
-R --> UC_CheckinRap
-R --> UC_Final
-R --> UC_Anular
-R --> UC_List
+R --> UC_Plan
+R --> UC_Ck
 R --> UC_Ajustar
-R --> UC_ListSrv
+R --> UC_Fin
+R --> UC_Anular
 R --> UC_AddSrv
-R --> UC_Dashboard
-R --> UC_Undo
-R --> UC_Redo
 R --> UC_VerHab
-R --> UC_RefHab
+R --> UC_Dash
+R --> UC_U
+R --> UC_R
 
-UC_Crear --> UC_VerHab : <<include>>
-UC_CheckinRap --> UC_VerHab : <<include>>
-UC_Final --> UC_List : <<include>>
-UC_Anular --> UC_List : <<include>>
-UC_Ajustar --> UC_List : <<include>>
-UC_AddSrv --> UC_ListSrv : <<include>>
-UC_Undo ..> UC_Crear : <<extend>>
-UC_Undo ..> UC_Final : <<extend>>
-UC_Undo ..> UC_Anular : <<extend>>
-UC_Undo ..> UC_AddSrv : <<extend>>
-UC_Redo --> UC_Undo : <<include>>
-UC_Migrar ..> UC_Reg : <<extend>>
-UC_Init ..> UC_VerHab : <<extend>>
+' Dependencias clave
+UC_Ck --> UC_VerHab : <<consulta>>
+UC_Plan --> UC_VerHab : <<consulta>>
+UC_AddSrv ..> UC_Ck : <<requiere activa>>
+UC_Fin ..> UC_Ck : <<incluye>>
+UC_U ..> UC_Plan
+UC_U ..> UC_Ck
+UC_U ..> UC_Fin
+UC_U ..> UC_Anular
+UC_U ..> UC_AddSrv
+UC_R --> UC_U : <<reaplica>>
 
-DB <-- UC_Reg
-DB <-- UC_Crear
-DB <-- UC_CheckinRap
-DB <-- UC_Final
-DB <-- UC_Anular
-DB <-- UC_AddSrv
-DB <-- UC_Migrar
-DB <-- UC_Init
-
-note bottom of UC_Crear
-Reserva planificada:
+note right of UC_Plan
+Reserva planificada
 no ocupa habitación
-hasta Check-in
+end note
+note right of UC_Ck
+Crea reserva activa
+ocupa habitación
 end note
 note right of UC_AddSrv
-Sólo con reserva activa
+Sólo reserva activa
 end note
 
 legend left
-Clientes|Habitaciones|Reservas|Servicios|Reportes|Historial|Mantenimiento
+Reservas|Servicios|Habitaciones|Reportes|Historial|Mantenimiento
 endlegend
 @enduml

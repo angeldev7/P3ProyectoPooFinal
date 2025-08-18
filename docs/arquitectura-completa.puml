@@ -40,8 +40,12 @@ package "persistencia" #F2F2F2 {
   class ConexionBD
 }
 
-package "singleton" #FFEFD6 { class GestorDisponibilidad <<Singleton>> }
-package "builder" #E8F4FF { class ReservaBuilder }
+package "singleton" #FFEFD6 {
+  class GestorDisponibilidad <<Singleton>>
+}
+package "builder" #E8F4FF {
+  class ReservaBuilder
+}
 
 package "command" #FFF0F3 {
   interface ICommand
@@ -52,7 +56,10 @@ package "command" #FFF0F3 {
   class AnularReservaCommand
 }
 
-package "memento" #F2E8FF { class ModeloMemento  interface ICaretaker }
+package "memento" #F2E8FF {
+  class ModeloMemento
+  interface ICaretaker
+}
 
 VentanaPrincipal --> ControladorVentanaPrincipal : eventos
 VentanaAdmin --> ControladorVentanaAdmin : eventos

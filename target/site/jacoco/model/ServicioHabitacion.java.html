@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServicioHabitacion.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">P3ProyectoPooFinal</a> &gt; <a href="index.source.html" class="el_package">model</a> &gt; <span class="el_source">ServicioHabitacion.java</span></div><h1>ServicioHabitacion.java</h1><pre class="source lang-java linenums">package model;
+
+import org.bson.Document;
+import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Entidad que representa un servicio a la habitación (room service) asociado a una reserva/habitación ocupada.
+ * Mantiene información básica para cálculo y auditoría.
+ */
+public class ServicioHabitacion {
+    public static final String TIPO_COMIDA = &quot;COMIDA&quot;;
+    public static final String TIPO_BEBIDA = &quot;BEBIDA&quot;;
+    public static final String TIPO_LIMPIEZA = &quot;LIMPIEZA&quot;;
+
+    private static final double PRECIO_COMIDA = 15.0;
+    private static final double PRECIO_BEBIDA = 5.0;
+    private static final double PRECIO_LIMPIEZA = 10.0;
+
+    private String id;               // SRV-0001
+    private String idReserva;        // Reserva asociada (activa al momento del registro)
+    private String idHabitacion;     // Redundante para búsquedas rápidas
+    private Date fecha;              // Timestamp del servicio
+    private String tipo;             // COMIDA | BEBIDA | LIMPIEZA
+    private String descripcion;      // Texto libre (ej. detalle de pedido)
+    private double costo;            // Costo individual fijo por tipo
+    private List&lt;String&gt; especias;   // Solo aplica a COMIDA
+
+<span class="fc" id="L30">    public ServicioHabitacion() {}</span>
+
+    public ServicioHabitacion(String id, String idReserva, String idHabitacion, Date fecha,
+<span class="fc" id="L33">                              String tipo, String descripcion, double costo, List&lt;String&gt; especias) {</span>
+<span class="fc" id="L34">        this.id = id;</span>
+<span class="fc" id="L35">        this.idReserva = idReserva;</span>
+<span class="fc" id="L36">        this.idHabitacion = idHabitacion;</span>
+<span class="fc" id="L37">        this.fecha = fecha;</span>
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">        this.tipo = tipo != null ? tipo.toUpperCase() : null;</span>
+<span class="fc" id="L39">        this.descripcion = descripcion;</span>
+        // Forzar costo fijo por tipo ignorando parámetro variable
+<span class="fc" id="L41">        this.costo = costoPorTipo(this.tipo);</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        this.especias = especias != null ? new ArrayList&lt;&gt;(especias) : new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L43">    }</span>
+
+    // Fábricas estáticas para claridad
+    public static ServicioHabitacion crearComida(String idReserva, String idHabitacion, String descripcion, List&lt;String&gt; especias){
+<span class="fc" id="L47">        return new ServicioHabitacion(null, idReserva, idHabitacion, new Date(), TIPO_COMIDA, descripcion, PRECIO_COMIDA, especias);</span>
+    }
+    public static ServicioHabitacion crearBebida(String idReserva, String idHabitacion, String descripcion){
+<span class="fc" id="L50">        return new ServicioHabitacion(null, idReserva, idHabitacion, new Date(), TIPO_BEBIDA, descripcion, PRECIO_BEBIDA, null);</span>
+    }
+    public static ServicioHabitacion crearLimpieza(String idReserva, String idHabitacion){
+<span class="fc" id="L53">        return new ServicioHabitacion(null, idReserva, idHabitacion, new Date(), TIPO_LIMPIEZA, &quot;Servicio de limpieza&quot;, PRECIO_LIMPIEZA, null);</span>
+    }
+
+<span class="fc" id="L56">    public String getId() {return id;}</span>
+<span class="fc" id="L57">    public void setId(String id) {this.id = id;}</span>
+<span class="fc" id="L58">    public String getIdReserva() {return idReserva;}</span>
+<span class="fc" id="L59">    public void setIdReserva(String idReserva) {this.idReserva = idReserva;}</span>
+<span class="fc" id="L60">    public String getIdHabitacion() {return idHabitacion;}</span>
+<span class="fc" id="L61">    public void setIdHabitacion(String idHabitacion) {this.idHabitacion = idHabitacion;}</span>
+<span class="nc" id="L62">    public Date getFecha() {return fecha;}</span>
+<span class="nc" id="L63">    public void setFecha(Date fecha) {this.fecha = fecha;}</span>
+<span class="fc" id="L64">    public String getTipo() {return tipo;}</span>
+<span class="fc" id="L65">    public void setTipo(String tipo) {this.tipo = tipo;}</span>
+<span class="fc" id="L66">    public String getDescripcion() {return descripcion;}</span>
+<span class="fc" id="L67">    public void setDescripcion(String descripcion) {this.descripcion = descripcion;}</span>
+<span class="fc" id="L68">    public double getCosto() {return costo;}</span>
+<span class="fc" id="L69">    public void setCosto(double costo) {this.costo = costoPorTipo(this.tipo);} // ignora costo externo</span>
+<span class="fc" id="L70">    public List&lt;String&gt; getEspecias(){return especias;}</span>
+<span class="fc" id="L71">    public void setEspecias(List&lt;String&gt; especias){this.especias = especias;}</span>
+
+    public static boolean tipoValido(String tipo){
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        if (tipo == null) return false;</span>
+<span class="fc" id="L75">        String t = tipo.toUpperCase();</span>
+<span class="fc bfc" id="L76" title="All 6 branches covered.">        return TIPO_COMIDA.equals(t) || TIPO_BEBIDA.equals(t) || TIPO_LIMPIEZA.equals(t);</span>
+    }
+
+    public static double costoPorTipo(String tipo){
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        if (tipo == null) return 0.0;</span>
+<span class="fc bfc" id="L81" title="All 4 branches covered.">        switch (tipo.toUpperCase()){</span>
+<span class="fc" id="L82">            case TIPO_COMIDA: return PRECIO_COMIDA;</span>
+<span class="fc" id="L83">            case TIPO_BEBIDA: return PRECIO_BEBIDA;</span>
+<span class="fc" id="L84">            case TIPO_LIMPIEZA: return PRECIO_LIMPIEZA;</span>
+<span class="fc" id="L85">            default: return 0.0;</span>
+        }
+    }
+
+    public Document toDocument(){
+<span class="fc" id="L90">    return new Document(&quot;_id&quot;, id)</span>
+<span class="fc" id="L91">        .append(&quot;idReserva&quot;, idReserva)</span>
+<span class="fc" id="L92">        .append(&quot;idHabitacion&quot;, idHabitacion)</span>
+<span class="fc" id="L93">        .append(&quot;fecha&quot;, fecha)</span>
+<span class="fc" id="L94">        .append(&quot;tipo&quot;, tipo)</span>
+<span class="fc" id="L95">        .append(&quot;descripcion&quot;, descripcion)</span>
+<span class="fc" id="L96">        .append(&quot;costo&quot;, costo)</span>
+<span class="fc" id="L97">        .append(&quot;especias&quot;, especias);</span>
+    }
+
+    public static ServicioHabitacion fromDocument(Document d){
+<span class="fc" id="L101">        List&lt;String&gt; especias = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L102">        Object raw = d.get(&quot;especias&quot;);</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">        if (raw instanceof List&lt;?&gt;) {</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">            for (Object o: (List&lt;?&gt;)raw){</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">                if (o!=null) especias.add(o.toString());</span>
+<span class="fc" id="L106">            }</span>
+        }
+<span class="fc" id="L108">        ServicioHabitacion s = new ServicioHabitacion(</span>
+<span class="fc" id="L109">                d.getString(&quot;_id&quot;),</span>
+<span class="fc" id="L110">                d.getString(&quot;idReserva&quot;),</span>
+<span class="fc" id="L111">                d.getString(&quot;idHabitacion&quot;),</span>
+<span class="fc" id="L112">                d.getDate(&quot;fecha&quot;),</span>
+<span class="fc" id="L113">                d.getString(&quot;tipo&quot;),</span>
+<span class="fc" id="L114">                d.getString(&quot;descripcion&quot;),</span>
+<span class="fc" id="L115">                costoPorTipo(d.getString(&quot;tipo&quot;)),</span>
+                especias
+        );
+<span class="fc" id="L118">        return s;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

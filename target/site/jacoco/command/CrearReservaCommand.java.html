@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CrearReservaCommand.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">P3ProyectoPooFinal</a> &gt; <a href="index.source.html" class="el_package">command</a> &gt; <span class="el_source">CrearReservaCommand.java</span></div><h1>CrearReservaCommand.java</h1><pre class="source lang-java linenums">package command;
+
+import model.*;
+import builder.ReservaBuilder;
+
+/**
+ * Comando para creación de una nueva reserva (con soporte básico de undo liberando la habitación).
+ */
+public class CrearReservaCommand implements ICommand {
+    private final IModeloService modeloService;
+    private final String idCliente;
+    private final String idHabitacion;
+    private double total;
+    private final String descripcion;
+    private Reserva reservaCreada;
+    private final long executionTime;
+
+<span class="fc" id="L18">    public CrearReservaCommand(IModeloService modeloService, String idCliente, String idHabitacion, double total, String descripcion) {</span>
+<span class="fc" id="L19">        this.modeloService = modeloService;</span>
+<span class="fc" id="L20">        this.idCliente = idCliente;</span>
+<span class="fc" id="L21">        this.idHabitacion = idHabitacion;</span>
+<span class="fc" id="L22">        this.total = total;</span>
+<span class="fc" id="L23">        this.descripcion = descripcion;</span>
+<span class="fc" id="L24">        this.executionTime = System.currentTimeMillis();</span>
+<span class="fc" id="L25">    }</span>
+
+    @Override
+    public void execute() {
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">        if (reservaCreada == null) {</span>
+            // En modo headless (tests CI) no se puede mostrar JOptionPane; usar valores por defecto.
+<span class="fc" id="L31">            boolean headless = java.awt.GraphicsEnvironment.isHeadless();</span>
+<span class="fc" id="L32">            int noches = 1;</span>
+<span class="fc" id="L33">            java.time.LocalDate inicio = java.time.LocalDate.now();</span>
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">            if (!headless) {</span>
+<span class="fc" id="L35">                String inputNoches = javax.swing.JOptionPane.showInputDialog(null, &quot;Número de noches (1+)&quot;, &quot;1&quot;);</span>
+<span class="pc bpc" id="L36" title="2 of 4 branches missed.">                if (inputNoches != null &amp;&amp; !inputNoches.trim().isEmpty()) {</span>
+<span class="pc" id="L37">                    try { noches = Math.max(1, Integer.parseInt(inputNoches.trim())); } catch(NumberFormatException ignored) {}</span>
+                }
+<span class="fc" id="L39">                String inputDiasInicio = javax.swing.JOptionPane.showInputDialog(null, &quot;Días hasta la llegada (0 = hoy)&quot;, &quot;0&quot;);</span>
+<span class="pc bpc" id="L40" title="2 of 4 branches missed.">                if (inputDiasInicio != null &amp;&amp; !inputDiasInicio.trim().isEmpty()) {</span>
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">                    try { int offset = Integer.parseInt(inputDiasInicio.trim()); if (offset&gt;=0) inicio = inicio.plusDays(offset); } catch(NumberFormatException ignored) {}</span>
+                }
+            }
+            // Fin planificado = inicio + noches (si noches=1, fin es inicio+1, mostrando noche completa)
+<span class="fc" id="L45">            java.time.LocalDate finPlan = inicio.plusDays(noches);</span>
+<span class="fc" id="L46">            java.util.Date fechaInicioPlan = java.util.Date.from(inicio.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());</span>
+<span class="fc" id="L47">            java.util.Date fechaFinPlan = java.util.Date.from(finPlan.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());</span>
+            // Recalcular total si se proporcionó uno base (precio noche estimado = total original)
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">            if (total &gt; 0) {</span>
+                // Interpretar 'total' pasado como precio por noche si se creó desde UI anterior
+<span class="fc" id="L51">                this.total = total * noches;</span>
+            }
+<span class="fc" id="L53">            reservaCreada = new ReservaBuilder()</span>
+<span class="fc" id="L54">                .setCliente(idCliente)</span>
+<span class="fc" id="L55">                .setHabitacion(idHabitacion)</span>
+<span class="fc" id="L56">                .setTotal(this.total)</span>
+<span class="fc" id="L57">                .setFechaIngreso(fechaInicioPlan) // guardamos como inicio planificado inicial</span>
+<span class="fc" id="L58">                .setFechaSalida(null)</span>
+<span class="fc" id="L59">                .build();</span>
+            // Asignar metadatos de planificación completos
+<span class="fc" id="L61">            reservaCreada.setFechaReserva(new java.util.Date());</span>
+<span class="fc" id="L62">            reservaCreada.setFechaInicioPlanificada(fechaInicioPlan);</span>
+<span class="fc" id="L63">            reservaCreada.setFechaFinPlanificada(fechaFinPlan);</span>
+<span class="fc" id="L64">            reservaCreada.setNoches(noches);</span>
+        }
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if (!modeloService.crearReserva(reservaCreada)) {</span>
+<span class="fc" id="L67">            throw new RuntimeException(&quot;No se pudo crear la reserva&quot;);</span>
+        }
+<span class="fc" id="L69">    }</span>
+
+    @Override
+    public void undo() {
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        if (reservaCreada != null) {</span>
+<span class="fc" id="L74">            modeloService.finalizarReserva(reservaCreada.getId());</span>
+        }
+<span class="fc" id="L76">    }</span>
+
+    @Override
+    public String getDescription() {
+<span class="fc" id="L80">        return &quot;Crear reserva: &quot; + descripcion;</span>
+    }
+
+    @Override
+<span class="nc" id="L84">    public long getExecutionTime() {return executionTime;}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

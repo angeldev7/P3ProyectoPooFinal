@@ -28,9 +28,11 @@ public class CheckinRapidoAdminCommand implements ICommand {
             }
         }
         int noches = 1;
-        String inputNoches = javax.swing.JOptionPane.showInputDialog(null, "Noches de hospedaje (check-in rápido)", "1");
-        if (inputNoches != null && !inputNoches.trim().isEmpty()) {
-            try { noches = Math.max(1, Integer.parseInt(inputNoches.trim())); } catch(NumberFormatException ignored) {}
+        if (!java.awt.GraphicsEnvironment.isHeadless()) {
+            String inputNoches = javax.swing.JOptionPane.showInputDialog(null, "Noches de hospedaje (check-in rápido)", "1");
+            if (inputNoches != null && !inputNoches.trim().isEmpty()) {
+                try { noches = Math.max(1, Integer.parseInt(inputNoches.trim())); } catch(NumberFormatException ignored) {}
+            }
         }
         java.time.LocalDate hoy = java.time.LocalDate.now();
         java.time.LocalDate finPlan = hoy.plusDays(noches);

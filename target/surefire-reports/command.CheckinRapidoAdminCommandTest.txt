@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: command.CheckinRapidoAdminCommandTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.494 s -- in command.CheckinRapidoAdminCommandTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.296 s -- in command.CheckinRapidoAdminCommandTest

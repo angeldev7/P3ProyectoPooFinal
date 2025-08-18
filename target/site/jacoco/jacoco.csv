@@ -1,0 +1,14 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+P3ProyectoPooFinal,singleton,GestorDisponibilidad,0,187,2,14,0,43,2,22,0,16
+P3ProyectoPooFinal,builder,ReservaBuilder,0,184,2,10,0,55,2,20,0,16
+P3ProyectoPooFinal,memento,ModeloMemento,20,303,6,20,2,45,8,13,2,6
+P3ProyectoPooFinal,model,Reserva,103,353,3,19,7,92,10,34,7,26
+P3ProyectoPooFinal,model,Habitacion,22,165,2,6,5,29,7,14,5,12
+P3ProyectoPooFinal,model,Cliente,19,148,3,5,4,29,7,13,4,12
+P3ProyectoPooFinal,model,ServicioHabitacion,8,276,3,21,2,60,5,33,2,23
+P3ProyectoPooFinal,command,CheckinRapidoAdminCommand,32,118,9,7,4,27,10,3,2,3
+P3ProyectoPooFinal,command,ICommand,0,2,0,0,0,1,0,1,0,1
+P3ProyectoPooFinal,command,CommandInvoker,59,256,11,27,15,58,13,21,3,12
+P3ProyectoPooFinal,command,CrearReservaCommand,5,172,9,11,1,42,10,5,1,4
+P3ProyectoPooFinal,command,FinalizarReservaCommand,15,140,9,13,2,27,10,7,1,5
+P3ProyectoPooFinal,command,CommandInvoker.CommandSnapshot,0,9,0,0,0,2,0,1,0,1

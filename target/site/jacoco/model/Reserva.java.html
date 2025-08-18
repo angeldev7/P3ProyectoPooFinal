@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Reserva.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">P3ProyectoPooFinal</a> &gt; <a href="index.source.html" class="el_package">model</a> &gt; <span class="el_source">Reserva.java</span></div><h1>Reserva.java</h1><pre class="source lang-java linenums">package model;
+
+import org.bson.Document;
+import java.util.Date;
+
+/**
+ * Entidad Reserva que representa una reserva de habitación.
+ * Maneja las fechas de ingreso y salida, así como el total de la reserva.
+ * 
+ * @author asdw
+ * @version 1.0
+ */
+public class Reserva {
+    private String id;
+    private String idCliente;
+    private String idHabitacion;
+    private Date fechaIngreso;
+    private Date fechaSalida;
+    private double total;
+    private String observaciones;
+    private boolean confirmada;
+    // Nuevos campos de planificación
+    private Date fechaReserva; // cuando se registró la reserva
+    private Date fechaInicioPlanificada; // día que el cliente planea llegar
+    private Date fechaFinPlanificada; // día que el cliente planea irse
+    private int noches; // número de noches planificadas
+
+    /**
+     * Constructor por defecto.
+     */
+<span class="nc" id="L31">    public Reserva() {}</span>
+
+    /**
+     * Constructor básico para crear una reserva.
+     * 
+     * @param id Identificador único de la reserva
+     * @param idCliente ID del cliente que realiza la reserva
+     * @param idHabitacion ID de la habitación reservada
+     * @param fechaIngreso Fecha de ingreso al hotel
+     * @param fechaSalida Fecha de salida del hotel (puede ser null para reservas activas)
+     * @param total Monto total de la reserva
+     */
+<span class="fc" id="L43">    public Reserva(String id, String idCliente, String idHabitacion, Date fechaIngreso, Date fechaSalida, double total) {</span>
+<span class="fc" id="L44">        this.id = id;</span>
+<span class="fc" id="L45">        this.idCliente = idCliente;</span>
+<span class="fc" id="L46">        this.idHabitacion = idHabitacion;</span>
+<span class="fc" id="L47">        this.fechaIngreso = fechaIngreso;</span>
+<span class="fc" id="L48">        this.fechaSalida = fechaSalida;</span>
+<span class="fc" id="L49">        this.total = total;</span>
+<span class="fc" id="L50">        this.observaciones = &quot;&quot;;</span>
+<span class="fc" id="L51">        this.confirmada = true;</span>
+    // Defaults planificación (compatibilidad hacia atrás)
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">    this.fechaReserva = fechaIngreso != null ? new Date(fechaIngreso.getTime()) : new Date();</span>
+<span class="fc" id="L54">    this.fechaInicioPlanificada = fechaIngreso;</span>
+<span class="fc" id="L55">    this.fechaFinPlanificada = fechaSalida;</span>
+<span class="fc" id="L56">    this.noches = 1;</span>
+<span class="fc" id="L57">    }</span>
+
+    /**
+     * Constructor completo para crear una reserva con todos los atributos.
+     * 
+     * @param id Identificador único de la reserva
+     * @param idCliente ID del cliente que realiza la reserva
+     * @param idHabitacion ID de la habitación reservada
+     * @param fechaIngreso Fecha de ingreso al hotel
+     * @param fechaSalida Fecha de salida del hotel
+     * @param total Monto total de la reserva
+     * @param observaciones Observaciones adicionales
+     * @param confirmada Estado de confirmación de la reserva
+     */
+    public Reserva(String id, String idCliente, String idHabitacion, Date fechaIngreso, 
+<span class="fc" id="L72">                   Date fechaSalida, double total, String observaciones, boolean confirmada) {</span>
+<span class="fc" id="L73">        this.id = id;</span>
+<span class="fc" id="L74">        this.idCliente = idCliente;</span>
+<span class="fc" id="L75">        this.idHabitacion = idHabitacion;</span>
+<span class="fc" id="L76">        this.fechaIngreso = fechaIngreso;</span>
+<span class="fc" id="L77">        this.fechaSalida = fechaSalida;</span>
+<span class="fc" id="L78">        this.total = total;</span>
+<span class="fc" id="L79">        this.observaciones = observaciones;</span>
+<span class="fc" id="L80">        this.confirmada = confirmada;</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        this.fechaReserva = fechaIngreso != null ? new Date(fechaIngreso.getTime()) : new Date();</span>
+<span class="fc" id="L82">        this.fechaInicioPlanificada = fechaIngreso;</span>
+<span class="fc" id="L83">        this.fechaFinPlanificada = fechaSalida;</span>
+<span class="fc" id="L84">        this.noches = 1;</span>
+<span class="fc" id="L85">    }</span>
+
+    /**
+     * Constructor completo con planificación explícita.
+     */
+    public Reserva(String id, String idCliente, String idHabitacion,
+                   Date fechaIngreso, Date fechaSalida, double total,
+                   String observaciones, boolean confirmada,
+<span class="fc" id="L93">                   Date fechaReserva, Date fechaInicioPlanificada, Date fechaFinPlanificada, int noches) {</span>
+<span class="fc" id="L94">        this.id = id;</span>
+<span class="fc" id="L95">        this.idCliente = idCliente;</span>
+<span class="fc" id="L96">        this.idHabitacion = idHabitacion;</span>
+<span class="fc" id="L97">        this.fechaIngreso = fechaIngreso;</span>
+<span class="fc" id="L98">        this.fechaSalida = fechaSalida;</span>
+<span class="fc" id="L99">        this.total = total;</span>
+<span class="fc" id="L100">        this.observaciones = observaciones;</span>
+<span class="fc" id="L101">        this.confirmada = confirmada;</span>
+<span class="fc" id="L102">        this.fechaReserva = fechaReserva;</span>
+<span class="fc" id="L103">        this.fechaInicioPlanificada = fechaInicioPlanificada;</span>
+<span class="fc" id="L104">        this.fechaFinPlanificada = fechaFinPlanificada;</span>
+<span class="fc" id="L105">        this.noches = noches;</span>
+<span class="fc" id="L106">    }</span>
+
+    // Getters y setters
+<span class="fc" id="L109">    public String getId() { return id; }</span>
+<span class="fc" id="L110">    public void setId(String id) { this.id = id; }</span>
+<span class="fc" id="L111">    public String getIdCliente() { return idCliente; }</span>
+<span class="nc" id="L112">    public void setIdCliente(String idCliente) { this.idCliente = idCliente; }</span>
+<span class="fc" id="L113">    public String getIdHabitacion() { return idHabitacion; }</span>
+<span class="nc" id="L114">    public void setIdHabitacion(String idHabitacion) { this.idHabitacion = idHabitacion; }</span>
+<span class="fc" id="L115">    public Date getFechaIngreso() { return fechaIngreso; }</span>
+<span class="nc" id="L116">    public void setFechaIngreso(Date fechaIngreso) { this.fechaIngreso = fechaIngreso; }</span>
+<span class="fc" id="L117">    public Date getFechaSalida() { return fechaSalida; }</span>
+<span class="fc" id="L118">    public void setFechaSalida(Date fechaSalida) { this.fechaSalida = fechaSalida; }</span>
+<span class="fc" id="L119">    public double getTotal() { return total; }</span>
+<span class="nc" id="L120">    public void setTotal(double total) { this.total = total; }</span>
+<span class="fc" id="L121">    public String getObservaciones() { return observaciones; }</span>
+<span class="fc" id="L122">    public void setObservaciones(String observaciones) { this.observaciones = observaciones; }</span>
+<span class="fc" id="L123">    public boolean isConfirmada() { return confirmada; }</span>
+<span class="fc" id="L124">    public void setConfirmada(boolean confirmada) { this.confirmada = confirmada; }</span>
+<span class="nc" id="L125">    public Date getFechaReserva() { return fechaReserva; }</span>
+<span class="fc" id="L126">    public void setFechaReserva(Date fechaReserva) { this.fechaReserva = fechaReserva; }</span>
+<span class="fc" id="L127">    public Date getFechaInicioPlanificada() { return fechaInicioPlanificada; }</span>
+<span class="fc" id="L128">    public void setFechaInicioPlanificada(Date fechaInicioPlanificada) { this.fechaInicioPlanificada = fechaInicioPlanificada; }</span>
+<span class="fc" id="L129">    public Date getFechaFinPlanificada() { return fechaFinPlanificada; }</span>
+<span class="fc" id="L130">    public void setFechaFinPlanificada(Date fechaFinPlanificada) { this.fechaFinPlanificada = fechaFinPlanificada; }</span>
+<span class="fc" id="L131">    public int getNoches() { return noches; }</span>
+<span class="fc" id="L132">    public void setNoches(int noches) { this.noches = noches; }</span>
+
+    /**
+     * Convierte la reserva a un Document de MongoDB.
+     * 
+     * @return Document para insertar en MongoDB
+     */
+    public Document toDocument() {
+<span class="fc" id="L140">        return new Document(&quot;_id&quot;, id)</span>
+<span class="fc" id="L141">                .append(&quot;idCliente&quot;, idCliente)</span>
+<span class="fc" id="L142">                .append(&quot;idHabitacion&quot;, idHabitacion)</span>
+<span class="fc" id="L143">                .append(&quot;fechaIngreso&quot;, fechaIngreso)</span>
+<span class="fc" id="L144">                .append(&quot;fechaSalida&quot;, fechaSalida)</span>
+<span class="fc" id="L145">                .append(&quot;total&quot;, total)</span>
+<span class="fc" id="L146">                .append(&quot;observaciones&quot;, observaciones)</span>
+<span class="fc" id="L147">                .append(&quot;confirmada&quot;, confirmada)</span>
+<span class="fc" id="L148">                .append(&quot;fechaReserva&quot;, fechaReserva)</span>
+<span class="fc" id="L149">                .append(&quot;fechaInicioPlanificada&quot;, fechaInicioPlanificada)</span>
+<span class="fc" id="L150">                .append(&quot;fechaFinPlanificada&quot;, fechaFinPlanificada)</span>
+<span class="fc" id="L151">                .append(&quot;noches&quot;, noches);</span>
+    }
+
+    /**
+     * Crea una Reserva desde un Document de MongoDB.
+     * 
+     * @param doc Document obtenido de MongoDB
+     * @return Nueva instancia de Reserva
+     */
+    public static Reserva fromDocument(Document doc) {
+<span class="fc" id="L161">        Reserva r = new Reserva(</span>
+<span class="fc" id="L162">            doc.getString(&quot;_id&quot;),</span>
+<span class="fc" id="L163">            doc.getString(&quot;idCliente&quot;),</span>
+<span class="fc" id="L164">            doc.getString(&quot;idHabitacion&quot;),</span>
+<span class="fc" id="L165">            doc.getDate(&quot;fechaIngreso&quot;),</span>
+<span class="fc" id="L166">            doc.getDate(&quot;fechaSalida&quot;),</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">            doc.getDouble(&quot;total&quot;) != null ? doc.getDouble(&quot;total&quot;) : 0.0,</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">            doc.getString(&quot;observaciones&quot;) != null ? doc.getString(&quot;observaciones&quot;) : &quot;&quot;,</span>
+<span class="fc" id="L169">            doc.getBoolean(&quot;confirmada&quot;, true)</span>
+        );
+        // cargar campos nuevos si existen
+<span class="fc bfc" id="L172" title="All 2 branches covered.">        if (doc.containsKey(&quot;fechaReserva&quot;)) r.setFechaReserva(doc.getDate(&quot;fechaReserva&quot;));</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">        if (doc.containsKey(&quot;fechaInicioPlanificada&quot;)) r.setFechaInicioPlanificada(doc.getDate(&quot;fechaInicioPlanificada&quot;));</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        if (doc.containsKey(&quot;fechaFinPlanificada&quot;)) r.setFechaFinPlanificada(doc.getDate(&quot;fechaFinPlanificada&quot;));</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">        if (doc.containsKey(&quot;noches&quot;)) {</span>
+<span class="fc" id="L176">            Object n = doc.get(&quot;noches&quot;);</span>
+<span class="pc bpc" id="L177" title="1 of 2 branches missed.">            if (n instanceof Number) r.setNoches(((Number) n).intValue());</span>
+        }
+<span class="fc" id="L179">        return r;</span>
+    }
+
+    /**
+     * Verifica si la reserva está activa (sin fecha de salida).
+     * 
+     * @return true si la reserva está activa, false en caso contrario
+     */
+    public boolean isActiva() {
+<span class="fc bfc" id="L188" title="All 4 branches covered.">        return fechaSalida == null &amp;&amp; confirmada;</span>
+    }
+
+    /**
+     * Finaliza la reserva estableciendo la fecha de salida.
+     */
+    public void finalizar() {
+<span class="fc" id="L195">        this.fechaSalida = new Date();</span>
+<span class="fc" id="L196">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L200">        return &quot;Reserva{&quot; +</span>
+                &quot;id='&quot; + id + '\'' +
+                &quot;, idCliente='&quot; + idCliente + '\'' +
+                &quot;, idHabitacion='&quot; + idHabitacion + '\'' +
+                &quot;, fechaIngreso=&quot; + fechaIngreso +
+                &quot;, fechaSalida=&quot; + fechaSalida +
+                &quot;, total=&quot; + total +
+                &quot;, observaciones='&quot; + observaciones + '\'' +
+                &quot;, confirmada=&quot; + confirmada +
+                &quot;, fechaReserva=&quot; + fechaReserva +
+                &quot;, fechaInicioPlanificada=&quot; + fechaInicioPlanificada +
+                &quot;, fechaFinPlanificada=&quot; + fechaFinPlanificada +
+                &quot;, noches=&quot; + noches +
+                '}';
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

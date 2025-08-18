@@ -27,16 +27,19 @@ public class CrearReservaCommand implements ICommand {
     @Override
     public void execute() {
         if (reservaCreada == null) {
-            // Pedir fecha de inicio (offset en días) y noches
+            // En modo headless (tests CI) no se puede mostrar JOptionPane; usar valores por defecto.
+            boolean headless = java.awt.GraphicsEnvironment.isHeadless();
             int noches = 1;
-            String inputNoches = javax.swing.JOptionPane.showInputDialog(null, "Número de noches (1+)", "1");
-            if (inputNoches != null && !inputNoches.trim().isEmpty()) {
-                try { noches = Math.max(1, Integer.parseInt(inputNoches.trim())); } catch(NumberFormatException ignored) {}
-            }
             java.time.LocalDate inicio = java.time.LocalDate.now();
-            String inputDiasInicio = javax.swing.JOptionPane.showInputDialog(null, "Días hasta la llegada (0 = hoy)", "0");
-            if (inputDiasInicio != null && !inputDiasInicio.trim().isEmpty()) {
-                try { int offset = Integer.parseInt(inputDiasInicio.trim()); if (offset>=0) inicio = inicio.plusDays(offset); } catch(NumberFormatException ignored) {}
+            if (!headless) {
+                String inputNoches = javax.swing.JOptionPane.showInputDialog(null, "Número de noches (1+)", "1");
+                if (inputNoches != null && !inputNoches.trim().isEmpty()) {
+                    try { noches = Math.max(1, Integer.parseInt(inputNoches.trim())); } catch(NumberFormatException ignored) {}
+                }
+                String inputDiasInicio = javax.swing.JOptionPane.showInputDialog(null, "Días hasta la llegada (0 = hoy)", "0");
+                if (inputDiasInicio != null && !inputDiasInicio.trim().isEmpty()) {
+                    try { int offset = Integer.parseInt(inputDiasInicio.trim()); if (offset>=0) inicio = inicio.plusDays(offset); } catch(NumberFormatException ignored) {}
+                }
             }
             // Fin planificado = inicio + noches (si noches=1, fin es inicio+1, mostrando noche completa)
             java.time.LocalDate finPlan = inicio.plusDays(noches);

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ModeloMemento.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">P3ProyectoPooFinal</a> &gt; <a href="index.source.html" class="el_package">memento</a> &gt; <span class="el_source">ModeloMemento.java</span></div><h1>ModeloMemento.java</h1><pre class="source lang-java linenums">package memento;
+
+import model.Cliente;
+import model.Habitacion;
+import model.Reserva;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Date;
+
+/**
+ * Memento que guarda el estado completo del modelo del hotel.
+ * Implementa el patrón Memento para permitir restaurar estados anteriores.
+ * 
+ * @author asdw
+ * @version 1.0
+ */
+public class ModeloMemento {
+    
+    private final List&lt;Cliente&gt; clientes;
+    private final List&lt;Habitacion&gt; habitaciones;
+    private final List&lt;Reserva&gt; reservas;
+    private final Date timestamp;
+
+    /**
+     * Constructor que crea un snapshot del estado actual.
+     * 
+     * @param clientes Lista actual de clientes
+     * @param habitaciones Lista actual de habitaciones
+     * @param reservas Lista actual de reservas
+     */
+<span class="fc" id="L31">    public ModeloMemento(List&lt;Cliente&gt; clientes, List&lt;Habitacion&gt; habitaciones, List&lt;Reserva&gt; reservas) {</span>
+        // Crear copias profundas para evitar modificaciones externas
+<span class="fc" id="L33">        this.clientes = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        for (Cliente cliente : clientes) {</span>
+<span class="fc" id="L35">            this.clientes.add(new Cliente(cliente.getId(), cliente.getNombre(), </span>
+<span class="fc" id="L36">                                        cliente.getApellido(), cliente.getCedula(), cliente.getTelefono()));</span>
+<span class="fc" id="L37">        }</span>
+        
+<span class="fc" id="L39">        this.habitaciones = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        for (Habitacion hab : habitaciones) {</span>
+<span class="fc" id="L41">            this.habitaciones.add(new Habitacion(hab.getId(), hab.getNumero(), </span>
+<span class="fc" id="L42">                                               hab.getTipo(), hab.isOcupada(), hab.getPrecio()));</span>
+<span class="fc" id="L43">        }</span>
+        
+<span class="fc" id="L45">        this.reservas = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        for (Reserva reserva : reservas) {</span>
+<span class="pc bpc" id="L47" title="1 of 2 branches missed.">            Date fechaIngreso = reserva.getFechaIngreso() != null ? new Date(reserva.getFechaIngreso().getTime()) : null;</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">            Date fechaSalida = reserva.getFechaSalida() != null ? new Date(reserva.getFechaSalida().getTime()) : null;</span>
+<span class="fc" id="L49">            this.reservas.add(new Reserva(reserva.getId(), reserva.getIdCliente(), reserva.getIdHabitacion(),</span>
+<span class="fc" id="L50">                                        fechaIngreso, fechaSalida, reserva.getTotal(), </span>
+<span class="fc" id="L51">                                        reserva.getObservaciones(), reserva.isConfirmada()));</span>
+<span class="fc" id="L52">        }</span>
+        
+<span class="fc" id="L54">        this.timestamp = new Date();</span>
+<span class="fc" id="L55">    }</span>
+
+    /**
+     * Obtiene la lista de clientes del memento.
+     * 
+     * @return Copia de la lista de clientes
+     */
+    public List&lt;Cliente&gt; getClientes() {
+<span class="fc" id="L63">        List&lt;Cliente&gt; copy = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        for (Cliente cliente : clientes) {</span>
+<span class="fc" id="L65">            copy.add(new Cliente(cliente.getId(), cliente.getNombre(), </span>
+<span class="fc" id="L66">                               cliente.getApellido(), cliente.getCedula(), cliente.getTelefono()));</span>
+<span class="fc" id="L67">        }</span>
+<span class="fc" id="L68">        return copy;</span>
+    }
+
+    /**
+     * Obtiene la lista de habitaciones del memento.
+     * 
+     * @return Copia de la lista de habitaciones
+     */
+    public List&lt;Habitacion&gt; getHabitaciones() {
+<span class="fc" id="L77">        List&lt;Habitacion&gt; copy = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        for (Habitacion hab : habitaciones) {</span>
+<span class="fc" id="L79">            copy.add(new Habitacion(hab.getId(), hab.getNumero(), </span>
+<span class="fc" id="L80">                                  hab.getTipo(), hab.isOcupada(), hab.getPrecio()));</span>
+<span class="fc" id="L81">        }</span>
+<span class="fc" id="L82">        return copy;</span>
+    }
+
+    /**
+     * Obtiene la lista de reservas del memento.
+     * 
+     * @return Copia de la lista de reservas
+     */
+    public List&lt;Reserva&gt; getReservas() {
+<span class="fc" id="L91">        List&lt;Reserva&gt; copy = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        for (Reserva reserva : reservas) {</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">            Date fechaIngreso = reserva.getFechaIngreso() != null ? new Date(reserva.getFechaIngreso().getTime()) : null;</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">            Date fechaSalida = reserva.getFechaSalida() != null ? new Date(reserva.getFechaSalida().getTime()) : null;</span>
+<span class="fc" id="L95">            copy.add(new Reserva(reserva.getId(), reserva.getIdCliente(), reserva.getIdHabitacion(),</span>
+<span class="fc" id="L96">                               fechaIngreso, fechaSalida, reserva.getTotal(), </span>
+<span class="fc" id="L97">                               reserva.getObservaciones(), reserva.isConfirmada()));</span>
+<span class="fc" id="L98">        }</span>
+<span class="fc" id="L99">        return copy;</span>
+    }
+
+    /**
+     * Obtiene el timestamp de cuando se creó el memento.
+     * 
+     * @return Fecha y hora de creación
+     */
+    public Date getTimestamp() {
+<span class="nc" id="L108">        return new Date(timestamp.getTime());</span>
+    }
+
+    /**
+     * Obtiene una descripción del memento.
+     * 
+     * @return Descripción con estadísticas del estado guardado
+     */
+    public String getDescription() {
+<span class="fc" id="L117">        return String.format(&quot;Estado guardado: %d clientes, %d habitaciones, %d reservas - %s&quot;,</span>
+<span class="fc" id="L118">                           clientes.size(), habitaciones.size(), reservas.size(), timestamp.toString());</span>
+    }
+
+    /**
+     * Verifica si el memento está vacío.
+     * 
+     * @return true si no contiene datos
+     */
+    public boolean isEmpty() {
+<span class="pc bpc" id="L127" title="3 of 6 branches missed.">        return clientes.isEmpty() &amp;&amp; habitaciones.isEmpty() &amp;&amp; reservas.isEmpty();</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L132">        return getDescription();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

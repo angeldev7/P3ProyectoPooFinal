@@ -1,29 +1,32 @@
 @startmindmap
-* Responsabilidades
+* Responsabilidades (Actualizado)
 ** View
-*** Selector (inicio)
-*** Principal (navegación)
-*** Admin (undo/redo)
-*** Clientes (tabla/buscar)
-*** Habitaciones (estado)
-*** Reservas (lista)
-*** Checkin (rápido)
+*** VentanaSelector (inicio)
+*** VentanaPrincipal (navegación)
+*** VentanaAdmin (dashboard, undo/redo)
+*** PanelClientes (tabla/buscar)
+*** PanelHabitaciones (estado / check-in)
+*** PanelReservas (lista / filtros / ajustes)
+*** PanelServicios (servicios hab)
+*** PanelReportes (métricas)
 ** Controllers
-*** Admin Ctrl (CRUD + comandos)
+*** Admin Ctrl (CRUD + comandos + servicios)
 *** Principal Ctrl
-*** Hab Ctrl (lecturas)
-** Service
+*** Hab Ctrl (disponibilidad)
+** Servicio/Fachada
 *** IModeloService (contrato)
 *** Impl
-**** Orquesta reglas
-**** IDs legibles
-**** Snapshots
-**** Inicializa HAB
+**** Planificación reservas
+**** IDs legibles (CLI/RES/SRV)
+**** Servicios habitación
+**** Snapshots memento
+**** Inicializa habitaciones
 ** Dominio
 *** Cliente
-*** Habitacion (disp & precio)
-*** Reserva (activo)
-*** OcupadaInfo
+*** Habitacion (ocupación, precio)
+*** Reserva (planificada vs activa)
+*** ServicioHabitacion (tipo/costo)
+*** HabitacionOcupadaInfo
 ** Persistencia
 *** MongoCRUD
 *** ConexionBD
@@ -31,18 +34,14 @@
 *** Singleton (GestorDisp)
 *** Builder (ReservaBuilder)
 *** Memento (ModeloMemento)
-*** CommandInvoker
-*** Comandos
-**** Crear
-**** Finalizar
-**** Checkin / Rápido
-**** Anular
+*** CommandInvoker (Undo/Redo)
+*** Commands (Crear, Finalizar, CheckinRápido, Anular)
 ** Utilidades
-*** migrar IDs
-*** inicializar HAB
-*** debug estado
+*** Migrar IDs
+*** Inicializar HAB
+*** Ajustar planificación
 ** Tests/CI
 *** FakeModeloService
 *** JUnit + JaCoCo
-*** GitHub Actions
+*** Headless safe commands
 @endmindmap

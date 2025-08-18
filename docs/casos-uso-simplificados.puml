@@ -1,0 +1,43 @@
+@startuml
+left to right direction
+title Casos de Uso Simplificados
+skinparam actorStyle awesome
+skinparam shadowing false
+skinparam packageStyle rect
+
+actor Recepcionista as R
+actor Admin as A
+
+package Reservas #FFF8F0 {
+  usecase (Planificar Reserva) as UC_Plan
+  usecase (Check-in Rápido) as UC_Ck
+  usecase (Finalizar Reserva) as UC_Fin
+}
+package Servicios #F4F8FF { usecase (Agregar Servicio) as UC_AddSrv }
+package Historial #F9F4FF { usecase (Undo) as UC_U  usecase (Redo) as UC_R }
+package Reporte #F2E8FF { usecase (Dashboard) as UC_Dash }
+
+R --> UC_Plan
+R --> UC_Ck
+R --> UC_Fin
+R --> UC_AddSrv
+R --> UC_U
+R --> UC_R
+R --> UC_Dash
+A --> UC_Plan
+A --> UC_Ck
+A --> UC_Fin
+A --> UC_AddSrv
+A --> UC_U
+A --> UC_R
+A --> UC_Dash
+
+UC_AddSrv ..> UC_Ck : <<requiere reserva activa>>
+UC_Fin ..> UC_Ck : <<include>>
+UC_R --> UC_U : <<include>>
+
+note right of UC_Plan
+Genera campos planificados
+sin ocupar habitación
+end note
+@enduml

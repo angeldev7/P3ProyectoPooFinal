@@ -1,0 +1,138 @@
+@startuml
+title Arquitectura General (MVC + Patrones + Servicios a Habitación)
+skinparam packageStyle rect
+skinparam shadowing false
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam defaultTextAlignment center
+
+package "view (UI Swing)" #F4F6FA {
+  class VentanaPrincipal
+  class VentanaAdmin
+  class VentanaSelector
+  package panels {
+    class PanelClientes
+    class PanelHabitaciones
+    class PanelReservas
+    class PanelServicios
+    class PanelReportes
+  }
+}
+
+package "controller" #E9F8E7 {
+  class ControladorVentanaPrincipal
+  class ControladorVentanaAdmin
+  class ControladorHabitaciones
+}
+
+package "model (Fachada + Dominio)" #F9F5F2 {
+  interface IModeloService
+  class ModeloServiceImpl <<Fachada>>
+  class Cliente
+  class Habitacion
+  class Reserva
+  class ServicioHabitacion
+  class HabitacionOcupadaInfo
+}
+
+package "persistencia" #F2F2F2 {
+  class MongoCRUD
+  class ConexionBD
+}
+
+package "singleton" #FFEFD6 { class GestorDisponibilidad <<Singleton>> }
+package "builder" #E8F4FF { class ReservaBuilder }
+
+package "command" #FFF0F3 {
+  interface ICommand
+  class CommandInvoker
+  class CrearReservaCommand
+  class FinalizarReservaCommand
+  class CheckinRapidoAdminCommand
+  class AnularReservaCommand
+}
+
+package "memento" #F2E8FF { class ModeloMemento  interface ICaretaker }
+
+VentanaPrincipal --> ControladorVentanaPrincipal : eventos
+VentanaAdmin --> ControladorVentanaAdmin : eventos
+VentanaSelector --> ControladorVentanaPrincipal : inicia
+PanelClientes --> ControladorVentanaAdmin
+PanelHabitaciones --> ControladorHabitaciones
+PanelReservas --> ControladorVentanaAdmin
+PanelServicios --> ControladorVentanaAdmin
+PanelReportes --> ControladorVentanaAdmin
+
+ControladorVentanaPrincipal --> IModeloService
+ControladorVentanaAdmin --> IModeloService
+ControladorHabitaciones --> IModeloService
+ControladorVentanaAdmin --> CommandInvoker
+ControladorVentanaAdmin ..> ICommand : crea
+
+ModeloServiceImpl ..|> IModeloService
+ModeloServiceImpl --> MongoCRUD
+ModeloServiceImpl --> GestorDisponibilidad
+ModeloServiceImpl --> ReservaBuilder
+ModeloServiceImpl --> ModeloMemento
+ModeloServiceImpl --> Cliente
+ModeloServiceImpl --> Habitacion
+ModeloServiceImpl --> Reserva
+ModeloServiceImpl --> ServicioHabitacion
+ModeloServiceImpl --> HabitacionOcupadaInfo
+
+ReservaBuilder --> Reserva : build()
+
+ICommand <|.. CrearReservaCommand
+ICommand <|.. FinalizarReservaCommand
+ICommand <|.. CheckinRapidoAdminCommand
+ICommand <|.. AnularReservaCommand
+CommandInvoker --> ICommand : ejecuta
+CommandInvoker --> ModeloMemento : snapshot
+CommandInvoker ..> ICaretaker
+CommandInvoker --> IModeloService : coordina
+
+ModeloMemento --> Cliente
+ModeloMemento --> Habitacion
+ModeloMemento --> Reserva
+ModeloMemento --> ServicioHabitacion
+ICaretaker <|.. CommandInvoker
+
+GestorDisponibilidad <.. ModeloServiceImpl : dependencia
+GestorDisponibilidad --> Habitacion : gestiona
+
+note top of ModeloServiceImpl
+  Fachada de negocio
+  - Planificación reservas
+  - Servicios a habitación
+  - Migración IDs legibles
+end note
+
+note right of CommandInvoker
+  Undo / Redo híbrido
+  (Snapshots + lógica)
+end note
+
+note bottom of Reserva
+  Campos planificados:
+  fechaInicioPlanificada
+  fechaFinPlanificada
+  noches
+end note
+
+note bottom of ServicioHabitacion
+  COMIDA/BEBIDA/LIMPIEZA
+  costo fijo por tipo
+end note
+
+legend left
+== Colores ==
+#F4F6FA View
+#E9F8E7 Controller
+#F9F5F2 Model/Dominio
+#F2F2F2 Persistencia
+#FFEFD6 Singleton
+#E8F4FF Builder
+#FFF0F3 Command
+#F2E8FF Memento
+endlegend
+@enduml

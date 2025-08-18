@@ -1,0 +1,77 @@
+@startuml
+title Vista Simplificada (Capas + Patrones Clave)
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rect
+skinparam ArrowColor #555555
+skinparam defaultTextAlignment center
+
+package "View" #F4F6FA {
+  class VentanaAdmin
+  class VentanaPrincipal
+  package Panels {
+    class PanelClientes
+    class PanelHabitaciones
+    class PanelReservas
+    class PanelServicios
+    class PanelReportes
+  }
+}
+package "Controller" #E9F8E7 {
+  class ControladorVentanaAdmin
+  class ControladorVentanaPrincipal
+  class ControladorHabitaciones
+}
+package "Fachada Servicio" #FFF8E6 {
+  interface IModeloService
+  class ModeloServiceImpl <<Fachada>>
+}
+package "Dominio" #F9F5F2 {
+  class Cliente
+  class Habitacion
+  class Reserva
+  class ServicioHabitacion
+}
+package "Patrones" #FFF0F3 {
+  interface ICommand
+  class CommandInvoker
+  class CrearReservaCommand
+  class FinalizarReservaCommand
+  class CheckinRapidoAdminCommand
+  class AnularReservaCommand
+}
+package "Estado" #F2E8FF { class ModeloMemento }
+package "Infra" #F2F2F2 { class MongoCRUD  class ConexionBD }
+package "Soporte" #FFEFD6 { class GestorDisponibilidad <<Singleton>>  class ReservaBuilder <<Builder>> }
+
+VentanaAdmin --> ControladorVentanaAdmin
+VentanaPrincipal --> ControladorVentanaPrincipal
+Panels --> ControladorVentanaAdmin
+ControladorVentanaAdmin --> IModeloService
+ControladorVentanaPrincipal --> IModeloService
+ControladorHabitaciones --> IModeloService
+
+IModeloService <|.. ModeloServiceImpl
+ModeloServiceImpl --> MongoCRUD
+ModeloServiceImpl --> GestorDisponibilidad
+ModeloServiceImpl --> ReservaBuilder
+ModeloServiceImpl --> ModeloMemento
+ModeloServiceImpl --> ServicioHabitacion
+
+ICommand <|.. CrearReservaCommand
+ICommand <|.. FinalizarReservaCommand
+ICommand <|.. CheckinRapidoAdminCommand
+ICommand <|.. AnularReservaCommand
+CommandInvoker --> ICommand
+CommandInvoker --> ModeloMemento
+CommandInvoker --> IModeloService
+
+ReservaBuilder --> Reserva
+GestorDisponibilidad --> Habitacion
+ModeloMemento --> Reserva
+ModeloMemento --> ServicioHabitacion
+
+legend left
+View|Controller|Fachada|Dominio|Patrones|Estado|Infra|Soporte
+endlegend
+@enduml
